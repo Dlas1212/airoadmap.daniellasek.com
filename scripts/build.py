@@ -62,12 +62,17 @@ def main():
         subs = []
         for s in c.get("subtopics", []):
             lvl = s.get("level", "core")
-            subs.append({
+            sub = {
                 "title": s.get("title", ""),
                 "desc": s.get("desc", ""),
                 "level": lvl if lvl in LEVELS else "core",
                 "resources": clean_resources(s.get("resources"), f"{n['id']} / {s.get('title')}", problems),
-            })
+            }
+            # optional third level: the key ideas inside a subtopic
+            concepts = [{"title": c["title"], "desc": c.get("desc", "")} for c in s.get("concepts", []) if c.get("title")]
+            if concepts:
+                sub["concepts"] = concepts
+            subs.append(sub)
         n["subtopics"] = subs
 
     data_js = "window.ROADMAP = " + json.dumps(structure, ensure_ascii=False, separators=(",", ":")) + ";\n"

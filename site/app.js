@@ -28,12 +28,12 @@
 
   // ---------- state ----------
   const KEY = 'ai-atlas:v1';
-  const S = { role: 'all', view: null, status: {}, sel: null, pace: 6, showAll: false, legend: true };
+  const S = { role: 'all', view: null, status: {}, subs: {}, sel: null, pace: 6, showAll: false, legend: true, wide: false };
   try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* storage unavailable */ }
   S.sel = null;
   if (!S.view) S.view = window.innerWidth < 700 ? 'path' : 'map';
   const save = () => {
-    try { localStorage.setItem(KEY, JSON.stringify({ role: S.role, view: S.view, status: S.status, pace: S.pace, showAll: S.showAll, legend: S.legend })); } catch (e) { /* ignore */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ role: S.role, view: S.view, status: S.status, subs: S.subs, pace: S.pace, showAll: S.showAll, legend: S.legend, wide: S.wide })); } catch (e) { /* ignore */ }
   };
 
   const rel = (n, role = S.role) => (role === 'all' ? null : n.roles[role] || null);
@@ -176,7 +176,14 @@
 
   // ---------- pan & zoom ----------
   const T = { x: 0, y: 0, k: 1 };
-  const apply = () => { el.world.style.transform = `translate(${T.x}px,${T.y}px) scale(${T.k})`; };
+  // keep at least a margin of the map on screen so it can't be panned out of reach
+  function clampPan() {
+    const vw = el.viewport.clientWidth - drawerW(), vh = el.viewport.clientHeight;
+    const mx = Math.min(160, vw / 3), my = Math.min(160, vh / 3);
+    T.x = Math.min(vw - mx, Math.max(mx - W * T.k, T.x));
+    T.y = Math.min(vh - my, Math.max(my - H * T.k, T.y));
+  }
+  const apply = () => { clampPan(); el.world.style.transform = `translate(${T.x}px,${T.y}px) scale(${T.k})`; };
   const clampK = (k) => Math.min(1.6, Math.max(0.22, k));
   function zoomAt(f, cx, cy) {
     const k2 = clampK(T.k * f);
@@ -405,6 +412,81 @@
     </a>`;
   const linkBtn = (id) => { const n = byId[id]; return `<button data-open="${id}" class="${isClear(id) ? 'done' : ''}" style="--h:${laneById[n.lane].hue}"><span class="n-dot"></span>${esc(n.title)}</button>`; };
 
+  // "What to learn": subtopics grouped by level, each with a checkbox and an optional third level of key ideas
+  const LEVEL_GROUPS = [['core', 'Core', 'Learn these'], ['deep', 'Deep', 'Once the core feels comfortable'], ['optional', 'Optional', 'Safe to skip']];
+  const subsGot = (id) => new Set(S.subs[id] || []);
+  function learnHTML(n) {
+    const subs = n.subtopics || [];
+    if (!subs.length) return '';
+    const got = subsGot(n.id);
+    let num = 0;
+    const groups = LEVEL_GROUPS.map(([lv, name, hint]) => {
+      const items = subs.map((sb, j) => ({ sb, j })).filter((x) => x.sb.level === lv);
+      if (!items.length) return '';
+      return `<div class="sub-group" data-lv="${lv}">
+        <div class="sg-head"><span class="lvl ${lv}">${name}</span><span class="sg-hint">${hint}</span><span class="sg-count"></span></div>
+        <ol class="subtree">${items.map(({ sb, j }) => `
+          <li class="sub${got.has(j) ? ' got' : ''}" data-j="${j}">
+            <div class="sub-row">
+              <button class="sub-check" aria-pressed="${got.has(j)}" aria-label="Got it: ${esc(sb.title)}" title="Mark as understood">✓</button>
+              <button class="sub-toggle" aria-expanded="false">
+                <span class="sub-num">${++num}</span>
+                <span class="sub-title">${esc(sb.title)}</span>
+                ${sb.concepts?.length ? `<span class="sub-count">${sb.concepts.length} ideas</span>` : ''}
+                <span class="chev">▶</span>
+              </button>
+            </div>
+            <div class="sub-body" hidden>
+              <p class="sub-desc">${esc(sb.desc)}</p>
+              ${sb.concepts?.length ? `<h4>Key ideas</h4><ol class="concepts">${sb.concepts.map((c) => `<li><b>${esc(c.title)}</b><span>${esc(c.desc)}</span></li>`).join('')}</ol>` : ''}
+              ${sb.resources?.length ? `<h4>Learn it from</h4><div class="res-list">${sb.resources.map((x) => resHTML(x, false)).join('')}</div>` : ''}
+            </div>
+          </li>`).join('')}</ol>
+      </div>`;
+    }).join('');
+    return `<div class="d-sec d-learn">
+      <div class="learn-head">
+        <h3>What to learn</h3>
+        <span class="learn-prog"><span class="bar"><i></i></span><span class="lp-txt"></span></span>
+      </div>
+      <div class="learn-tools">
+        <button class="btn sm" id="subAll">Expand all</button>
+        <button class="btn sm wide-only" id="wideToggle">${S.wide ? 'Narrow view' : 'Wide view'}</button>
+      </div>
+      ${groups}
+      <p class="learn-foot">Tick a subtopic once you could explain it to someone else.</p>
+    </div>`;
+  }
+  function syncLearn(n) {
+    const got = subsGot(n.id), total = n.subtopics?.length || 0;
+    el.drawerInner.querySelectorAll('.sub').forEach((li) => {
+      const on = got.has(+li.dataset.j);
+      li.classList.toggle('got', on); li.querySelector('.sub-check').setAttribute('aria-pressed', on);
+    });
+    el.drawerInner.querySelectorAll('.sub-group').forEach((g) => {
+      const lis = g.querySelectorAll('.sub');
+      g.querySelector('.sg-count').textContent = `${g.querySelectorAll('.sub.got').length}/${lis.length}`;
+    });
+    const bar = el.drawerInner.querySelector('.learn-prog');
+    if (bar) {
+      bar.querySelector('i').style.width = `${total ? Math.round((got.size / total) * 100) : 0}%`;
+      bar.querySelector('.lp-txt').innerHTML = `<b>${got.size}</b>/${total} understood`;
+    }
+  }
+  function redrawDrawer() {
+    const top = el.drawer.scrollTop;
+    const open = [...el.drawerInner.querySelectorAll('.sub.open')].map((x) => x.dataset.j);
+    renderDrawer();
+    el.drawer.scrollTop = top;
+    open.forEach((j) => el.drawerInner.querySelector(`.sub[data-j="${j}"] .sub-toggle`)?.click());
+  }
+  function toggleWide() {
+    S.wide = !S.wide; save();
+    el.drawer.classList.toggle('wide', S.wide);
+    redrawDrawer();
+    if (S.view === 'map' && S.sel) centerOn(S.sel);
+  }
+
   function renderDrawer() {
     const n = byId[S.sel];
     if (!n) return;
@@ -421,6 +503,7 @@
       <div class="d-top">
         <span class="tag lane" style="--h:${lane.hue}">${esc(lane.name)}</span>
         <span class="tag">Tier ${n.tier} · ${esc(D.tiers[n.tier].name)}</span>
+        <button class="btn icon wide-btn" id="dWide" aria-pressed="${S.wide}" aria-label="${S.wide ? 'Narrow panel' : 'Widen panel'}" title="${S.wide ? 'Narrow panel' : 'Widen panel'}">${S.wide ? '⇥' : '⇤'}</button>
         <button class="btn icon close" id="dClose" aria-label="Close">×</button>
       </div>
       <h2 class="d-title">${esc(n.title)}</h2>
@@ -437,21 +520,24 @@
       <div class="status-row" role="group" aria-label="Your status">
         ${Object.entries(STATUS).map(([k, v]) => `<button data-s="${k}" aria-pressed="${s === k}">${v}</button>`).join('')}
       </div>
+      <div class="d-cols">
+      <div class="d-main">
       ${hasContent ? `<p class="d-sum">${esc(n.summary)}</p>` : '<div class="d-sec"><div class="d-empty">Detailed notes for this topic are on the way. Prerequisites and connections below are final.</div></div>'}
       ${n.why ? `<div class="d-sec"><h3>Why it matters</h3><p>${esc(n.why)}</p></div>` : ''}
       ${n.depth ? `<div class="d-sec"><h3>How deep to go</h3><p class="d-callout">${esc(n.depth)}</p></div>` : ''}
       ${n.outcomes?.length ? `<div class="d-sec"><h3>You'll be able to</h3><ul class="outcomes">${n.outcomes.map((o) => `<li>${esc(o)}</li>`).join('')}</ul></div>` : ''}
+      </div>
+      ${learnHTML(n)}
+      <div class="d-more">
       <div class="d-sec"><h3>Learn these first</h3><div class="links">${n.prereqs.length ? n.prereqs.map(linkBtn).join('') : '<span class="none">Nothing. This is a starting point.</span>'}</div>
         ${anc.length > n.prereqs.length ? `<p style="font-size:13px;color:var(--ink-3);margin-top:8px">Full route to here: ${anc.length} topics, ${anc.filter((a) => isClear(a.id)).length} done. The map highlights the route while this panel is open.</p>` : ''}
         ${anc.length ? `<button class="btn" id="knowAll" style="margin-top:10px">I know this and everything before it</button>` : ''}
       </div>
       <div class="d-sec"><h3>Unlocks</h3><div class="links">${n.unlocks.length ? n.unlocks.map(linkBtn).join('') : '<span class="none">End of this branch. Time to build something.</span>'}</div></div>
-      ${n.subtopics?.length ? `<div class="d-sec"><h3>Go deeper · subtopics</h3><ul class="subtree">${n.subtopics.map((sb, j) => `
-        <li class="sub" data-j="${j}"><button aria-expanded="false"><span class="lvl ${esc(sb.level)}">${esc(sb.level === 'optional' ? 'optional' : sb.level)}</span>${esc(sb.title)}<span class="chev">▶</span></button>
-          <div class="sub-body" hidden><p>${esc(sb.desc)}</p>${sb.resources?.length ? `<div class="res-list">${sb.resources.map((x) => resHTML(x, false)).join('')}</div>` : ''}</div></li>`).join('')}</ul>
-        <p style="font-size:12px;color:var(--ink-3);margin-top:10px"><b>core</b> learn it · <b>deep</b> once comfortable · <b>optional</b> safe to skip</p></div>` : ''}
       ${n.resources?.length ? `<div class="d-sec"><h3>Resources</h3><div class="res-list">${n.resources.map((x, j) => resHTML(x, j === 0)).join('')}</div></div>` : ''}
       ${n.project ? `<div class="d-sec"><h3>Prove it · mini project</h3><p class="d-project">${esc(n.project)}</p></div>` : ''}
+      </div>
+      </div>
       <div class="d-nav">
         ${prev ? `<button class="btn" data-open="${prev.id}" title="${esc(prev.title)}">← ${esc(prev.title)}</button>` : '<span></span>'}
         ${next ? `<button class="btn" data-open="${next.id}" title="${esc(next.title)}">${esc(next.title)} →</button>` : ''}
@@ -460,10 +546,26 @@
     $('#dClose').onclick = closeDrawer;
     el.drawerInner.querySelectorAll('[data-open]').forEach((b) => (b.onclick = () => select(b.dataset.open, { center: true })));
     el.drawerInner.querySelectorAll('.status-row button').forEach((b) => (b.onclick = () => setStatus(n.id, b.dataset.s)));
-    el.drawerInner.querySelectorAll('.sub > button').forEach((b) => (b.onclick = () => {
-      const li = b.parentElement, open = !li.classList.contains('open');
-      li.classList.toggle('open', open); b.setAttribute('aria-expanded', open); li.querySelector('.sub-body').hidden = !open;
-    }));
+    $('#dWide').onclick = toggleWide;
+    const wb = $('#wideToggle');
+    if (wb) wb.onclick = toggleWide;
+    const toggleSub = (li, open) => {
+      li.classList.toggle('open', open); li.querySelector('.sub-toggle').setAttribute('aria-expanded', open); li.querySelector('.sub-body').hidden = !open;
+    };
+    const items = [...el.drawerInner.querySelectorAll('.sub')];
+    const allBtn = $('#subAll');
+    const syncAll = () => { if (allBtn) allBtn.textContent = items.every((li) => li.classList.contains('open')) ? 'Collapse all' : 'Expand all'; };
+    items.forEach((li) => {
+      li.querySelector('.sub-toggle').onclick = () => { toggleSub(li, !li.classList.contains('open')); syncAll(); };
+      li.querySelector('.sub-check').onclick = () => {
+        const j = +li.dataset.j, got = new Set(S.subs[n.id] || []);
+        if (got.has(j)) got.delete(j); else got.add(j);
+        if (got.size) S.subs[n.id] = [...got].sort((a, b) => a - b); else delete S.subs[n.id];
+        save(); syncLearn(n);
+      };
+    });
+    if (allBtn) allBtn.onclick = () => { const open = !items.every((li) => li.classList.contains('open')); items.forEach((li) => toggleSub(li, open)); syncAll(); };
+    syncLearn(n);
     const ka = $('#knowAll');
     if (ka) ka.onclick = () => {
       [...ancestors(n.id), n.id].forEach((id) => { if (st(id) !== 'skip') S.status[id] = 'done'; });
@@ -475,6 +577,7 @@
     if (!byId[id]) return;
     S.sel = id;
     el.drawer.hidden = false;
+    el.drawer.classList.toggle('wide', S.wide);
     renderDrawer();
     el.drawer.scrollTop = 0;
     refreshMap();
@@ -636,8 +739,7 @@
   function refreshAll() {
     renderProgress();
     if (S.view === 'map') { refreshMap(); renderBanner(); } else renderPath();
-    if (S.sel) { const top = el.drawer.scrollTop; const open = [...el.drawerInner.querySelectorAll('.sub.open')].map((x) => x.dataset.j); renderDrawer(); el.drawer.scrollTop = top;
-      open.forEach((j) => el.drawerInner.querySelector(`.sub[data-j="${j}"] > button`)?.click()); }
+    if (S.sel) redrawDrawer();
   }
 
   // ---------- hash & keys ----------

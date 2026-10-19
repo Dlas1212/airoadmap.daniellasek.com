@@ -702,6 +702,14 @@
         "title": "Linear and logistic regression (implement from scratch)",
         "desc": "Linear regression fits a weighted sum to predict a number; logistic regression squashes it through a sigmoid to predict a probability. Build both in NumPy with gradient descent. Nearly every later model, including neural networks, extends these ideas.",
         "level": "core",
+        "concepts": [
+          { "title": "The model is a weighted sum", "desc": "A prediction is w·x + b. Each weight says how much one feature pushes the prediction up or down." },
+          { "title": "Loss functions", "desc": "Mean squared error scores regression; log loss (cross-entropy) scores classification. Training means making this number small." },
+          { "title": "Gradient descent", "desc": "Compute how the loss changes with each weight, take a small step the other way, repeat. Too large a learning rate makes it diverge." },
+          { "title": "Sigmoid and the decision threshold", "desc": "The sigmoid turns a score into a probability between 0 and 1. Moving the 0.5 cutoff trades precision for recall." },
+          { "title": "Feature scaling", "desc": "Standardize features (mean 0, std 1) so gradient descent converges quickly and weights are comparable." },
+          { "title": "Reading coefficients", "desc": "Sign and size tell you a feature's effect, but correlated features make individual weights unstable." }
+        ],
         "resources": [
           { "title": "Linear Regression (visual essay)", "url": "https://mlu-explain.github.io/linear-regression/", "type": "interactive", "source": "Amazon MLU", "free": true },
           { "title": "StatQuest: Logistic Regression", "url": "https://www.youtube.com/watch?v=yIYKR4sgzI8", "type": "video", "source": "StatQuest", "free": true }
@@ -711,6 +719,14 @@
         "title": "Regularization: L1, L2 (understand deeply)",
         "desc": "Regularization adds a penalty for large weights so the model doesn't overfit. Ridge (L2) shrinks weights, Lasso (L1) can zero them out. Know what the penalty does to the model; one scikit-learn parameter turns it on.",
         "level": "core",
+        "concepts": [
+          { "title": "Bias–variance trade-off", "desc": "A penalty makes the model slightly less flexible (more bias) in exchange for much less overfitting (less variance)." },
+          { "title": "L2 / Ridge", "desc": "Penalizes squared weights. Shrinks all weights smoothly toward zero; a safe default, especially with correlated features." },
+          { "title": "L1 / Lasso", "desc": "Penalizes absolute weights. Pushes some weights exactly to zero, so it doubles as feature selection." },
+          { "title": "Elastic Net", "desc": "A mix of L1 and L2 that keeps sparsity while staying stable when features are correlated." },
+          { "title": "Tuning the strength", "desc": "alpha in Ridge/Lasso, C (the inverse) in LogisticRegression. Pick it with cross-validation, never on the test set." },
+          { "title": "Scale before you penalize", "desc": "Penalties compare weights directly, so unscaled features get punished unevenly." }
+        ],
         "resources": [
           { "title": "Regularization Part 1: Ridge (L2) Regression", "url": "https://www.youtube.com/watch?v=Q81RR3yKn30", "type": "video", "source": "StatQuest", "free": true }
         ]
@@ -719,6 +735,14 @@
         "title": "Decision trees (implement a simple one)",
         "desc": "A tree asks yes/no questions about features to split the data into purer groups. Writing a small one yourself (Gini or entropy splits, max depth) makes ensembles easy to understand.",
         "level": "core",
+        "concepts": [
+          { "title": "Impurity: Gini and entropy", "desc": "Both measure how mixed the labels in a node are. A pure node (one class) scores zero." },
+          { "title": "Greedy split search", "desc": "Try every feature and threshold, keep the split with the biggest impurity drop (information gain), then recurse." },
+          { "title": "Stopping and pruning", "desc": "max_depth, min_samples_leaf, and pruning stop a tree from growing until it memorizes the training data." },
+          { "title": "Regression trees", "desc": "Leaves predict the mean of their samples; splits are chosen to reduce variance instead of impurity." },
+          { "title": "Trees as rules", "desc": "A shallow tree reads as nested if/else rules, which is why trees are easy to explain to non-technical people." },
+          { "title": "Weaknesses", "desc": "Single trees are unstable (small data changes flip splits) and draw only axis-aligned boundaries. Ensembles fix both." }
+        ],
         "resources": [
           { "title": "Decision Trees (visual essay)", "url": "https://mlu-explain.github.io/decision-tree/", "type": "interactive", "source": "Amazon MLU", "free": true },
           { "title": "Decision and Classification Trees, Clearly Explained", "url": "https://www.youtube.com/watch?v=_L39rN6gz7Y", "type": "video", "source": "StatQuest", "free": true }
@@ -728,6 +752,14 @@
         "title": "Random forests and gradient boosting (understand and use)",
         "desc": "Random forests average many trees trained on random subsets. Gradient boosting adds trees one at a time, each fixing the last one's errors. XGBoost and LightGBM are still the best default for tabular data. Understand the idea and the key hyperparameters; don't implement them.",
         "level": "core",
+        "concepts": [
+          { "title": "Bagging", "desc": "Train many trees on bootstrap samples (random draws with replacement) and average them. Averaging cuts variance." },
+          { "title": "Random feature subsets", "desc": "Each split only considers a random subset of features (max_features), so the trees disagree in useful ways." },
+          { "title": "Boosting", "desc": "Each new tree fits the errors (gradients) of the ensemble so far; a learning rate shrinks each tree's contribution." },
+          { "title": "Hyperparameters that matter", "desc": "n_estimators, learning_rate, max_depth or num_leaves, and early stopping on a validation set." },
+          { "title": "XGBoost, LightGBM, CatBoost", "desc": "Same core idea. LightGBM is fastest on big data; CatBoost handles categorical features with little preprocessing." },
+          { "title": "Explaining predictions", "desc": "Built-in feature importance can mislead. SHAP values explain individual predictions more reliably." }
+        ],
         "resources": [
           { "title": "Gradient Boost Part 1: Regression Main Ideas", "url": "https://www.youtube.com/watch?v=3CC4N4z3GJc", "type": "video", "source": "StatQuest", "free": true },
           { "title": "XGBoost: Introduction to Boosted Trees", "url": "https://xgboost.readthedocs.io/en/stable/tutorials/model.html", "type": "docs", "source": "XGBoost", "free": true }
@@ -737,6 +769,14 @@
         "title": "Unsupervised: k-means and PCA (understand and use)",
         "desc": "k-means groups points into k clusters around centers. PCA compresses many features into a few directions that keep the most variance. Both are everyday tools for exploring data and embeddings.",
         "level": "deep",
+        "concepts": [
+          { "title": "The k-means loop", "desc": "Assign each point to its nearest center, move each center to the mean of its points, repeat until nothing changes." },
+          { "title": "Choosing k", "desc": "Use the elbow plot and silhouette score as hints, then check that the clusters make sense in your domain." },
+          { "title": "Where k-means fails", "desc": "It assumes round clusters of similar size and is sensitive to feature scale and outliers. k-means++ helps with starting points." },
+          { "title": "What PCA finds", "desc": "Orthogonal directions (principal components) that capture the most variance. Each is a weighted mix of the original features." },
+          { "title": "Explained variance", "desc": "The explained variance ratio tells you how many components you need to keep, e.g. enough for 95%." },
+          { "title": "Typical uses", "desc": "Plot high-dimensional data in 2D, compress embeddings, and remove noise before another model. Standardize first." }
+        ],
         "resources": [
           { "title": "StatQuest: K-means clustering", "url": "https://www.youtube.com/watch?v=4b5d3muPQmA", "type": "video", "source": "StatQuest", "free": true },
           { "title": "StatQuest: PCA Step-by-Step", "url": "https://www.youtube.com/watch?v=FgakZw6K1QQ", "type": "video", "source": "StatQuest", "free": true }
@@ -746,6 +786,14 @@
         "title": "The wider toolbox (know they exist)",
         "desc": "SVMs find the widest margin between classes, naive Bayes is a fast probabilistic text classifier, k-nearest neighbors predicts from the closest examples, DBSCAN finds clusters of any shape, and t-SNE/UMAP make 2D maps of high-dimensional data. Know when each fits; reach for docs when you need one.",
         "level": "optional",
+        "concepts": [
+          { "title": "Support vector machines", "desc": "Find the widest margin between classes; kernels handle curved boundaries. Strong on small datasets with many features." },
+          { "title": "Naive Bayes", "desc": "Assumes features are independent given the class. Fast, surprisingly strong baseline for text such as spam filtering." },
+          { "title": "k-nearest neighbors", "desc": "No real training: predict from the k closest examples. Needs scaled features and gets slow at scale. Vector search uses the same idea." },
+          { "title": "DBSCAN", "desc": "Groups dense regions into clusters of any shape and marks sparse points as noise. You don't choose k." },
+          { "title": "Hierarchical clustering", "desc": "Builds a tree of merges (a dendrogram) that you can cut at any level to get clusters." },
+          { "title": "t-SNE and UMAP", "desc": "Make 2D maps of high-dimensional data for looking at it. Distances between clusters on the map don't mean much." }
+        ],
         "resources": [
           { "title": "scikit-learn: Choosing the right estimator", "url": "https://scikit-learn.org/stable/machine_learning_map.html", "type": "docs", "source": "scikit-learn", "free": true }
         ]
@@ -754,6 +802,14 @@
         "title": "scikit-learn fluency",
         "desc": "The fit/predict/transform API, Pipelines, and hyperparameter search. Once you know the pattern, every model works the same way.",
         "level": "core",
+        "concepts": [
+          { "title": "The estimator API", "desc": "fit learns from data; predict / predict_proba / transform apply it. Fit preprocessing on training data only." },
+          { "title": "Pipelines and ColumnTransformer", "desc": "Bundle scaling, encoding, and the model into one object so preprocessing can't leak test data into training." },
+          { "title": "Splits and cross-validation", "desc": "train_test_split for a holdout set; cross_val_score with stratified folds for a more reliable estimate." },
+          { "title": "Hyperparameter search", "desc": "GridSearchCV tries every combination; RandomizedSearchCV samples them and is usually the better use of time." },
+          { "title": "Metrics", "desc": "classification_report, roc_auc_score, mean_absolute_error and friends. Pick the one that matches the real cost of mistakes." },
+          { "title": "Baselines first", "desc": "DummyClassifier/DummyRegressor tell you what 'no skill' scores, so you know whether your model actually helps." }
+        ],
         "resources": [
           { "title": "scikit-learn MOOC", "url": "https://inria.github.io/scikit-learn-mooc/", "type": "course", "source": "Inria", "free": true }
         ]
