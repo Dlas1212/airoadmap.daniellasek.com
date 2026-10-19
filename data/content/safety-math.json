@@ -1,0 +1,1100 @@
+{
+  "ai-limitations": {
+    "summary": "AI models can sound confident and still be wrong. A hallucination is when a model produces something plausible but false, like a fake citation, a wrong number, or an API function that does not exist.",
+    "why": "Every AI user hits this on day one. Knowing where models fail tells you when to trust an answer, when to check it, and when not to use AI at all.",
+    "depth": "Everyone must master the practical habits: spot risky tasks, check facts that matter, and give the model sources to work from. You only need to know that the technical causes exist (next-token prediction, training that rewards guessing); you don't need to study them.",
+    "hours": 4,
+    "outcomes": [
+      "You can explain in plain words why a language model can invent facts while sounding sure of itself.",
+      "You can tell which tasks are high-risk for hallucination (citations, niche facts, exact numbers, recent events) and which are low-risk.",
+      "You can use grounding, \"say I don't know\" instructions, and source checks to cut errors.",
+      "You can describe other common failure modes: sycophancy, stale knowledge, weak arithmetic, and losing track of long inputs."
+    ],
+    "subtopics": [
+      {
+        "title": "Why models hallucinate",
+        "desc": "A model predicts likely text. It has no built-in fact database, and training and benchmarks have often rewarded a confident guess over admitting uncertainty.",
+        "level": "core",
+        "resources": [
+          { "title": "Why language models hallucinate", "url": "https://openai.com/index/why-language-models-hallucinate/", "type": "article", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "The jagged frontier",
+        "desc": "AI can be excellent at a hard task and fail at an easy-looking one right next to it. You can't guess its skill from how hard a task feels to a human, so you learn it by testing.",
+        "level": "core",
+        "resources": [
+          { "title": "Centaurs and Cyborgs on the Jagged Frontier", "url": "https://www.oneusefulthing.org/p/centaurs-and-cyborgs-on-the-jagged", "type": "article", "source": "Ethan Mollick", "free": true }
+        ]
+      },
+      {
+        "title": "Practical ways to reduce hallucinations",
+        "desc": "Give the model the source documents, ask it to quote them, let it say \"I don't know,\" turn on web search for current facts, and verify anything you will act on.",
+        "level": "core",
+        "resources": [
+          { "title": "Reduce hallucinations", "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Sycophancy",
+        "desc": "Models tend to agree with you, praise your idea, or change a correct answer when you push back. Ask neutral questions and invite criticism to get honest output.",
+        "level": "core",
+        "resources": [
+          { "title": "Towards Understanding Sycophancy in Language Models", "url": "https://arxiv.org/abs/2310.13548", "type": "paper", "source": "arXiv (Anthropic)", "free": true }
+        ]
+      },
+      {
+        "title": "Knowledge cutoffs, long context, and counting",
+        "desc": "Models know little after their training cutoff unless they search. They can miss details buried in the middle of long inputs. Exact counting and arithmetic are unreliable without a tool like code execution.",
+        "level": "deep",
+        "resources": [
+          { "title": "Lost in the Middle: How Language Models Use Long Contexts", "url": "https://arxiv.org/abs/2307.03172", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Reasoning failures and odd blind spots",
+        "desc": "Reasoning models are much better at multi-step problems but still make logic slips. Some gaps are strange. For example, a model trained on \"A is B\" may not know \"B is A.\"",
+        "level": "optional",
+        "resources": [
+          { "title": "The Reversal Curse", "url": "https://arxiv.org/abs/2309.12288", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Deep Dive into LLMs like ChatGPT (hallucination section)", "url": "https://www.youtube.com/watch?v=7xTGNNLPyMI", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "Why language models hallucinate", "url": "https://openai.com/index/why-language-models-hallucinate/", "type": "article", "source": "OpenAI", "free": true },
+      { "title": "Reduce hallucinations", "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Centaurs and Cyborgs on the Jagged Frontier", "url": "https://www.oneusefulthing.org/p/centaurs-and-cyborgs-on-the-jagged", "type": "article", "source": "Ethan Mollick", "free": true },
+      { "title": "Simon Willison on hallucinations", "url": "https://simonwillison.net/tags/hallucinations/", "type": "article", "source": "Simon Willison", "free": true },
+      { "title": "Extrinsic Hallucinations in LLMs", "url": "https://lilianweng.github.io/posts/2024-07-07-hallucination/", "type": "article", "source": "Lilian Weng", "free": true }
+    ],
+    "project": "Pick a topic you know well. Ask an AI assistant 15 questions about it: 5 common facts, 5 obscure facts, and 5 requests for sources. Check every answer and log which kinds of questions failed. Then repeat the obscure ones with a pasted source document and \"say I don't know if unsure,\" and compare the error rate."
+  },
+
+  "ai-privacy": {
+    "summary": "Safe use means knowing where your data goes when you type it into an AI tool, who can see it, and whether it can be used to train future models.",
+    "why": "Pasting a customer list, contract, or health record into the wrong tool can break the law or your company's rules. If you build AI products, you also handle other people's data and need to protect it.",
+    "depth": "Everyone must master the basics: consumer vs business plans, training opt-outs, what never to paste, and your company's AI policy. Builders should also understand PII redaction, data retention, and GDPR basics. Training-data extraction and differential privacy are 'know it exists' unless you train models.",
+    "hours": 6,
+    "outcomes": [
+      "You can check whether a given AI tool and plan uses your data for training, and how to opt out.",
+      "You can sort data into \"fine to paste,\" \"only in approved tools,\" and \"never\" categories.",
+      "You can explain when to choose an enterprise plan, a zero-retention API, or a local model.",
+      "You can strip or mask personal data (PII) before it reaches a model in an app you build."
+    ],
+    "subtopics": [
+      {
+        "title": "Consumer vs business plans",
+        "desc": "Free and consumer plans often have different training and retention terms from team, enterprise, and API plans. Read the data-use page for each tool you use and check the settings.",
+        "level": "core",
+        "resources": [
+          { "title": "Is my data used for model training?", "url": "https://privacy.claude.com/en/articles/10023580-is-my-data-used-for-model-training", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "Data Controls FAQ", "url": "https://help.openai.com/en/articles/7730893-data-controls-faq", "type": "docs", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "What not to paste",
+        "desc": "Passwords, API keys, customer personal data, health or financial records, and confidential business documents stay out of unapproved tools. When in doubt, anonymize or summarize first.",
+        "level": "core"
+      },
+      {
+        "title": "Sensitive data in AI apps",
+        "desc": "Apps can leak data through prompts, logs, retrieved documents, and model outputs. Limit what goes into context, redact PII, and control who can see conversation logs.",
+        "level": "core",
+        "resources": [
+          { "title": "LLM02:2025 Sensitive Information Disclosure", "url": "https://genai.owasp.org/llmrisk/llm022025-sensitive-information-disclosure/", "type": "docs", "source": "OWASP", "free": true },
+          { "title": "Presidio (PII detection and anonymization)", "url": "https://github.com/data-privacy-stack/presidio", "type": "tool", "source": "GitHub", "free": true }
+        ]
+      },
+      {
+        "title": "Data protection law basics",
+        "desc": "Laws like GDPR require a lawful basis for processing personal data, data minimization, and rights such as access and deletion. These apply to data you send to AI vendors too.",
+        "level": "deep",
+        "resources": [
+          { "title": "Guidance on AI and data protection", "url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/", "type": "docs", "source": "UK ICO", "free": true }
+        ]
+      },
+      {
+        "title": "Local and private deployment",
+        "desc": "Running an open model on your own machine or servers keeps data in-house. It trades some quality and convenience for control.",
+        "level": "deep",
+        "resources": [
+          { "title": "Ollama", "url": "https://ollama.com/", "type": "tool", "source": "Ollama", "free": true }
+        ]
+      },
+      {
+        "title": "Memorization and training-data extraction",
+        "desc": "Models can memorize and repeat rare text from their training data, including personal details. This is why training on private data needs care.",
+        "level": "optional",
+        "resources": [
+          { "title": "Extracting Training Data from Large Language Models", "url": "https://arxiv.org/abs/2012.07805", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Is my data used for model training?", "url": "https://privacy.claude.com/en/articles/10023580-is-my-data-used-for-model-training", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Data Controls FAQ", "url": "https://help.openai.com/en/articles/7730893-data-controls-faq", "type": "docs", "source": "OpenAI", "free": true },
+      { "title": "Gemini Apps Privacy Hub", "url": "https://support.google.com/gemini/answer/13594961", "type": "docs", "source": "Google", "free": true },
+      { "title": "LLM02:2025 Sensitive Information Disclosure", "url": "https://genai.owasp.org/llmrisk/llm022025-sensitive-information-disclosure/", "type": "docs", "source": "OWASP", "free": true },
+      { "title": "Guidance on AI and data protection", "url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/", "type": "docs", "source": "UK ICO", "free": true },
+      { "title": "Presidio", "url": "https://github.com/data-privacy-stack/presidio", "type": "tool", "source": "GitHub", "free": true }
+    ],
+    "project": "Audit the AI tools you or your team use. For each one, record the plan, whether data is used for training, retention period, and where the opt-out lives. Turn it into a one-page \"what you can paste where\" guide. Builders: add a Presidio redaction step in front of an LLM call and show that names and emails never reach the model."
+  },
+
+  "ai-ethics": {
+    "summary": "AI ethics asks whether an AI system is fair, honest, accountable, and good for the people it affects. Bias is when a system works worse for, or treats unfairly, certain groups of people.",
+    "why": "AI now helps decide who gets hired, approved for loans, or flagged for fraud. Biased or careless systems cause real harm, lose user trust, and create legal risk.",
+    "depth": "PMs and leaders must master the main harm types and how to ask the right questions before launch. Data scientists and ML engineers should also know how to measure group fairness metrics and document a model. The formal math of fairness trade-offs is for those who build high-stakes models.",
+    "hours": 8,
+    "outcomes": [
+      "You can name the main sources of bias: skewed data, proxy features, labels that encode past decisions, and feedback loops.",
+      "You can describe at least three real cases where AI caused harm and what went wrong.",
+      "You can compare outcomes across groups and explain why different fairness definitions can conflict.",
+      "You can write a short model card or impact note for an AI feature."
+    ],
+    "subtopics": [
+      {
+        "title": "Where bias comes from",
+        "desc": "Bias enters through who is in the data, how labels were made, which features act as proxies for protected traits, and how the system is used after launch.",
+        "level": "core",
+        "resources": [
+          { "title": "Fairness (Machine Learning Crash Course)", "url": "https://developers.google.com/machine-learning/crash-course/fairness", "type": "course", "source": "Google", "free": true }
+        ]
+      },
+      {
+        "title": "Case studies of real harm",
+        "desc": "Learning from documented failures, like risk scores in criminal justice and face recognition that misses darker-skinned women, is the fastest way to build judgment.",
+        "level": "core",
+        "resources": [
+          { "title": "Machine Bias", "url": "https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing", "type": "article", "source": "ProPublica", "free": true },
+          { "title": "Gender Shades", "url": "http://gendershades.org/", "type": "article", "source": "MIT Media Lab", "free": true }
+        ]
+      },
+      {
+        "title": "Measuring fairness",
+        "desc": "Compare error rates and outcomes across groups. Definitions like demographic parity and equalized odds often can't all hold at once, so you must choose based on the context.",
+        "level": "deep",
+        "resources": [
+          { "title": "Fairlearn", "url": "https://fairlearn.org/", "type": "tool", "source": "Fairlearn", "free": true },
+          { "title": "Fairness and Machine Learning", "url": "https://fairmlbook.org/", "type": "book", "source": "Barocas, Hardt, Narayanan", "free": true }
+        ]
+      },
+      {
+        "title": "Transparency and documentation",
+        "desc": "Model cards and datasheets record what a model or dataset is for, how it was tested, and where it should not be used.",
+        "level": "core",
+        "resources": [
+          { "title": "Model Cards for Model Reporting", "url": "https://arxiv.org/abs/1810.03993", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Datasheets for Datasets", "url": "https://arxiv.org/abs/1803.09010", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Generative AI harms",
+        "desc": "LLMs and image models add new issues: stereotypes in generated content, misinformation, deepfakes, copyright questions, and the labor behind training data.",
+        "level": "deep"
+      },
+      {
+        "title": "Accountability and human oversight",
+        "desc": "Someone must own each AI decision, people need a way to appeal, and humans in the loop need the time and information to actually catch errors.",
+        "level": "optional"
+      }
+    ],
+    "resources": [
+      { "title": "Practical Data Ethics", "url": "https://ethics.fast.ai/", "type": "course", "source": "fast.ai", "free": true },
+      { "title": "Fairness (Machine Learning Crash Course)", "url": "https://developers.google.com/machine-learning/crash-course/fairness", "type": "course", "source": "Google", "free": true },
+      { "title": "Intro to AI Ethics", "url": "https://www.kaggle.com/learn/intro-to-ai-ethics", "type": "interactive", "source": "Kaggle Learn", "free": true },
+      { "title": "Fairness and Machine Learning", "url": "https://fairmlbook.org/", "type": "book", "source": "Barocas, Hardt, Narayanan", "free": true },
+      { "title": "AI Safety, Ethics, and Society", "url": "https://www.aisafetybook.com/", "type": "book", "source": "Center for AI Safety", "free": true },
+      { "title": "Machine Bias", "url": "https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing", "type": "article", "source": "ProPublica", "free": true }
+    ],
+    "project": "Take a public tabular dataset with a demographic column (for example, a credit or income dataset). Train a simple classifier, then use Fairlearn to compare accuracy and false-positive rates across groups. Write a one-page model card that states the gaps you found and where the model should not be used. Non-coders: write an impact note for an AI feature at your work covering who could be harmed and how you would check."
+  },
+
+  "ai-regulation": {
+    "summary": "AI regulation covers the laws and standards that govern how AI is built and used, such as the EU AI Act, data protection law, and sector rules for hiring, lending, and health.",
+    "why": "If you ship AI to customers in the EU or in regulated industries, compliance decides what you can build and what paperwork you need. Fines and forced shutdowns are real risks.",
+    "depth": "Business owners and PMs must master the risk-based logic of the EU AI Act, which of their uses might be high-risk, and the existing laws (privacy, consumer protection, anti-discrimination) that already apply. Engineers only need to know the obligations that land on them: logging, transparency notices, and documentation. Leave the legal detail to counsel.",
+    "hours": 8,
+    "outcomes": [
+      "You can explain the EU AI Act's risk tiers and place a given use case in one.",
+      "You can list the main AI Act dates, including the delayed high-risk deadlines.",
+      "You can name which existing laws (GDPR, consumer protection, anti-discrimination) already apply to an AI feature.",
+      "You can use NIST AI RMF or ISO/IEC 42001 as a checklist even where no AI law applies."
+    ],
+    "subtopics": [
+      {
+        "title": "EU AI Act: the risk tiers",
+        "desc": "The Act bans some uses outright (like social scoring), sets heavy rules for high-risk uses (hiring, credit, education, critical infrastructure), adds transparency duties for chatbots and deepfakes, and leaves most other uses alone.",
+        "level": "core",
+        "resources": [
+          { "title": "High-level summary of the AI Act", "url": "https://artificialintelligenceact.eu/high-level-summary/", "type": "article", "source": "Future of Life Institute", "free": true }
+        ]
+      },
+      {
+        "title": "EU AI Act: the timeline",
+        "desc": "Bans and AI literacy duties applied from February 2025, general-purpose model rules from August 2025, and most other rules from August 2026. The 2026 AI Omnibus moved high-risk deadlines to December 2027 (Annex III uses) and August 2028 (AI inside regulated products).",
+        "level": "core",
+        "resources": [
+          { "title": "AI Act (official policy page)", "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai", "type": "docs", "source": "European Commission", "free": true }
+        ]
+      },
+      {
+        "title": "General-purpose AI model rules",
+        "desc": "Providers of foundation models must publish training-data summaries and technical documentation. The most capable models carry extra safety duties. The voluntary Code of Practice shows how to comply.",
+        "level": "deep",
+        "resources": [
+          { "title": "The General-Purpose AI Code of Practice", "url": "https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai", "type": "docs", "source": "European Commission", "free": true }
+        ]
+      },
+      {
+        "title": "Laws that already apply",
+        "desc": "GDPR covers personal data and automated decisions with legal effects. Consumer protection, anti-discrimination, and sector rules apply to AI just as they do to any other product.",
+        "level": "core",
+        "resources": [
+          { "title": "GDPR Art. 22: Automated individual decision-making", "url": "https://gdpr-info.eu/art-22-gdpr/", "type": "docs", "source": "gdpr-info.eu", "free": true },
+          { "title": "EDPB Opinion 28/2024 on AI models and personal data", "url": "https://www.edpb.europa.eu/documents/opinion-of-the-board-art-64/opinion-282024-on-certain-data-protection-aspects-related-to_en", "type": "docs", "source": "EDPB", "free": true }
+        ]
+      },
+      {
+        "title": "US and global landscape",
+        "desc": "The US has no single federal AI law. Rules come from agencies, state laws, and executive orders that change often. Use a tracker rather than memorizing a list.",
+        "level": "deep",
+        "resources": [
+          { "title": "Global AI Law and Policy Tracker", "url": "https://iapp.org/resources/article/global-ai-legislation-tracker/", "type": "article", "source": "IAPP", "free": true }
+        ]
+      },
+      {
+        "title": "Voluntary standards",
+        "desc": "NIST AI RMF and ISO/IEC 42001 give a structure for managing AI risk. They are often what customers and auditors ask for, even when no law requires them.",
+        "level": "optional",
+        "resources": [
+          { "title": "AI Risk Management Framework", "url": "https://www.nist.gov/itl/ai-risk-management-framework", "type": "docs", "source": "NIST", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "High-level summary of the AI Act", "url": "https://artificialintelligenceact.eu/high-level-summary/", "type": "article", "source": "Future of Life Institute", "free": true },
+      { "title": "AI Act (official policy page)", "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai", "type": "docs", "source": "European Commission", "free": true },
+      { "title": "Regulation (EU) 2024/1689 (full text)", "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj", "type": "docs", "source": "EUR-Lex", "free": true },
+      { "title": "Global AI Law and Policy Tracker", "url": "https://iapp.org/resources/article/global-ai-legislation-tracker/", "type": "article", "source": "IAPP", "free": true },
+      { "title": "AI Risk Management Framework", "url": "https://www.nist.gov/itl/ai-risk-management-framework", "type": "docs", "source": "NIST", "free": true },
+      { "title": "OECD AI Policy Observatory", "url": "https://oecd.ai/", "type": "docs", "source": "OECD", "free": true }
+    ],
+    "project": "List every AI feature or tool your company uses or plans (or invent five for a sample company). For each, classify its EU AI Act risk tier, note the applicable deadline, list other laws that apply, and write the top three compliance actions. Check your classifications against the AI Act Explorer's text."
+  },
+
+  "ai-security": {
+    "summary": "AI security is about attacks that target AI systems. The biggest one is prompt injection: hidden instructions in a web page, email, or file that hijack a model into doing what the attacker wants.",
+    "why": "Once a model can read untrusted content and take actions (send email, call APIs, run code), a single poisoned document can leak data or cause damage. No model is immune, so the defense has to be in your system design.",
+    "depth": "AI engineers must master prompt injection, the \"lethal trifecta,\" and design patterns that limit damage, plus the OWASP LLM Top 10. PMs and no-code builders need to recognize risky setups and ask for guardrails. Adversarial ML attacks like data poisoning and model extraction are 'know it exists' unless you train models.",
+    "hours": 12,
+    "outcomes": [
+      "You can explain direct vs indirect prompt injection and why filtering alone can't fix it.",
+      "You can spot the lethal trifecta (private data + untrusted content + a way to send data out) in an agent design.",
+      "You can apply least privilege, human approval, and isolation patterns to an LLM app or agent.",
+      "You can walk through the OWASP Top 10 for LLM applications and map each risk to your own app.",
+      "You can review an MCP server or tool integration for security risks before installing it."
+    ],
+    "subtopics": [
+      {
+        "title": "Prompt injection: direct and indirect",
+        "desc": "Direct injection is a user typing \"ignore your instructions.\" Indirect injection hides instructions in content the model reads, like a web page or email, and is far more dangerous for agents.",
+        "level": "core",
+        "resources": [
+          { "title": "Simon Willison on prompt injection", "url": "https://simonwillison.net/tags/prompt-injection/", "type": "article", "source": "Simon Willison", "free": true },
+          { "title": "Not what you've signed up for (indirect prompt injection)", "url": "https://arxiv.org/abs/2302.12173", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "The lethal trifecta",
+        "desc": "An agent with access to private data, exposure to untrusted content, and a way to communicate externally can be tricked into leaking that data. Remove one of the three to break the attack.",
+        "level": "core",
+        "resources": [
+          { "title": "The lethal trifecta for AI agents", "url": "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/", "type": "article", "source": "Simon Willison", "free": true }
+        ]
+      },
+      {
+        "title": "Secure design patterns",
+        "desc": "Since models can't reliably tell instructions from data, constrain what they can do: least-privilege tools, human approval for risky actions, plan-then-execute, and separating a privileged model from one that reads untrusted text.",
+        "level": "core",
+        "resources": [
+          { "title": "Design Patterns for Securing LLM Agents against Prompt Injections", "url": "https://arxiv.org/abs/2506.08837", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Defeating Prompt Injections by Design (CaMeL)", "url": "https://arxiv.org/abs/2503.18813", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "OWASP Top 10 for LLMs and agents",
+        "desc": "A shared checklist of the main risks: injection, sensitive data leaks, supply chain, excessive agency, improper output handling, and more. There is a separate list for agentic apps.",
+        "level": "core",
+        "resources": [
+          { "title": "OWASP Top 10 for LLM Applications", "url": "https://genai.owasp.org/llm-top-10/", "type": "docs", "source": "OWASP", "free": true },
+          { "title": "OWASP Top 10 for Agentic Applications for 2026", "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/", "type": "docs", "source": "OWASP", "free": true }
+        ]
+      },
+      {
+        "title": "Tool, MCP, and output security",
+        "desc": "Treat model output as untrusted input: never pass it straight into SQL, shell commands, or HTML. Vet MCP servers and plugins like any third-party code, and watch for tool descriptions that carry hidden instructions.",
+        "level": "deep",
+        "resources": [
+          { "title": "MCP Security Best Practices", "url": "https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices", "type": "docs", "source": "Model Context Protocol", "free": true }
+        ]
+      },
+      {
+        "title": "Jailbreaks vs prompt injection",
+        "desc": "A jailbreak tricks the model into breaking its own safety rules. Prompt injection hijacks your app. They overlap in technique but the risks and fixes differ.",
+        "level": "deep"
+      },
+      {
+        "title": "Adversarial ML: poisoning, extraction, evasion",
+        "desc": "Attackers can poison training data, extract model weights or behavior through queries, or craft inputs that fool classifiers. These matter most if you train or host models.",
+        "level": "optional",
+        "resources": [
+          { "title": "NIST AI 100-2: Adversarial Machine Learning taxonomy", "url": "https://csrc.nist.gov/pubs/ai/100/2/e2025/final", "type": "docs", "source": "NIST", "free": true },
+          { "title": "MITRE ATLAS", "url": "https://atlas.mitre.org/", "type": "docs", "source": "MITRE", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "OWASP Top 10 for LLM Applications", "url": "https://genai.owasp.org/llm-top-10/", "type": "docs", "source": "OWASP", "free": true },
+      { "title": "The lethal trifecta for AI agents", "url": "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/", "type": "article", "source": "Simon Willison", "free": true },
+      { "title": "Design Patterns for Securing LLM Agents against Prompt Injections", "url": "https://arxiv.org/abs/2506.08837", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Lakera prompt injection games (Gandalf, Agent Breaker)", "url": "https://gandalf.lakera.ai/", "type": "interactive", "source": "Lakera", "free": true },
+      { "title": "Red Teaming LLM Applications", "url": "https://www.deeplearning.ai/courses/red-teaming-llm-applications", "type": "course", "source": "DeepLearning.AI", "free": true },
+      { "title": "MCP Security Best Practices", "url": "https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices", "type": "docs", "source": "Model Context Protocol", "free": true },
+      { "title": "MITRE ATLAS", "url": "https://atlas.mitre.org/", "type": "docs", "source": "MITRE", "free": true }
+    ],
+    "project": "Build a small agent that reads a web page or email and can call one tool (for example, \"send a message\"). Plant a hidden instruction in the input that tries to exfiltrate data, and show that it works. Then fix it with design changes (remove the exfiltration path, add human approval, or split into a quarantined reader model) and show the attack fails. Write up which OWASP risks you addressed."
+  },
+
+  "ai-governance": {
+    "summary": "An AI governance program is how an organization decides which AI uses are allowed, who approves them, how risks are checked, and how problems are caught and fixed over time.",
+    "why": "Once AI is used across a company, ad hoc decisions stop working. Governance lets you move fast on low-risk uses, keep high-risk ones under control, and show customers, auditors, and regulators that you are in charge.",
+    "depth": "Business leaders must master the building blocks: an AI policy, a use-case inventory, risk tiers, an approval path, and incident handling. PMs should know how their features pass through that process. Engineers just need to know what evidence (evals, logs, documentation) the process will ask for.",
+    "hours": 15,
+    "outcomes": [
+      "You can draft an acceptable-use AI policy for staff.",
+      "You can set up an inventory of AI systems and a risk-tiering method tied to review depth.",
+      "You can map your program to NIST AI RMF (Govern, Map, Measure, Manage) or ISO/IEC 42001.",
+      "You can design an incident response and monitoring loop for AI systems in production."
+    ],
+    "subtopics": [
+      {
+        "title": "Policy, roles, and ownership",
+        "desc": "Write down what staff may and may not do with AI, who owns each AI system, and who can approve new uses. A small cross-functional committee (legal, security, product, business) is common.",
+        "level": "core"
+      },
+      {
+        "title": "Inventory and risk tiering",
+        "desc": "You can't govern what you don't know about. Keep a register of every AI system and vendor tool, rate each by impact, and scale review effort to the risk.",
+        "level": "core",
+        "resources": [
+          { "title": "MIT AI Risk Repository", "url": "https://airisk.mit.edu/", "type": "tool", "source": "MIT", "free": true }
+        ]
+      },
+      {
+        "title": "Frameworks: NIST AI RMF and ISO/IEC 42001",
+        "desc": "NIST AI RMF is a free, flexible risk framework with a playbook and a generative AI profile. ISO/IEC 42001 is a certifiable management-system standard that customers increasingly ask about.",
+        "level": "core",
+        "resources": [
+          { "title": "NIST AI RMF Playbook", "url": "https://airc.nist.gov/airmf-resources/playbook/", "type": "docs", "source": "NIST", "free": true },
+          { "title": "ISO/IEC 42001: AI management systems", "url": "https://www.iso.org/standard/42001", "type": "docs", "source": "ISO", "free": false }
+        ]
+      },
+      {
+        "title": "Vendor and third-party AI risk",
+        "desc": "Most AI risk comes in through tools you buy. Ask vendors about training on your data, retention, security certifications, subprocessors, and model change notices.",
+        "level": "deep"
+      },
+      {
+        "title": "Monitoring, incidents, and audits",
+        "desc": "Models and vendors change under you. Track quality and harm metrics after launch, give people a way to report problems, and learn from public incidents at other companies.",
+        "level": "deep",
+        "resources": [
+          { "title": "AI Incident Database", "url": "https://incidentdatabase.ai/", "type": "tool", "source": "Responsible AI Collaborative", "free": true }
+        ]
+      },
+      {
+        "title": "AI literacy and training",
+        "desc": "The EU AI Act requires AI literacy for staff who use AI systems. A short, role-based training program is usually the most cost-effective control you have.",
+        "level": "optional"
+      }
+    ],
+    "resources": [
+      { "title": "AI Risk Management Framework", "url": "https://www.nist.gov/itl/ai-risk-management-framework", "type": "docs", "source": "NIST", "free": true },
+      { "title": "NIST AI RMF: Generative AI Profile (AI 600-1)", "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence", "type": "docs", "source": "NIST", "free": true },
+      { "title": "NIST AI RMF Playbook", "url": "https://airc.nist.gov/airmf-resources/playbook/", "type": "docs", "source": "NIST", "free": true },
+      { "title": "ISO/IEC 42001: AI management systems", "url": "https://www.iso.org/standard/42001", "type": "docs", "source": "ISO", "free": false },
+      { "title": "Microsoft Responsible AI", "url": "https://www.microsoft.com/en-us/ai/responsible-ai", "type": "article", "source": "Microsoft", "free": true },
+      { "title": "AIGP certification", "url": "https://iapp.org/certify/aigp/", "type": "course", "source": "IAPP", "free": false },
+      { "title": "AI Incident Database", "url": "https://incidentdatabase.ai/", "type": "tool", "source": "Responsible AI Collaborative", "free": true }
+    ],
+    "project": "Build a starter governance kit for a real or sample company: a one-page AI use policy, an inventory spreadsheet with risk tiers, an intake form for new AI use cases, and an incident response checklist. Map each part to the four NIST AI RMF functions and run one real use case through the whole process."
+  },
+
+  "red-teaming": {
+    "summary": "Red teaming means attacking your own AI system on purpose to find harmful or unsafe behavior before real users do. Safety evals turn those findings into repeatable tests you can run on every release.",
+    "why": "Normal evals check that the happy path works. Red teaming checks what happens when someone tries to break it. Labs use it to decide whether a model is safe to release, and app teams use it before launching anything public-facing.",
+    "depth": "AI engineers should master manual and automated red teaming for their own apps (jailbreaks, injection, harmful content, data leaks) and turning failures into regression tests. Research scientists should go deeper into automated attack methods, capability evals for dangerous skills, and benchmark design. Gradient-based attacks are 'know it exists' for app builders.",
+    "hours": 20,
+    "outcomes": [
+      "You can write a red-team plan that lists threats, attacker types, and harm categories for an AI app.",
+      "You can run automated scans with tools like promptfoo, garak, or PyRIT and read the results.",
+      "You can turn red-team findings into a safety eval suite that runs in CI.",
+      "You can explain how frontier labs use dangerous-capability evals to make release decisions."
+    ],
+    "subtopics": [
+      {
+        "title": "Planning a red-team exercise",
+        "desc": "Decide what you're protecting, who might attack, and what counts as a failure. Mix domain experts with people who think like attackers.",
+        "level": "core",
+        "resources": [
+          { "title": "Red Teaming Language Models to Reduce Harms", "url": "https://arxiv.org/abs/2209.07858", "type": "paper", "source": "arXiv (Anthropic)", "free": true }
+        ]
+      },
+      {
+        "title": "Jailbreak and attack techniques",
+        "desc": "Know the common families: role-play, encoding tricks, many-shot prompting, multi-turn escalation, and optimized adversarial suffixes. Knowing them helps you test for them.",
+        "level": "core",
+        "resources": [
+          { "title": "Adversarial Attacks on LLMs", "url": "https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/", "type": "article", "source": "Lilian Weng", "free": true },
+          { "title": "Many-shot jailbreaking", "url": "https://www.anthropic.com/research/many-shot-jailbreaking", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Automated red teaming tools",
+        "desc": "Use one model to generate attacks on another at scale. Open-source scanners provide ready-made attack libraries and scoring.",
+        "level": "core",
+        "resources": [
+          { "title": "LLM red teaming guide", "url": "https://www.promptfoo.dev/docs/red-team/", "type": "tool", "source": "Promptfoo", "free": true },
+          { "title": "garak: LLM vulnerability scanner", "url": "https://github.com/NVIDIA/garak", "type": "tool", "source": "NVIDIA", "free": true }
+        ]
+      },
+      {
+        "title": "From findings to safety evals",
+        "desc": "Every confirmed failure becomes a test case. Track attack success rate and over-refusal rate together, since a model that refuses everything is also broken.",
+        "level": "deep",
+        "resources": [
+          { "title": "Inspect", "url": "https://inspect.aisi.org.uk/", "type": "tool", "source": "UK AI Security Institute", "free": true }
+        ]
+      },
+      {
+        "title": "Dangerous capability evals",
+        "desc": "Frontier labs and safety institutes test whether models can meaningfully help with cyberattacks, bioweapons, or autonomous replication, and tie the results to release policies.",
+        "level": "deep",
+        "resources": [
+          { "title": "Anthropic's Responsible Scaling Policy", "url": "https://www.anthropic.com/responsible-scaling-policy", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "METR", "url": "https://metr.org/", "type": "article", "source": "METR", "free": true }
+        ]
+      },
+      {
+        "title": "Benchmarks and optimized attacks",
+        "desc": "Standard benchmarks like HarmBench let you compare defenses. Gradient-based attacks such as GCG search for adversarial strings automatically and need access to model weights.",
+        "level": "optional",
+        "resources": [
+          { "title": "HarmBench", "url": "https://arxiv.org/abs/2402.04249", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Universal and Transferable Adversarial Attacks on Aligned Language Models", "url": "https://arxiv.org/abs/2307.15043", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "LLM red teaming guide", "url": "https://www.promptfoo.dev/docs/red-team/", "type": "docs", "source": "Promptfoo", "free": true },
+      { "title": "Red Teaming LLM Applications", "url": "https://www.deeplearning.ai/courses/red-teaming-llm-applications", "type": "course", "source": "DeepLearning.AI", "free": true },
+      { "title": "Adversarial Attacks on LLMs", "url": "https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/", "type": "article", "source": "Lilian Weng", "free": true },
+      { "title": "PyRIT", "url": "https://github.com/Azure/PyRIT", "type": "tool", "source": "Microsoft", "free": true },
+      { "title": "Inspect", "url": "https://inspect.aisi.org.uk/", "type": "tool", "source": "UK AI Security Institute", "free": true },
+      { "title": "Red Teaming Language Models with Language Models", "url": "https://arxiv.org/abs/2202.03286", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Advancing red teaming with people and AI", "url": "https://openai.com/index/advancing-red-teaming-with-people-and-ai/", "type": "article", "source": "OpenAI", "free": true }
+    ],
+    "project": "Pick a chatbot or agent you built (or a simple one with a system prompt). Write a red-team plan with five harm categories. Run 30 minutes of manual attacks, then an automated scan with promptfoo or garak. Fix the top two issues and turn every successful attack into an eval case that runs on each change. Report attack success rate and over-refusal rate before and after."
+  },
+
+  "interpretability": {
+    "summary": "Mechanistic interpretability tries to reverse-engineer neural networks: find the features a model represents and the circuits that connect them, so we can understand how it actually computes an answer.",
+    "why": "If we can read what a model is doing inside, we can catch deception, debug failures, and verify safety in ways that testing outputs alone can't. It is one of the most active research areas in AI safety.",
+    "depth": "This is research-level work. Research scientists in the field must master transformer internals, the residual stream view, superposition, sparse autoencoders, and attribution methods, and be able to run experiments in TransformerLens or nnsight. Everyone else only needs the big idea: models store many concepts as directions in activation space, and we can now find and steer some of them.",
+    "hours": 80,
+    "outcomes": [
+      "You can explain the residual stream, attention heads as information movers, and why superposition makes neurons hard to read.",
+      "You can train or load a sparse autoencoder and inspect the features it finds.",
+      "You can run activation patching to find which components cause a behavior.",
+      "You can reproduce a known circuit (such as induction heads) in a small model.",
+      "You can read current circuit-tracing papers and name their limitations."
+    ],
+    "subtopics": [
+      {
+        "title": "The transformer circuits view",
+        "desc": "Think of a transformer as a residual stream that attention heads and MLPs read from and write to. This framing makes it possible to trace how information flows.",
+        "level": "core",
+        "resources": [
+          { "title": "A Mathematical Framework for Transformer Circuits", "url": "https://transformer-circuits.pub/2021/framework/index.html", "type": "paper", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Features and superposition",
+        "desc": "Models represent more concepts than they have neurons by packing them into overlapping directions. This is why single neurons often look like a mix of unrelated things.",
+        "level": "core",
+        "resources": [
+          { "title": "Toy Models of Superposition", "url": "https://transformer-circuits.pub/2022/toy_model/index.html", "type": "paper", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Sparse autoencoders and dictionary learning",
+        "desc": "A sparse autoencoder learns to rewrite activations as a sparse mix of features, many of which match human-readable concepts. This has been scaled to production models.",
+        "level": "core",
+        "resources": [
+          { "title": "Towards Monosemanticity", "url": "https://transformer-circuits.pub/2023/monosemantic-features", "type": "paper", "source": "Anthropic", "free": true },
+          { "title": "Scaling Monosemanticity", "url": "https://transformer-circuits.pub/2024/scaling-monosemanticity/", "type": "paper", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Causal methods: patching and circuit tracing",
+        "desc": "Activation patching swaps internal activations between runs to see what changes the output. Attribution graphs trace step-by-step how features combine to produce an answer.",
+        "level": "deep",
+        "resources": [
+          { "title": "Circuit Tracing: Revealing Computational Graphs in Language Models", "url": "https://transformer-circuits.pub/2025/attribution-graphs/methods.html", "type": "paper", "source": "Anthropic", "free": true },
+          { "title": "circuit-tracer", "url": "https://github.com/decoderesearch/circuit-tracer", "type": "tool", "source": "GitHub", "free": true }
+        ]
+      },
+      {
+        "title": "Probing and steering",
+        "desc": "Linear probes test whether a concept is readable from activations. Steering adds a direction to the activations to push behavior, for example toward honesty or a topic.",
+        "level": "deep",
+        "resources": [
+          { "title": "Representation Engineering", "url": "https://arxiv.org/abs/2310.01405", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Steering Language Models With Activation Engineering", "url": "https://arxiv.org/abs/2308.10248", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Open problems and critiques",
+        "desc": "Features found by SAEs are incomplete, explanations may not be faithful, and it is unclear how well current methods scale to safety guarantees. Know the debate before you pick a project.",
+        "level": "optional",
+        "resources": [
+          { "title": "Open Problems in Mechanistic Interpretability", "url": "https://arxiv.org/abs/2501.16496", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "ARENA (Chapter 1: Transformer Interpretability)", "url": "https://www.arena.education/", "type": "course", "source": "ARENA", "free": true },
+      { "title": "How To Become A Mechanistic Interpretability Researcher", "url": "https://www.alignmentforum.org/posts/jP9KDyMkchuv6tHwm/how-to-become-a-mechanistic-interpretability-researcher", "type": "article", "source": "Neel Nanda", "free": true },
+      { "title": "Transformer Circuits Thread", "url": "https://transformer-circuits.pub/", "type": "paper", "source": "Anthropic", "free": true },
+      { "title": "On the Biology of a Large Language Model", "url": "https://transformer-circuits.pub/2025/attribution-graphs/biology.html", "type": "paper", "source": "Anthropic", "free": true },
+      { "title": "TransformerLens", "url": "https://github.com/TransformerLensOrg/TransformerLens", "type": "tool", "source": "GitHub", "free": true },
+      { "title": "Neuronpedia", "url": "https://www.neuronpedia.org/", "type": "interactive", "source": "Neuronpedia", "free": true },
+      { "title": "Tracing the thoughts of a large language model", "url": "https://www.anthropic.com/research/tracing-thoughts-language-model", "type": "article", "source": "Anthropic", "free": true }
+    ],
+    "project": "Using TransformerLens on GPT-2 small, find the induction heads: show their attention pattern on repeated random tokens, then ablate them and measure the loss jump on the repeated half. Next, explore features for a concept of your choice on Neuronpedia and write a short post on what you found and what you couldn't explain."
+  },
+
+  "alignment-research": {
+    "summary": "Alignment research asks how to make AI systems reliably pursue what their developers and users actually intend, even as systems become more capable than the people overseeing them.",
+    "why": "Current training methods produce models that mostly behave well, but studies already show reward hacking, sycophancy, and models that act differently when they think they're being watched. These problems get harder as models become more autonomous.",
+    "depth": "This is research-level work for research scientists. Master the core problems (specification gaming, reward hacking, deceptive alignment, scalable oversight) and the main empirical methods (model organisms, control evaluations, CoT monitoring). You don't need to master every agenda. Pick one area and go deep after reading broadly.",
+    "hours": 100,
+    "outcomes": [
+      "You can explain outer vs inner alignment, specification gaming, and reward hacking with real examples.",
+      "You can describe the main research agendas: scalable oversight, interpretability, AI control, model organisms, and evaluation.",
+      "You can read and critique a recent alignment paper, including its threat model and what the result does and doesn't show.",
+      "You can design a small empirical experiment that tests an alignment hypothesis on an open model."
+    ],
+    "subtopics": [
+      {
+        "title": "Core problems: specification gaming and reward hacking",
+        "desc": "Models optimize the objective you wrote, not the one you meant. This shows up as agents exploiting bugs in environments and LLMs gaming tests or graders.",
+        "level": "core",
+        "resources": [
+          { "title": "Specification gaming: the flip side of AI ingenuity", "url": "https://deepmind.google/blog/specification-gaming-the-flip-side-of-ai-ingenuity/", "type": "article", "source": "Google DeepMind", "free": true },
+          { "title": "Reward Hacking in Reinforcement Learning", "url": "https://lilianweng.github.io/posts/2024-11-28-reward-hacking/", "type": "article", "source": "Lilian Weng", "free": true }
+        ]
+      },
+      {
+        "title": "Scalable oversight",
+        "desc": "How do humans supervise a model that knows more than they do? Ideas include debate, AI-assisted feedback, constitutional methods, and weak-to-strong generalization.",
+        "level": "core",
+        "resources": [
+          { "title": "Weak-to-Strong Generalization", "url": "https://arxiv.org/abs/2312.09390", "type": "paper", "source": "arXiv (OpenAI)", "free": true },
+          { "title": "Constitutional AI", "url": "https://arxiv.org/abs/2212.08073", "type": "paper", "source": "arXiv (Anthropic)", "free": true }
+        ]
+      },
+      {
+        "title": "Deception and model organisms",
+        "desc": "Researchers build models with known bad behaviors to study whether safety training removes them. Results show some behaviors persist and models can fake alignment during training.",
+        "level": "core",
+        "resources": [
+          { "title": "Alignment faking in large language models", "url": "https://www.anthropic.com/research/alignment-faking", "type": "article", "source": "Anthropic", "free": true },
+          { "title": "Sleeper Agents", "url": "https://arxiv.org/abs/2401.05566", "type": "paper", "source": "arXiv (Anthropic)", "free": true }
+        ]
+      },
+      {
+        "title": "AI control",
+        "desc": "Assume the model might be misaligned and design protocols (monitoring, trusted editing, limited permissions) that stay safe anyway. This is measured with red-team vs blue-team evaluations.",
+        "level": "deep",
+        "resources": [
+          { "title": "AI Control: Improving Safety Despite Intentional Subversion", "url": "https://arxiv.org/abs/2312.06942", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Chain-of-thought monitoring",
+        "desc": "Reasoning models think in readable text, which gives a chance to spot bad intent. That chance is fragile, because training pressure can make reasoning less faithful or less readable.",
+        "level": "deep",
+        "resources": [
+          { "title": "Chain of Thought Monitorability", "url": "https://arxiv.org/abs/2507.11473", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Generalization surprises",
+        "desc": "Narrow training can have broad effects. Fine-tuning on insecure code, for example, has made models misaligned in unrelated chats. Understanding why is an open question.",
+        "level": "optional",
+        "resources": [
+          { "title": "Emergent Misalignment", "url": "https://arxiv.org/abs/2502.17424", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "BlueDot Impact AI safety courses", "url": "https://bluedot.org/courses", "type": "course", "source": "BlueDot Impact", "free": true },
+      { "title": "Concrete Problems in AI Safety", "url": "https://arxiv.org/abs/1606.06565", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Alignment Science Blog", "url": "https://alignment.anthropic.com/", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "AI Safety, Ethics, and Society", "url": "https://www.aisafetybook.com/", "type": "book", "source": "Center for AI Safety", "free": true },
+      { "title": "ARENA", "url": "https://www.arena.education/", "type": "course", "source": "ARENA", "free": true },
+      { "title": "AI Alignment Forum", "url": "https://www.alignmentforum.org/", "type": "article", "source": "Alignment Forum", "free": true },
+      { "title": "MATS research program", "url": "https://www.matsprogram.org/", "type": "course", "source": "MATS", "free": true }
+    ],
+    "project": "Replicate a small model-organism result on an open-weight model. For example, fine-tune a small model on a narrow bad behavior and measure whether it generalizes to unrelated prompts, or build a simple reward-hacking environment and show the model exploiting it. Write it up with your threat model, method, results, and what would change your conclusion."
+  },
+
+  "math-intuition": {
+    "summary": "Math intuition for AI means understanding the few big ideas that make machine learning work (vectors, functions, slopes, probability, and averages) without needing to do the calculations by hand.",
+    "why": "Almost every AI concept, from embeddings to training loss to temperature, is a math idea in disguise. A little intuition turns jargon into something you can reason about.",
+    "depth": "How much math you need depends on your role. AI engineers building apps need only this intuition level: what a vector and similarity are, what training minimizes, and what a probability distribution is. PMs need even less. ML engineers, data scientists, and researchers should treat this as a warm-up before the deeper math nodes.",
+    "hours": 8,
+    "outcomes": [
+      "You can explain an embedding as a list of numbers where similar things end up close together.",
+      "You can explain training as \"adjusting numbers to make the error smaller, one small step at a time.\"",
+      "You can explain an LLM's output as a probability distribution over next tokens, and what temperature does to it.",
+      "You can read a simple formula with a sum or a dot product and say what it computes."
+    ],
+    "subtopics": [
+      {
+        "title": "Vectors and similarity",
+        "desc": "A vector is a list of numbers that can represent a word, image, or user. Cosine similarity measures how closely two vectors point in the same direction, which is how semantic search works.",
+        "level": "core",
+        "resources": [
+          { "title": "Essence of linear algebra (chapter 1)", "url": "https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab", "type": "video", "source": "3Blue1Brown", "free": true }
+        ]
+      },
+      {
+        "title": "Functions and models",
+        "desc": "A model is a function that turns inputs into outputs, controlled by adjustable numbers called parameters. An LLM is the same idea with billions of parameters.",
+        "level": "core"
+      },
+      {
+        "title": "Slopes, loss, and gradient descent",
+        "desc": "Loss measures how wrong a model is. The gradient tells you which way to nudge each parameter to reduce it. Training repeats that nudge millions of times.",
+        "level": "core",
+        "resources": [
+          { "title": "Neural networks series", "url": "https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi", "type": "video", "source": "3Blue1Brown", "free": true },
+          { "title": "A Neural Network Playground", "url": "https://playground.tensorflow.org/", "type": "interactive", "source": "Google", "free": true }
+        ]
+      },
+      {
+        "title": "Probability and sampling",
+        "desc": "Models output probabilities, not certainties. Sampling picks from those probabilities, and temperature makes the choice more or less random.",
+        "level": "core",
+        "resources": [
+          { "title": "Seeing Theory", "url": "https://seeing-theory.brown.edu/", "type": "interactive", "source": "Brown University", "free": true }
+        ]
+      },
+      {
+        "title": "Averages, spread, and noise",
+        "desc": "Means, variance, and sample size explain why one test run proves little and why eval results need enough examples to be trusted.",
+        "level": "deep"
+      },
+      {
+        "title": "Reading math notation",
+        "desc": "Learn to read Σ (sum), subscripts, vectors in bold, and function notation. That small step lets you follow docs and blog posts that use formulas.",
+        "level": "optional"
+      }
+    ],
+    "resources": [
+      { "title": "Neural networks series", "url": "https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi", "type": "video", "source": "3Blue1Brown", "free": true },
+      { "title": "Machine Learning Crash Course", "url": "https://developers.google.com/machine-learning/crash-course", "type": "course", "source": "Google", "free": true },
+      { "title": "A Neural Network Playground", "url": "https://playground.tensorflow.org/", "type": "interactive", "source": "Google", "free": true },
+      { "title": "Seeing Theory", "url": "https://seeing-theory.brown.edu/", "type": "interactive", "source": "Brown University", "free": true },
+      { "title": "Mathematics for Machine Learning and Data Science", "url": "https://www.deeplearning.ai/specializations/mathematics-for-machine-learning-and-data-science", "type": "course", "source": "DeepLearning.AI", "free": false },
+      { "title": "BetterExplained", "url": "https://betterexplained.com/", "type": "article", "source": "Kalid Azad", "free": true }
+    ],
+    "project": "Get embeddings for 20 short sentences from any embedding API (or a spreadsheet of made-up 3-number vectors). Compute cosine similarity between every pair and confirm that sentences with similar meaning score higher. Then, in the TensorFlow Playground, train a tiny network and write three sentences explaining what the loss curve and learning rate are doing."
+  },
+
+  "linear-algebra": {
+    "summary": "Linear algebra is the math of vectors and matrices. Every neural network layer is a matrix multiplication, and embeddings, attention, and LoRA are all linear algebra.",
+    "why": "If you train, debug, or design models, tensor shapes and matrix operations are your daily language. It also explains why GPUs matter: they are machines for multiplying matrices fast.",
+    "depth": "AI engineers building apps need only vectors, dot products, and cosine similarity; the rest is 'know it exists.' ML engineers must master matrix multiplication, shapes, broadcasting, and the geometric view of transformations. Researchers should also be fluent with eigenvectors, SVD, low-rank structure, and norms. Almost nobody needs to compute decompositions by hand; libraries do that.",
+    "hours": 30,
+    "outcomes": [
+      "You can read a matrix multiplication as a transformation and predict the output shape of any layer.",
+      "You can explain dot products, norms, and cosine similarity, and implement them in NumPy.",
+      "You can explain eigenvectors and SVD and how low-rank approximation underlies PCA and LoRA.",
+      "You can debug shape mismatches and broadcasting errors in tensor code."
+    ],
+    "subtopics": [
+      {
+        "title": "Vectors, dot products, and norms",
+        "desc": "Vectors are points or directions. The dot product measures alignment, the norm measures length, and together they give cosine similarity, the core of embedding search.",
+        "level": "core",
+        "resources": [
+          { "title": "Linear Algebra (Dive into Deep Learning 2.3)", "url": "https://d2l.ai/chapter_preliminaries/linear-algebra.html", "type": "book", "source": "d2l.ai", "free": true }
+        ]
+      },
+      {
+        "title": "Matrices as transformations",
+        "desc": "A matrix stretches, rotates, or projects space. Multiplying matrices chains these transformations. A neural network layer is a matrix followed by a nonlinearity.",
+        "level": "core",
+        "resources": [
+          { "title": "Essence of linear algebra", "url": "https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab", "type": "video", "source": "3Blue1Brown", "free": true }
+        ]
+      },
+      {
+        "title": "Tensors, shapes, and broadcasting",
+        "desc": "Real code works with batches: 3D and 4D arrays. Knowing how shapes combine and how broadcasting stretches dimensions prevents most bugs in model code.",
+        "level": "core",
+        "resources": [
+          { "title": "NumPy linear algebra reference", "url": "https://numpy.org/doc/stable/reference/routines.linalg.html", "type": "docs", "source": "NumPy", "free": true }
+        ]
+      },
+      {
+        "title": "Eigenvectors and SVD",
+        "desc": "Eigenvectors are directions a matrix only stretches. SVD breaks any matrix into rotate, scale, rotate, which reveals its most important directions.",
+        "level": "deep",
+        "resources": [
+          { "title": "Matrix Methods in Data Analysis, Signal Processing, and Machine Learning (18.065)", "url": "https://ocw.mit.edu/courses/18-065-matrix-methods-in-data-analysis-signal-processing-and-machine-learning-spring-2018/", "type": "course", "source": "MIT OCW", "free": true }
+        ]
+      },
+      {
+        "title": "Low rank and why it matters",
+        "desc": "Many large matrices are well approximated by a product of two thin ones. This is the idea behind PCA, compression, and LoRA fine-tuning.",
+        "level": "deep"
+      },
+      {
+        "title": "Proof-based linear algebra",
+        "desc": "Vector spaces, linear maps, and proofs. Useful for theory research and reading dense papers, but not needed for applied work.",
+        "level": "optional",
+        "resources": [
+          { "title": "Linear Algebra Done Right", "url": "https://linear.axler.net/", "type": "book", "source": "Sheldon Axler", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Essence of linear algebra", "url": "https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab", "type": "video", "source": "3Blue1Brown", "free": true },
+      { "title": "Mathematics for Machine Learning (Part I, ch. 2-4)", "url": "https://mml-book.github.io/", "type": "book", "source": "Deisenroth, Faisal, Ong", "free": true },
+      { "title": "Linear Algebra (18.06)", "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/", "type": "course", "source": "MIT OCW (Gilbert Strang)", "free": true },
+      { "title": "Immersive Linear Algebra", "url": "http://immersivemath.com/ila/index.html", "type": "interactive", "source": "immersivemath", "free": true },
+      { "title": "Linear Algebra (Dive into Deep Learning 2.3)", "url": "https://d2l.ai/chapter_preliminaries/linear-algebra.html", "type": "book", "source": "d2l.ai", "free": true },
+      { "title": "Computational Linear Algebra", "url": "https://github.com/fastai/numerical-linear-algebra", "type": "course", "source": "fast.ai", "free": true }
+    ],
+    "project": "In NumPy, write a 2-layer neural network forward pass by hand and print every shape. Then take a grayscale image, compute its SVD, and rebuild it from the top 5, 20, and 50 singular values. Plot the results and explain how this connects to LoRA's low-rank updates."
+  },
+
+  "calculus": {
+    "summary": "Calculus studies how things change. For AI, the key idea is the gradient: it tells you how a small change in each parameter would change the loss, which is how every model learns.",
+    "why": "Backpropagation, learning rates, vanishing gradients, and exploding losses are all calculus. If you train models, you need this to understand why training works or fails.",
+    "depth": "AI engineers building apps only need the intuition: a gradient points uphill, and training steps downhill. ML engineers must master derivatives, the chain rule, partial derivatives, and how autograd applies them, since that's what backprop is. Researchers should be comfortable with matrix calculus and Jacobians. You don't need integration techniques or to derive backprop by hand for every layer; frameworks do that.",
+    "hours": 25,
+    "outcomes": [
+      "You can explain a derivative as a rate of change and a gradient as the direction of steepest increase.",
+      "You can apply the chain rule to a small computation graph by hand.",
+      "You can explain how backpropagation and autograd compute gradients for a network.",
+      "You can diagnose vanishing and exploding gradients and say why they happen."
+    ],
+    "subtopics": [
+      {
+        "title": "Derivatives as rates of change",
+        "desc": "A derivative tells you how much the output moves when you nudge the input. That one idea drives all of gradient-based learning.",
+        "level": "core",
+        "resources": [
+          { "title": "Essence of calculus", "url": "https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr", "type": "video", "source": "3Blue1Brown", "free": true }
+        ]
+      },
+      {
+        "title": "The chain rule",
+        "desc": "When functions are stacked, their derivatives multiply. A neural network is a long stack of functions, so the chain rule is how gradients flow backward through it.",
+        "level": "core",
+        "resources": [
+          { "title": "Backpropagation calculus", "url": "https://www.3blue1brown.com/lessons/backpropagation-calculus", "type": "video", "source": "3Blue1Brown", "free": true }
+        ]
+      },
+      {
+        "title": "Partial derivatives and gradients",
+        "desc": "With many inputs, a partial derivative measures change along one input. The gradient collects them all into a vector that points uphill on the loss surface.",
+        "level": "core",
+        "resources": [
+          { "title": "Multivariable calculus", "url": "https://www.khanacademy.org/math/multivariable-calculus", "type": "course", "source": "Khan Academy", "free": true }
+        ]
+      },
+      {
+        "title": "Backpropagation and autograd",
+        "desc": "Backprop applies the chain rule efficiently from the output back to every parameter. PyTorch's autograd does this automatically by recording a computation graph.",
+        "level": "core",
+        "resources": [
+          { "title": "The spelled-out intro to neural networks and backpropagation: building micrograd", "url": "https://www.youtube.com/watch?v=VMj-3S1tku0", "type": "video", "source": "Andrej Karpathy", "free": true },
+          { "title": "A Gentle Introduction to torch.autograd", "url": "https://docs.pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html", "type": "docs", "source": "PyTorch", "free": true }
+        ]
+      },
+      {
+        "title": "Matrix calculus and Jacobians",
+        "desc": "Gradients of vector and matrix functions, written compactly. Needed to derive gradients for new layers or to follow derivations in papers.",
+        "level": "deep",
+        "resources": [
+          { "title": "The Matrix Calculus You Need For Deep Learning", "url": "https://explained.ai/matrix-calculus/", "type": "article", "source": "Terence Parr & Jeremy Howard", "free": true }
+        ]
+      },
+      {
+        "title": "Integrals and the rest of calculus",
+        "desc": "Integrals show up in probability (areas under density curves) and in diffusion model theory. Applied engineers can mostly skip them.",
+        "level": "optional",
+        "resources": [
+          { "title": "Single Variable Calculus (18.01SC)", "url": "https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/", "type": "course", "source": "MIT OCW", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "The spelled-out intro to neural networks and backpropagation: building micrograd", "url": "https://www.youtube.com/watch?v=VMj-3S1tku0", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "Essence of calculus", "url": "https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr", "type": "video", "source": "3Blue1Brown", "free": true },
+      { "title": "The Matrix Calculus You Need For Deep Learning", "url": "https://explained.ai/matrix-calculus/", "type": "article", "source": "Terence Parr & Jeremy Howard", "free": true },
+      { "title": "CS231n: Backpropagation, Intuitions", "url": "https://cs231n.github.io/optimization-2/", "type": "article", "source": "Stanford", "free": true },
+      { "title": "Mathematics for Machine Learning (ch. 5)", "url": "https://mml-book.github.io/", "type": "book", "source": "Deisenroth, Faisal, Ong", "free": true },
+      { "title": "Automatic Differentiation (Dive into Deep Learning 2.5)", "url": "https://d2l.ai/chapter_preliminaries/autograd.html", "type": "book", "source": "d2l.ai", "free": true }
+    ],
+    "project": "Follow Karpathy's micrograd video and build your own tiny autograd engine. Use it to train a small neural network on a toy dataset. Then check your gradients against PyTorch's autograd on the same network and confirm they match to several decimal places."
+  },
+
+  "probability-stats": {
+    "summary": "Probability describes uncertainty, and statistics turns data into conclusions you can trust. Together they explain how models make predictions and how you know whether a result is real.",
+    "why": "LLMs literally output probability distributions, and every eval, A/B test, and metric is a statistical claim. Without this, it's easy to ship a change that only looked better because of noise.",
+    "depth": "AI engineers must master the practical parts: distributions, sampling, expected value, confidence intervals, and enough to tell if an eval improvement is real. Data scientists must master hypothesis testing, regression, experiment design, and Bayesian thinking. ML engineers and researchers also need likelihood, maximum likelihood estimation, and conditional probability fluency. Measure theory is 'know it exists' for nearly everyone.",
+    "hours": 35,
+    "outcomes": [
+      "You can explain random variables, common distributions, expectation, and variance.",
+      "You can apply Bayes' theorem and conditional probability to a real problem.",
+      "You can put a confidence interval on an eval score and decide whether two model versions really differ.",
+      "You can explain maximum likelihood and why cross-entropy loss is used to train classifiers and LLMs.",
+      "You can design a simple A/B test with an adequate sample size."
+    ],
+    "subtopics": [
+      {
+        "title": "Probability basics and distributions",
+        "desc": "Random variables, Bernoulli, binomial, normal, and categorical distributions. An LLM's next-token output is a categorical distribution over its vocabulary.",
+        "level": "core",
+        "resources": [
+          { "title": "Seeing Theory", "url": "https://seeing-theory.brown.edu/", "type": "interactive", "source": "Brown University", "free": true }
+        ]
+      },
+      {
+        "title": "Conditional probability and Bayes",
+        "desc": "How beliefs should update with evidence. It underpins classifiers, explains base-rate errors, and is the core of Bayesian methods.",
+        "level": "core",
+        "resources": [
+          { "title": "Bayes' theorem", "url": "https://www.3blue1brown.com/lessons/bayes-theorem", "type": "video", "source": "3Blue1Brown", "free": true }
+        ]
+      },
+      {
+        "title": "Descriptive stats and sampling",
+        "desc": "Mean, median, variance, and the central limit theorem. Why averages of many samples behave predictably, and how sample size controls noise.",
+        "level": "core",
+        "resources": [
+          { "title": "StatQuest", "url": "https://www.youtube.com/@statquest", "type": "video", "source": "StatQuest", "free": true }
+        ]
+      },
+      {
+        "title": "Uncertainty in evals and experiments",
+        "desc": "Confidence intervals, standard errors, and significance tests tell you whether a score change is real. This applies directly to LLM evals and product A/B tests.",
+        "level": "core",
+        "resources": [
+          { "title": "A statistical approach to model evaluations", "url": "https://www.anthropic.com/research/statistical-approach-to-model-evals", "type": "article", "source": "Anthropic", "free": true },
+          { "title": "Evan's Awesome A/B Tools", "url": "https://www.evanmiller.org/ab-testing/", "type": "tool", "source": "Evan Miller", "free": true }
+        ]
+      },
+      {
+        "title": "Likelihood and estimation",
+        "desc": "Maximum likelihood picks parameters that make the observed data most probable. Minimizing cross-entropy loss is exactly this, which is how LLMs are pretrained.",
+        "level": "deep",
+        "resources": [
+          { "title": "Probability and Statistics (Dive into Deep Learning 2.6)", "url": "https://d2l.ai/chapter_preliminaries/probability.html", "type": "book", "source": "d2l.ai", "free": true }
+        ]
+      },
+      {
+        "title": "Bayesian methods",
+        "desc": "Treat parameters as uncertain and update a full distribution over them. Useful for small data, uncertainty estimates, and decision-making.",
+        "level": "optional",
+        "resources": [
+          { "title": "Think Bayes 2", "url": "https://allendowney.github.io/ThinkBayes2/", "type": "book", "source": "Allen Downey", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "StatQuest", "url": "https://www.youtube.com/@statquest", "type": "video", "source": "StatQuest", "free": true },
+      { "title": "Seeing Theory", "url": "https://seeing-theory.brown.edu/", "type": "interactive", "source": "Brown University", "free": true },
+      { "title": "Statistics 110: Probability", "url": "https://www.youtube.com/playlist?list=PL2SOU6wwxB0uwwH80KTQ6ht66KWxbzTIo", "type": "course", "source": "Harvard (Joe Blitzstein)", "free": true },
+      { "title": "OpenIntro Statistics", "url": "https://www.openintro.org/book/os/", "type": "book", "source": "OpenIntro", "free": true },
+      { "title": "Think Stats", "url": "https://greenteapress.com/wp/think-stats-3e/", "type": "book", "source": "Allen Downey", "free": true },
+      { "title": "Adding Error Bars to Evals", "url": "https://arxiv.org/abs/2411.00640", "type": "paper", "source": "arXiv (Anthropic)", "free": true },
+      { "title": "Statistics and probability", "url": "https://www.khanacademy.org/math/statistics-probability", "type": "course", "source": "Khan Academy", "free": true }
+    ],
+    "project": "Run the same 100-question eval on two prompt versions (or two models) at least three times each. Compute the mean score, standard error, and 95% confidence interval for each, plus a paired test on the difference. Write a short verdict on whether the \"better\" version is actually better, and how many questions you'd need to detect a 2-point difference."
+  },
+
+  "info-theory-optim": {
+    "summary": "Optimization is the science of how models find good parameters: gradient descent and optimizers like Adam. Information theory measures information and surprise, and gives us entropy, cross-entropy, and KL divergence, the losses most models are trained on.",
+    "why": "When training is unstable, slow, or stuck, the answer is usually in the optimizer settings or the loss. Cross-entropy, perplexity, and KL penalties in RLHF all come straight from information theory.",
+    "depth": "ML engineers must master SGD, momentum, Adam/AdamW, learning-rate schedules, and what cross-entropy, perplexity, and KL divergence mean. Researchers should go deeper into loss-landscape geometry, convergence, and newer optimizers. Data scientists need only cross-entropy and the basic idea of gradient descent. Convex optimization proofs and coding theory are 'know it exists' unless you do theory research.",
+    "hours": 25,
+    "outcomes": [
+      "You can explain entropy, cross-entropy, KL divergence, and perplexity, and how they relate.",
+      "You can explain why next-token cross-entropy loss is the training objective for LLMs.",
+      "You can compare SGD, momentum, and AdamW and choose sensible learning rates, warmup, and decay.",
+      "You can diagnose training curves that show too-high learning rate, plateaus, or divergence."
+    ],
+    "subtopics": [
+      {
+        "title": "Entropy, cross-entropy, and KL divergence",
+        "desc": "Entropy measures average surprise. Cross-entropy measures the cost of using the wrong distribution. KL divergence is the gap between them, and RLHF uses it to keep a model close to its starting point.",
+        "level": "core",
+        "resources": [
+          { "title": "Visual Information Theory", "url": "https://colah.github.io/posts/2015-09-Visual-Information/", "type": "article", "source": "Chris Olah", "free": true }
+        ]
+      },
+      {
+        "title": "Perplexity and compression",
+        "desc": "Perplexity is the exponent of cross-entropy, a measure of how surprised a language model is by real text. Better prediction means better compression.",
+        "level": "core",
+        "resources": [
+          { "title": "Information Theory (Dive into Deep Learning 22.11)", "url": "https://d2l.ai/chapter_appendix-mathematics-for-deep-learning/information-theory.html", "type": "book", "source": "d2l.ai", "free": true }
+        ]
+      },
+      {
+        "title": "Gradient descent and SGD",
+        "desc": "Take small steps against the gradient, using a random mini-batch each time. Batch size and learning rate trade off speed, noise, and stability.",
+        "level": "core",
+        "resources": [
+          { "title": "Optimization Algorithms (Dive into Deep Learning ch. 12)", "url": "https://d2l.ai/chapter_optimization/index.html", "type": "book", "source": "d2l.ai", "free": true }
+        ]
+      },
+      {
+        "title": "Momentum, Adam, and AdamW",
+        "desc": "Momentum smooths updates. Adam adapts the step size per parameter. AdamW fixes how weight decay interacts with Adam and is the default for training transformers.",
+        "level": "core",
+        "resources": [
+          { "title": "An overview of gradient descent optimization algorithms", "url": "https://www.ruder.io/optimizing-gradient-descent/", "type": "article", "source": "Sebastian Ruder", "free": true },
+          { "title": "Why Momentum Really Works", "url": "https://distill.pub/2017/momentum/", "type": "interactive", "source": "Distill", "free": true }
+        ]
+      },
+      {
+        "title": "Learning-rate schedules and newer optimizers",
+        "desc": "Warmup then decay (cosine or linear) is standard. Newer optimizers like Muon, which orthogonalize updates for weight matrices, are being adopted in large-scale training.",
+        "level": "deep",
+        "resources": [
+          { "title": "Muon: An optimizer for hidden layers in neural networks", "url": "https://kellerjordan.github.io/posts/muon/", "type": "article", "source": "Keller Jordan", "free": true },
+          { "title": "Decoupled Weight Decay Regularization (AdamW)", "url": "https://arxiv.org/abs/1711.05101", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Convex optimization and theory",
+        "desc": "Convex problems have one best answer and strong guarantees. Deep learning is not convex, but the ideas (duality, conditioning, convergence rates) still guide intuition.",
+        "level": "optional",
+        "resources": [
+          { "title": "Convex Optimization", "url": "https://web.stanford.edu/~boyd/cvxbook/", "type": "book", "source": "Boyd & Vandenberghe", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Visual Information Theory", "url": "https://colah.github.io/posts/2015-09-Visual-Information/", "type": "article", "source": "Chris Olah", "free": true },
+      { "title": "An overview of gradient descent optimization algorithms", "url": "https://www.ruder.io/optimizing-gradient-descent/", "type": "article", "source": "Sebastian Ruder", "free": true },
+      { "title": "Optimization Algorithms (Dive into Deep Learning ch. 12)", "url": "https://d2l.ai/chapter_optimization/index.html", "type": "book", "source": "d2l.ai", "free": true },
+      { "title": "Why Momentum Really Works", "url": "https://distill.pub/2017/momentum/", "type": "interactive", "source": "Distill", "free": true },
+      { "title": "Deep Learning (ch. 3 and 8)", "url": "https://www.deeplearningbook.org/", "type": "book", "source": "Goodfellow, Bengio, Courville", "free": true },
+      { "title": "Information Theory, Inference, and Learning Algorithms", "url": "https://www.inference.org.uk/itprnn/book.html", "type": "book", "source": "David MacKay", "free": true },
+      { "title": "Solving Wordle using information theory", "url": "https://www.3blue1brown.com/lessons/wordle", "type": "video", "source": "3Blue1Brown", "free": true }
+    ],
+    "project": "Train the same small network (for example, an MLP on MNIST or a tiny character-level language model) with SGD, SGD with momentum, and AdamW, each at three learning rates. Plot all loss curves on one chart and report final perplexity or accuracy. Write a paragraph explaining the differences using what you learned about momentum, adaptive steps, and cross-entropy."
+  },
+
+  "reading-papers": {
+    "summary": "Reading ML papers is the skill of getting the key idea out of a research paper quickly, judging whether the evidence supports it, and knowing when a paper deserves a deeper read.",
+    "why": "AI moves faster than textbooks and courses. New methods appear on arXiv first, and being able to read them directly keeps you current and lets you judge hype for yourself.",
+    "depth": "Researchers must master full critical reading: method, math, experimental design, baselines, and reproducing results. ML engineers should be able to read the method and results sections well enough to implement or apply an idea. AI engineers just need to skim abstracts, figures, and conclusions and know which sources to trust; a good blog summary is often enough.",
+    "hours": 20,
+    "outcomes": [
+      "You can use a three-pass approach to read a paper in 15 minutes, 1 hour, or deeply.",
+      "You can find a paper's main claim, the evidence for it, and its weakest point.",
+      "You can spot common problems: weak baselines, cherry-picked examples, missing error bars, and test-set leakage.",
+      "You can find, track, and organize papers using arXiv, Hugging Face Papers, and citation tools.",
+      "You can reimplement a key result from a short paper."
+    ],
+    "subtopics": [
+      {
+        "title": "The three-pass method",
+        "desc": "First pass: title, abstract, figures, conclusion. Second pass: the method and results, skipping proofs. Third pass: rebuild the argument yourself. Most papers only deserve the first pass.",
+        "level": "core",
+        "resources": [
+          { "title": "How to Read a Paper (S. Keshav)", "url": "http://ccr.sigcomm.org/online/files/p83-keshavA.pdf", "type": "paper", "source": "ACM SIGCOMM", "free": true }
+        ]
+      },
+      {
+        "title": "Anatomy of an ML paper",
+        "desc": "Know what each section is for: related work places the idea, the method defines it, ablations show what matters, and the appendix often holds the details that make it work.",
+        "level": "core",
+        "resources": [
+          { "title": "The Annotated Transformer", "url": "https://nlp.seas.harvard.edu/annotated-transformer/", "type": "article", "source": "Harvard NLP", "free": true }
+        ]
+      },
+      {
+        "title": "Reading critically",
+        "desc": "Ask whether baselines are fair and tuned, whether results include variance, whether benchmarks might be contaminated, and whether the claim generalizes beyond the tested setting.",
+        "level": "core",
+        "resources": [
+          { "title": "Adding Error Bars to Evals", "url": "https://arxiv.org/abs/2411.00640", "type": "paper", "source": "arXiv (Anthropic)", "free": true }
+        ]
+      },
+      {
+        "title": "Finding and tracking papers",
+        "desc": "Use arXiv listings, Hugging Face daily papers, and lab blogs to stay current. Citation graph tools help you find the earlier work a paper builds on.",
+        "level": "core",
+        "resources": [
+          { "title": "Hugging Face Papers", "url": "https://huggingface.co/papers", "type": "tool", "source": "Hugging Face", "free": true },
+          { "title": "Connected Papers", "url": "https://www.connectedpapers.com/", "type": "tool", "source": "Connected Papers", "free": true }
+        ]
+      },
+      {
+        "title": "Reading the math",
+        "desc": "Learn common notation and read equations by asking what goes in, what comes out, and what is being minimized. Map each equation to a few lines of code.",
+        "level": "deep"
+      },
+      {
+        "title": "Reproducing results",
+        "desc": "Reimplementing a paper is the deepest way to understand it and often reveals details the text leaves out.",
+        "level": "deep",
+        "resources": [
+          { "title": "Let's build GPT: from scratch, in code, spelled out", "url": "https://www.youtube.com/watch?v=kCc8FmEb1nY", "type": "video", "source": "Andrej Karpathy", "free": true }
+        ]
+      },
+      {
+        "title": "Using AI to read papers",
+        "desc": "Ask an LLM to explain a section, define terms, or quiz you, and use tools like alphaXiv to discuss a paper line by line. Always check claims against the paper itself.",
+        "level": "optional",
+        "resources": [
+          { "title": "alphaXiv", "url": "https://www.alphaxiv.org/", "type": "tool", "source": "alphaXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "How to Read a Paper (S. Keshav)", "url": "http://ccr.sigcomm.org/online/files/p83-keshavA.pdf", "type": "paper", "source": "ACM SIGCOMM", "free": true },
+      { "title": "The Annotated Transformer", "url": "https://nlp.seas.harvard.edu/annotated-transformer/", "type": "article", "source": "Harvard NLP", "free": true },
+      { "title": "Hugging Face Papers", "url": "https://huggingface.co/papers", "type": "tool", "source": "Hugging Face", "free": true },
+      { "title": "arXiv", "url": "https://arxiv.org/", "type": "tool", "source": "arXiv", "free": true },
+      { "title": "Lil'Log", "url": "https://lilianweng.github.io/", "type": "article", "source": "Lilian Weng", "free": true },
+      { "title": "Yannic Kilcher (paper walkthroughs)", "url": "https://www.youtube.com/@YannicKilcher", "type": "video", "source": "Yannic Kilcher", "free": true },
+      { "title": "Semantic Scholar", "url": "https://www.semanticscholar.org/", "type": "tool", "source": "Allen Institute for AI", "free": true }
+    ],
+    "project": "Pick three papers: one classic (Attention Is All You Need), one from the past year, and one in your area. Do a first pass on each and write a five-line summary: claim, method, evidence, weakest point, and whether it's worth a deeper read. Then take the shortest one and reproduce one key figure or table at small scale, noting anything the paper left out."
+  }
+}

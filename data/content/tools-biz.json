@@ -1,0 +1,968 @@
+{
+  "what-is-ai": {
+    "summary": "AI is software that learns patterns from data instead of following rules a programmer wrote by hand. Today's chat assistants are large language models (LLMs): systems trained on huge amounts of text to predict what comes next, which turns out to let them write, summarize, reason through problems, and use tools.",
+    "why": "Everything else on this map builds on a clear picture of what these systems are. If you know what is really happening under the hood, you can tell when to trust AI, when to double-check it, and when not to use it at all.",
+    "depth": "Aim for a solid mental model, not technical detail. You don't need to know how neural networks are trained; you do need to know that AI predicts likely answers rather than looking up true ones, and that it can be confidently wrong.",
+    "hours": 4,
+    "outcomes": [
+      "You can explain in plain words the difference between AI, machine learning, deep learning, and generative AI.",
+      "You can describe what an LLM does when it answers a question, and why that means it can make things up.",
+      "You can name tasks AI is reliably good at today and tasks where it still struggles.",
+      "You can spot hype in an AI claim and ask the right follow-up question."
+    ],
+    "subtopics": [
+      {
+        "title": "AI, machine learning, deep learning, generative AI",
+        "desc": "These terms nest inside each other. AI is the broad goal, machine learning is learning from data, deep learning uses large neural networks, and generative AI creates new text, images, or audio.",
+        "level": "core",
+        "resources": [
+          { "title": "Elements of AI", "url": "https://www.elementsofai.com/", "type": "course", "source": "University of Helsinki", "free": true }
+        ]
+      },
+      {
+        "title": "How a language model produces an answer",
+        "desc": "An LLM breaks text into tokens and repeatedly predicts the next one. Training on vast text gives it broad knowledge and skills, but it has no built-in fact checker.",
+        "level": "core",
+        "resources": [
+          { "title": "Large Language Models explained briefly", "url": "https://www.youtube.com/watch?v=LPZh9BOjkQs", "type": "video", "source": "3Blue1Brown", "free": true }
+        ]
+      },
+      {
+        "title": "What AI is good and bad at",
+        "desc": "AI ability is 'jagged': it can ace a hard exam question and then fail a simple counting task. Learn the rough shape of that frontier so you pick the right jobs for it.",
+        "level": "core",
+        "resources": [
+          { "title": "Centaurs and Cyborgs on the Jagged Frontier", "url": "https://www.oneusefulthing.org/p/centaurs-and-cyborgs-on-the-jagged", "type": "article", "source": "Ethan Mollick", "free": true }
+        ]
+      },
+      {
+        "title": "Assistants, reasoning models, and agents",
+        "desc": "A chat assistant answers a message. A reasoning model 'thinks' step by step before answering, which helps on hard problems. An agent can take actions on its own, like searching, running code, or editing files, over many steps.",
+        "level": "core"
+      },
+      {
+        "title": "Training vs. using a model",
+        "desc": "Building a model costs huge amounts of data and compute and happens once. Using it (called inference) is what you do every time you send a prompt. Most people and businesses only ever use models.",
+        "level": "deep",
+        "resources": [
+          { "title": "Intro to Large Language Models", "url": "https://www.youtube.com/watch?v=zjkBMFhNj_g", "type": "video", "source": "Andrej Karpathy", "free": true }
+        ]
+      },
+      {
+        "title": "Separating hype from reality",
+        "desc": "Claims like 'AI will replace all jobs' or 'it's just autocomplete' both miss the mark. Learn to ask what was measured, on which task, and compared to what.",
+        "level": "optional",
+        "resources": [
+          { "title": "AI as Normal Technology (newsletter)", "url": "https://www.normaltech.ai/", "type": "article", "source": "Arvind Narayanan & Sayash Kapoor", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Elements of AI", "url": "https://www.elementsofai.com/", "type": "course", "source": "University of Helsinki", "free": true },
+      { "title": "AI For Everyone", "url": "https://www.deeplearning.ai/courses/ai-for-everyone", "type": "course", "source": "DeepLearning.AI (Andrew Ng)", "free": true },
+      { "title": "Large Language Models explained briefly", "url": "https://www.youtube.com/watch?v=LPZh9BOjkQs", "type": "video", "source": "3Blue1Brown", "free": true },
+      { "title": "AI Fluency: Framework & Foundations", "url": "https://anthropic.skilljar.com/ai-fluency-framework-foundations", "type": "course", "source": "Anthropic", "free": true },
+      { "title": "Intro to Large Language Models", "url": "https://www.youtube.com/watch?v=zjkBMFhNj_g", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "What Is Artificial Intelligence (AI)?", "url": "https://www.ibm.com/think/topics/artificial-intelligence", "type": "article", "source": "IBM", "free": true }
+    ],
+    "project": "Write a one-page explainer called 'What AI is, in our house (or company)' for a friend or coworker who has never used it. Include three things it does well, three it gets wrong, and one real example you tested yourself where it confidently made a mistake."
+  },
+
+  "ai-landscape": {
+    "summary": "The AI tool landscape is the map of products you can actually use: general assistants like ChatGPT, Claude, Gemini, and Copilot, plus specialist tools for search, writing, coding, meetings, images, audio, video, and automation.",
+    "why": "New tools appear every week, and most are thin wrappers around a few underlying models. Knowing the categories lets you pick the right tool quickly, avoid paying twice for the same thing, and ignore most of the noise.",
+    "depth": "Know the main assistant families and the categories of specialist tools well enough to choose. You don't need to track every launch or benchmark; you do need a simple way to compare tools on your own tasks.",
+    "hours": 5,
+    "outcomes": [
+      "You can name the major general-purpose assistants and what each is known for.",
+      "You can sort a new AI product into a category and tell whether it adds real value over a general assistant.",
+      "You can compare two tools on a task you care about with a fair side-by-side test.",
+      "You can explain the difference between free, paid, and business/enterprise plans, including what happens to your data."
+    ],
+    "subtopics": [
+      {
+        "title": "General-purpose assistants",
+        "desc": "ChatGPT (OpenAI), Claude (Anthropic), Gemini (Google), and Microsoft Copilot are the big four. They overlap a lot, but differ in writing style, tool integrations, file handling, and which apps they live inside.",
+        "level": "core",
+        "resources": [
+          { "title": "A Guide to Which AI to Use in the Agentic Era", "url": "https://www.oneusefulthing.org/p/a-guide-to-which-ai-to-use-in-the", "type": "article", "source": "Ethan Mollick", "free": true }
+        ]
+      },
+      {
+        "title": "Models vs. products",
+        "desc": "A model (like a specific GPT, Claude, or Gemini version) is the engine. A product (the chat app, a writing tool, a meeting recorder) wraps a model with an interface and features. Many products let you pick which model runs underneath.",
+        "level": "core"
+      },
+      {
+        "title": "Specialist tool categories",
+        "desc": "AI search and research (Perplexity, deep research modes), meeting notes, writing aids, coding assistants, image/audio/video generators, and automation platforms. Each solves a narrower job, usually with better workflow fit.",
+        "level": "core",
+        "resources": [
+          { "title": "The best AI productivity tools", "url": "https://zapier.com/blog/best-ai-productivity-tools/", "type": "article", "source": "Zapier", "free": true }
+        ]
+      },
+      {
+        "title": "Plans, pricing, and data handling",
+        "desc": "Free tiers have usage limits and may use your chats for training unless you opt out. Business and enterprise plans usually exclude your data from training and add admin controls. Check the settings before pasting anything sensitive.",
+        "level": "core"
+      },
+      {
+        "title": "Reading leaderboards and benchmarks",
+        "desc": "Sites like Artificial Analysis compare models on quality, speed, and price. They are useful for a shortlist, but your own tasks are the real test.",
+        "level": "deep",
+        "resources": [
+          { "title": "Artificial Analysis", "url": "https://artificialanalysis.ai/", "type": "tool", "source": "Artificial Analysis", "free": true }
+        ]
+      },
+      {
+        "title": "Open-weight and local models",
+        "desc": "Some models (like Llama, Mistral, Qwen, Gemma) can be downloaded and run on your own computer or servers. That trades some convenience and capability for privacy and control.",
+        "level": "optional"
+      }
+    ],
+    "resources": [
+      { "title": "A Guide to Which AI to Use in the Agentic Era", "url": "https://www.oneusefulthing.org/p/a-guide-to-which-ai-to-use-in-the", "type": "article", "source": "Ethan Mollick", "free": true },
+      { "title": "How I use LLMs", "url": "https://www.youtube.com/watch?v=EWvNQjAaOHw", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "The best AI productivity tools", "url": "https://zapier.com/blog/best-ai-productivity-tools/", "type": "article", "source": "Zapier", "free": true },
+      { "title": "Artificial Analysis: model comparisons", "url": "https://artificialanalysis.ai/", "type": "tool", "source": "Artificial Analysis", "free": true },
+      { "title": "AI Index Report", "url": "https://hai.stanford.edu/ai-index", "type": "article", "source": "Stanford HAI", "free": true },
+      { "title": "Simon Willison's Weblog", "url": "https://simonwillison.net/", "type": "article", "source": "Simon Willison", "free": true }
+    ],
+    "project": "Pick three real tasks from your week (for example: drafting an email, summarizing a PDF, planning a trip). Run each through two different assistants with the identical prompt. Score the outputs in a simple table and write two sentences on which tool you'll default to and why."
+  },
+
+  "prompting-basics": {
+    "summary": "Prompting is how you ask AI for what you want. Good basic prompts give context, a clear task, and a description of what a good answer looks like, then you refine through conversation.",
+    "why": "The same model gives weak or excellent results depending on how you ask. A few simple habits get most people from 'AI is underwhelming' to 'AI saves me hours a week'.",
+    "depth": "Master the everyday habits: context, clear asks, examples, and iterating. You don't need special 'magic words' or long templates; modern models respond best to plain, specific instructions, like briefing a smart new colleague.",
+    "hours": 5,
+    "outcomes": [
+      "You can write a prompt that includes the context, the task, and the format you want.",
+      "You can improve a weak answer by giving feedback in the same chat instead of starting over.",
+      "You can use examples and documents in a prompt to steer the result.",
+      "You can recognize when to start a fresh chat because the conversation has gone off track."
+    ],
+    "subtopics": [
+      {
+        "title": "Give context like you're briefing a colleague",
+        "desc": "Say who you are, who the output is for, and why you need it. The model can't read your mind, and missing context is the most common cause of generic answers.",
+        "level": "core",
+        "resources": [
+          { "title": "Prompting best practices: be clear and direct", "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#be-clear-and-direct", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Be specific about the output",
+        "desc": "State length, tone, structure, and audience. 'Three bullet points for a busy CFO' beats 'summarize this'.",
+        "level": "core"
+      },
+      {
+        "title": "Show examples",
+        "desc": "Pasting one or two examples of what good looks like (a past email, a sample format) is often the fastest way to get the style you want.",
+        "level": "core"
+      },
+      {
+        "title": "Iterate in conversation",
+        "desc": "Treat the first answer as a draft. Tell the model what to change, ask it to try three alternatives, or ask what information it needs from you.",
+        "level": "core",
+        "resources": [
+          { "title": "Working with AI: Two paths to prompting", "url": "https://www.oneusefulthing.org/p/working-with-ai-two-paths-to-prompting", "type": "article", "source": "Ethan Mollick", "free": true }
+        ]
+      },
+      {
+        "title": "Attach files and sources",
+        "desc": "Upload the document, spreadsheet, or screenshot instead of describing it. Answers grounded in your material are far more accurate than answers from the model's memory.",
+        "level": "core"
+      },
+      {
+        "title": "Know when to start fresh",
+        "desc": "Long chats fill up with old instructions and mistakes that keep influencing answers. A clean chat with a better first prompt often beats ten corrections.",
+        "level": "deep"
+      }
+    ],
+    "resources": [
+      { "title": "Prompt engineering overview", "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Google Workspace with Gemini Prompt Guide", "url": "https://workspace.google.com/learning/content/gemini-prompt-guide", "type": "docs", "source": "Google", "free": true },
+      { "title": "AI prompt guide: How to write effective AI prompts", "url": "https://zapier.com/blog/ai-prompt/", "type": "article", "source": "Zapier", "free": true },
+      { "title": "How I use LLMs", "url": "https://www.youtube.com/watch?v=EWvNQjAaOHw", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "Learn Prompting", "url": "https://learnprompting.org/", "type": "course", "source": "Learn Prompting", "free": true },
+      { "title": "Google AI Essentials", "url": "https://grow.google/ai-essentials/", "type": "course", "source": "Google", "free": false }
+    ],
+    "project": "Take one task you do every week. Write a one-line prompt for it and save the result. Then rewrite the prompt with context, audience, format, and an example, and compare. Keep the improved version in a notes file as the start of your personal prompt library."
+  },
+
+  "prompt-engineering": {
+    "summary": "Prompt engineering is the more systematic version of prompting: structuring instructions, using examples and delimiters, asking for step-by-step reasoning, controlling output format, and testing prompts so they work reliably, not just once.",
+    "why": "Once a prompt is reused by a team, a custom assistant, or an automation, 'it worked once' isn't enough. Structured, tested prompts give consistent results and are the foundation for assistants, agents, and LLM apps.",
+    "depth": "Master clear structure, examples, output formats, and testing against a handful of real cases. Know that tricks like 'you are a world-class expert' or bribes matter much less with current models; reasoning models also need less step-by-step coaching than older ones.",
+    "hours": 12,
+    "outcomes": [
+      "You can write a reusable prompt template with sections for role, context, instructions, examples, and output format.",
+      "You can get reliable structured output (tables, JSON, fixed headings) from a model.",
+      "You can break a complex task into a chain of smaller prompts.",
+      "You can test a prompt against several real inputs and fix the failures you find.",
+      "You can explain how prompting differs for reasoning models."
+    ],
+    "subtopics": [
+      {
+        "title": "Structure: roles, sections, and delimiters",
+        "desc": "Separate instructions from data with clear headings or XML-style tags like <document>. This stops the model from confusing your material with your instructions.",
+        "level": "core",
+        "resources": [
+          { "title": "Structure prompts with XML tags", "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#structure-prompts-with-xml-tags", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Few-shot examples",
+        "desc": "Include a few input/output pairs that show exactly what you want. Vary them so the model learns the pattern rather than copying one example.",
+        "level": "core",
+        "resources": [
+          { "title": "Use examples effectively", "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#use-examples-effectively", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Reasoning and thinking",
+        "desc": "Asking the model to think before answering improves hard tasks. Reasoning models do this automatically, so with them you focus on the goal and constraints rather than spelling out every step.",
+        "level": "core",
+        "resources": [
+          { "title": "Reasoning models guide", "url": "https://developers.openai.com/api/docs/guides/reasoning", "type": "docs", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "Output formatting",
+        "desc": "Specify the exact shape you want: a table, a JSON object, a fixed set of headings. Consistent formats make results easy to paste into documents, spreadsheets, or automations.",
+        "level": "core"
+      },
+      {
+        "title": "Prompt chaining",
+        "desc": "Split big jobs into steps (extract, then analyze, then write) where each prompt's output feeds the next. Each step is easier to check and fix.",
+        "level": "deep"
+      },
+      {
+        "title": "Testing prompts",
+        "desc": "Collect 5 to 20 real inputs, including tricky ones, and run your prompt on all of them whenever you change it. This is the small-scale version of the evals that AI engineers use.",
+        "level": "deep",
+        "resources": [
+          { "title": "Define success criteria and build evaluations", "url": "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "From prompts to context engineering",
+        "desc": "In agents and apps, the prompt is only part of what the model sees. Context engineering is deciding which documents, tool results, and history go into the model's limited context window.",
+        "level": "optional",
+        "resources": [
+          { "title": "Effective context engineering for AI agents", "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Claude prompting best practices", "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Interactive prompt engineering tutorial", "url": "https://github.com/anthropics/prompt-eng-interactive-tutorial", "type": "interactive", "source": "Anthropic", "free": true },
+      { "title": "Prompt engineering guide", "url": "https://developers.openai.com/api/docs/guides/prompt-engineering", "type": "docs", "source": "OpenAI", "free": true },
+      { "title": "Prompt design strategies", "url": "https://ai.google.dev/gemini-api/docs/prompting-strategies", "type": "docs", "source": "Google", "free": true },
+      { "title": "AI prompt engineering: A deep dive", "url": "https://www.youtube.com/watch?v=T9aRN5JkmL8", "type": "video", "source": "Anthropic", "free": true },
+      { "title": "Prompt Engineering whitepaper", "url": "https://www.kaggle.com/whitepaper-prompt-engineering", "type": "paper", "source": "Google / Kaggle", "free": true },
+      { "title": "Prompt Engineering Guide", "url": "https://www.promptingguide.ai/", "type": "article", "source": "DAIR.AI", "free": true }
+    ],
+    "project": "Build a reusable prompt for a recurring job, such as turning messy meeting notes into a standard action-item summary. Collect 10 real inputs, run the prompt on all of them, log every failure, and revise until at least 9 of 10 come out right. Save the final prompt with a short note on what you changed and why."
+  },
+
+  "ai-productivity": {
+    "summary": "This is about weaving AI into the work you already do: email, documents, research, meetings, spreadsheets, planning, and learning. The goal is steady time savings and better quality, not occasional novelty.",
+    "why": "Most of AI's value for individuals and small teams comes from many small daily uses that add up. People who build these habits get hours back each week; people who don't often conclude AI 'isn't that useful'.",
+    "depth": "Master a handful of repeatable workflows in the tools you already use, plus the habit of checking outputs. You don't need to adopt every new app; you do need to know which tasks to hand off, which to do together with AI, and which to keep for yourself.",
+    "hours": 10,
+    "outcomes": [
+      "You can map your weekly tasks and pick the ones where AI saves the most time.",
+      "You can use AI for writing, summarizing, research, and data analysis with a reliable checking step.",
+      "You can use built-in AI features in your email, docs, and spreadsheet tools.",
+      "You can use deep research and file analysis features to get sourced answers.",
+      "You can measure how much time a new AI habit actually saves."
+    ],
+    "subtopics": [
+      {
+        "title": "Auditing your work for AI fit",
+        "desc": "List your recurring tasks and rate each one: how often, how long, how risky if wrong. Frequent, time-consuming, low-risk tasks with easy checking are the best starting points.",
+        "level": "core",
+        "resources": [
+          { "title": "15 Times to use AI, and 5 Not to", "url": "https://www.oneusefulthing.org/p/15-times-to-use-ai-and-5-not-to", "type": "article", "source": "Ethan Mollick", "free": true }
+        ]
+      },
+      {
+        "title": "Writing and editing",
+        "desc": "Use AI for first drafts, rewrites for different audiences, tightening long text, and getting critical feedback. Keep your own judgment and voice in the final version.",
+        "level": "core"
+      },
+      {
+        "title": "Research and deep research",
+        "desc": "Search-connected assistants and deep research modes read many web pages and return a sourced report. Always open the key sources yourself before relying on a claim.",
+        "level": "core"
+      },
+      {
+        "title": "Working with your own files and data",
+        "desc": "Upload PDFs, spreadsheets, and slides to get summaries, comparisons, charts, and analysis. Tools like Gemini Notebook (formerly NotebookLM) and Claude or ChatGPT Projects keep a set of sources handy.",
+        "level": "core"
+      },
+      {
+        "title": "AI inside the tools you already use",
+        "desc": "Microsoft 365 Copilot, Gemini in Google Workspace, and assistants connected to your email, calendar, and drives can act on your real work. Connectors (often built on MCP) let one assistant reach many apps.",
+        "level": "deep",
+        "resources": [
+          { "title": "Microsoft 365 Copilot", "url": "https://www.microsoft.com/en-us/microsoft-365/copilot", "type": "tool", "source": "Microsoft", "free": false }
+        ]
+      },
+      {
+        "title": "Verification habits",
+        "desc": "Decide in advance how you'll check each type of output: open the cited source, re-run the numbers, or ask a second model. The check should take much less time than doing the task yourself.",
+        "level": "core"
+      },
+      {
+        "title": "Handing off to agents",
+        "desc": "Agent features can now browse, fill forms, and run multi-step tasks for you. Start with low-stakes tasks and review what they did before trusting them with more.",
+        "level": "optional"
+      }
+    ],
+    "resources": [
+      { "title": "How I use LLMs", "url": "https://www.youtube.com/watch?v=EWvNQjAaOHw", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "15 Times to use AI, and 5 Not to", "url": "https://www.oneusefulthing.org/p/15-times-to-use-ai-and-5-not-to", "type": "article", "source": "Ethan Mollick", "free": true },
+      { "title": "OpenAI Academy", "url": "https://academy.openai.com/", "type": "course", "source": "OpenAI", "free": true },
+      { "title": "Anthropic Courses (AI Fluency and more)", "url": "https://anthropic.skilljar.com/", "type": "course", "source": "Anthropic", "free": true },
+      { "title": "Google Workspace with Gemini Prompt Guide", "url": "https://workspace.google.com/learning/content/gemini-prompt-guide", "type": "docs", "source": "Google", "free": true },
+      { "title": "Co-Intelligence: Living and Working with AI", "url": "https://www.penguinrandomhouse.com/books/741805/co-intelligence-by-ethan-mollick/", "type": "book", "source": "Ethan Mollick", "free": false }
+    ],
+    "project": "Track your work for one week and list every recurring task. Pick the three best AI candidates, design a workflow for each (prompt, tool, and how you'll check the output), and use them for two weeks. Record minutes saved per task and decide which to keep."
+  },
+
+  "multimodal-tools": {
+    "summary": "Multimodal tools create or understand images, audio, and video, not just text. They cover image generation and editing, voice and speech, music, and short video clips.",
+    "why": "Visuals, voice, and video used to need specialists and budgets. Now a small business or individual can make product images, voiceovers, explainer clips, and transcripts in minutes, if they understand the quality limits and the legal risks.",
+    "depth": "Get hands-on with at least one image, one voice, and one video tool, and learn the rules on rights and disclosure. You don't need to understand diffusion models; you do need to know about likeness, copyright, and labeling AI-made media.",
+    "hours": 8,
+    "outcomes": [
+      "You can generate and edit images with text prompts and reference images to match a specific look.",
+      "You can produce a voiceover or transcription and fix common errors.",
+      "You can create a short AI video clip and know its current length and consistency limits.",
+      "You can explain the copyright, likeness, and disclosure rules that apply to AI-generated media."
+    ],
+    "subtopics": [
+      {
+        "title": "Image generation and editing",
+        "desc": "Tools built into ChatGPT, Gemini, Midjourney, Adobe Firefly, and Canva can create images from text or edit existing ones by instruction. Describe subject, style, composition, and lighting, and use reference images for consistency.",
+        "level": "core",
+        "resources": [
+          { "title": "Image generation guide", "url": "https://ai.google.dev/gemini-api/docs/image-generation", "type": "docs", "source": "Google", "free": true }
+        ]
+      },
+      {
+        "title": "Voice, speech, and transcription",
+        "desc": "Text-to-speech can produce natural voiceovers in many languages; speech-to-text turns meetings and calls into searchable transcripts. Voice cloning exists but requires the speaker's clear consent.",
+        "level": "core",
+        "resources": [
+          { "title": "ElevenLabs documentation", "url": "https://elevenlabs.io/docs/overview/intro", "type": "docs", "source": "ElevenLabs", "free": true }
+        ]
+      },
+      {
+        "title": "Video generation",
+        "desc": "Models like Veo, Sora, and Runway create short clips from text or images. They are great for b-roll, concepts, and social content, but long scenes with consistent characters still take work.",
+        "level": "core",
+        "resources": [
+          { "title": "Runway Academy", "url": "https://academy.runwayml.com/", "type": "course", "source": "Runway", "free": true }
+        ]
+      },
+      {
+        "title": "Understanding images and documents",
+        "desc": "Assistants can read screenshots, charts, receipts, handwriting, and photos. This 'vision' input is often more useful day to day than generating new images.",
+        "level": "core"
+      },
+      {
+        "title": "Copyright, likeness, and commercial use",
+        "desc": "Purely AI-generated work may not be protected by copyright, tool terms differ on commercial rights, and using someone's face or voice without permission is risky or illegal. Check before you publish.",
+        "level": "deep",
+        "resources": [
+          { "title": "Copyright and Artificial Intelligence", "url": "https://www.copyright.gov/ai/", "type": "docs", "source": "U.S. Copyright Office", "free": true }
+        ]
+      },
+      {
+        "title": "Provenance and labeling",
+        "desc": "Content Credentials (the C2PA standard) and watermarks like SynthID mark media as AI-made. Some platforms and laws now require you to label synthetic media.",
+        "level": "optional",
+        "resources": [
+          { "title": "C2PA: Verifying Media Content Sources", "url": "https://c2pa.org/", "type": "docs", "source": "C2PA", "free": true }
+        ]
+      },
+      {
+        "title": "Music generation",
+        "desc": "Tools like Suno generate full songs from a prompt. Useful for background tracks and drafts; check licensing terms before commercial use.",
+        "level": "optional"
+      }
+    ],
+    "resources": [
+      { "title": "Image generation guide", "url": "https://ai.google.dev/gemini-api/docs/image-generation", "type": "docs", "source": "Google", "free": true },
+      { "title": "Image generation guide", "url": "https://developers.openai.com/api/docs/guides/image-generation", "type": "docs", "source": "OpenAI", "free": true },
+      { "title": "Runway Academy", "url": "https://academy.runwayml.com/", "type": "course", "source": "Runway", "free": true },
+      { "title": "Veo", "url": "https://deepmind.google/models/veo/", "type": "tool", "source": "Google DeepMind", "free": true },
+      { "title": "ElevenLabs documentation", "url": "https://elevenlabs.io/docs/overview/intro", "type": "docs", "source": "ElevenLabs", "free": true },
+      { "title": "Copyright and Artificial Intelligence", "url": "https://www.copyright.gov/ai/", "type": "docs", "source": "U.S. Copyright Office", "free": true },
+      { "title": "Content Authenticity Initiative", "url": "https://contentauthenticity.org/", "type": "article", "source": "Content Authenticity Initiative", "free": true }
+    ],
+    "project": "Make a 30-second promo for a real or imaginary product: three AI-generated images or clips, an AI voiceover reading a script you wrote with AI help, and simple editing to combine them. Add a note listing every tool used, its commercial-use terms, and how you labeled the result as AI-made."
+  },
+
+  "custom-assistants": {
+    "summary": "Custom assistants are saved, reusable setups of an AI with your own instructions, files, and tools. Examples include Claude Projects and Skills, ChatGPT Projects and custom GPTs, Gemini Gems, and Microsoft Copilot agents.",
+    "why": "Instead of re-explaining your business, style, and rules in every chat, you set it up once. Teams can share one assistant for support replies, proposals, onboarding, or policy questions, so everyone gets consistent results.",
+    "depth": "Master writing solid instructions, choosing the right knowledge files, and testing before you share. Know that features and plan availability change often (for example, which plans can build GPTs), so check the current help pages. Connecting tools and actions is a deeper step.",
+    "hours": 10,
+    "outcomes": [
+      "You can build a custom assistant with clear instructions and a curated knowledge base.",
+      "You can choose between a project, a custom assistant, a skill, and a full automation for a given job.",
+      "You can test an assistant on realistic questions and fix where it goes wrong.",
+      "You can share an assistant with a team safely, knowing what data it can access."
+    ],
+    "subtopics": [
+      {
+        "title": "The main options",
+        "desc": "Projects (Claude, ChatGPT) group chats with shared files and instructions. Custom GPTs and Gemini Gems are shareable assistants with a fixed purpose. Copilot Studio builds assistants inside Microsoft 365. Pick based on where your team already works.",
+        "level": "core",
+        "resources": [
+          { "title": "What are projects?", "url": "https://support.claude.com/en/articles/9517075-what-are-projects", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "Use Gems in Gemini Apps", "url": "https://support.google.com/gemini/answer/15146780", "type": "docs", "source": "Google", "free": true }
+        ]
+      },
+      {
+        "title": "Writing system instructions",
+        "desc": "Instructions tell the assistant its job, audience, tone, what to do when unsure, and what never to do. Write them like an onboarding doc for a new hire, with examples of good answers.",
+        "level": "core",
+        "resources": [
+          { "title": "On-boarding your AI Intern", "url": "https://www.oneusefulthing.org/p/on-boarding-your-ai-intern", "type": "article", "source": "Ethan Mollick", "free": true }
+        ]
+      },
+      {
+        "title": "Knowledge files",
+        "desc": "Upload the documents the assistant should rely on: FAQs, price lists, style guides, policies. Keep them current, well organized, and free of anything users shouldn't see.",
+        "level": "core"
+      },
+      {
+        "title": "Skills and reusable procedures",
+        "desc": "Skills package instructions, examples, and scripts for a specific procedure (like 'make a branded report') that the assistant loads only when needed. They keep long, detailed know-how out of every conversation.",
+        "level": "deep",
+        "resources": [
+          { "title": "What are skills?", "url": "https://support.claude.com/en/articles/12512176-what-are-skills", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Connecting tools and actions",
+        "desc": "Assistants can connect to calendars, CRMs, drives, and other apps through built-in connectors, actions, or MCP servers. This turns an assistant from 'answers questions' into 'does tasks'.",
+        "level": "deep",
+        "resources": [
+          { "title": "Model Context Protocol", "url": "https://modelcontextprotocol.io/", "type": "docs", "source": "MCP", "free": true }
+        ]
+      },
+      {
+        "title": "Testing and sharing safely",
+        "desc": "Try 15 to 20 real questions, including off-topic and adversarial ones, before sharing. Remember that users can sometimes extract instructions and files, so don't put secrets in them.",
+        "level": "core"
+      }
+    ],
+    "resources": [
+      { "title": "What are projects?", "url": "https://support.claude.com/en/articles/9517075-what-are-projects", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Use Gems in Gemini Apps", "url": "https://support.google.com/gemini/answer/15146780", "type": "docs", "source": "Google", "free": true },
+      { "title": "Introducing Agent Skills", "url": "https://claude.com/resources/articles/skills", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Microsoft Copilot Studio documentation", "url": "https://learn.microsoft.com/en-us/microsoft-copilot-studio/", "type": "docs", "source": "Microsoft", "free": true },
+      { "title": "On-boarding your AI Intern", "url": "https://www.oneusefulthing.org/p/on-boarding-your-ai-intern", "type": "article", "source": "Ethan Mollick", "free": true },
+      { "title": "OpenAI Academy", "url": "https://academy.openai.com/", "type": "course", "source": "OpenAI", "free": true }
+    ],
+    "project": "Build a custom assistant for one real job, such as answering customer FAQs or drafting proposals in your company style. Write the instructions, upload 3 to 5 knowledge files, and test it on 20 real questions. Track the failures, fix the instructions or files, and share it with one colleague for feedback."
+  },
+
+  "ai-for-business-101": {
+    "summary": "This is the business owner's overview of where AI fits: which kinds of work it helps with, what it costs, what risks it brings, and how other companies are using it today.",
+    "why": "Leaders face constant pressure to 'do something with AI'. A clear picture of where AI actually creates value helps you avoid both wasted pilots and missed opportunities.",
+    "depth": "Understand the main categories of business value and the main risks well enough to lead a conversation. You don't need technical knowledge of models; you do need to know that AI works best on specific tasks inside processes, not as a vague 'transformation'.",
+    "hours": 6,
+    "outcomes": [
+      "You can describe the main ways AI creates business value: saving time, improving quality, growing revenue, and enabling new offerings.",
+      "You can explain the difference between tasks AI can fully automate and tasks where it assists a person.",
+      "You can name the key risks (accuracy, data privacy, legal, reputational) and basic mitigations.",
+      "You can point to real examples of AI use in your industry."
+    ],
+    "subtopics": [
+      {
+        "title": "Tasks, not jobs",
+        "desc": "AI rarely replaces a whole role. It takes on specific tasks: drafting, summarizing, classifying, answering routine questions, extracting data. Think about work as a list of tasks to find the fit.",
+        "level": "core",
+        "resources": [
+          { "title": "The Anthropic Economic Index", "url": "https://www.anthropic.com/economic-index", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Where the value shows up",
+        "desc": "Common wins are customer support, sales and marketing content, internal knowledge search, document processing, coding, and analysis. Look at what peers in your industry have already shipped.",
+        "level": "core",
+        "resources": [
+          { "title": "Real-world gen AI use cases from leading organizations", "url": "https://cloud.google.com/transform/101-real-world-generative-ai-use-cases-from-industry-leaders", "type": "article", "source": "Google Cloud", "free": true }
+        ]
+      },
+      {
+        "title": "Augment vs. automate",
+        "desc": "Augmentation helps a person do the job faster or better and keeps them in charge. Automation lets AI do it end to end. Most companies should start with augmentation, then automate what proves reliable.",
+        "level": "core"
+      },
+      {
+        "title": "Costs",
+        "desc": "Costs include subscriptions or usage fees, setup and integration work, training staff, and the time spent checking output. Seat-based tools are predictable; usage-based APIs scale with volume.",
+        "level": "core"
+      },
+      {
+        "title": "Risks and guardrails",
+        "desc": "AI can be wrong, leak sensitive data if used carelessly, and create legal exposure. A simple acceptable-use policy and business-grade plans address most early risks.",
+        "level": "core",
+        "resources": [
+          { "title": "How to Implement AI Responsibly", "url": "https://hbr.org/2024/05/how-to-implement-ai-responsibly", "type": "article", "source": "Harvard Business Review", "free": false }
+        ]
+      },
+      {
+        "title": "Agents in business",
+        "desc": "AI agents can run multi-step work like processing an order or researching leads. They are powerful but need clear limits, logging, and human sign-off on important actions.",
+        "level": "deep"
+      }
+    ],
+    "resources": [
+      { "title": "Generative AI for Everyone", "url": "https://www.deeplearning.ai/courses/generative-ai-for-everyone", "type": "course", "source": "DeepLearning.AI (Andrew Ng)", "free": true },
+      { "title": "AI For Everyone", "url": "https://www.deeplearning.ai/courses/ai-for-everyone", "type": "course", "source": "DeepLearning.AI (Andrew Ng)", "free": true },
+      { "title": "AI in the Enterprise", "url": "https://cdn.openai.com/business-guides-and-resources/ai-in-the-enterprise.pdf", "type": "article", "source": "OpenAI", "free": true },
+      { "title": "Real-world gen AI use cases from leading organizations", "url": "https://cloud.google.com/transform/101-real-world-generative-ai-use-cases-from-industry-leaders", "type": "article", "source": "Google Cloud", "free": true },
+      { "title": "Co-Intelligence: Living and Working with AI", "url": "https://www.penguinrandomhouse.com/books/741805/co-intelligence-by-ethan-mollick/", "type": "book", "source": "Ethan Mollick", "free": false },
+      { "title": "Work Trend Index", "url": "https://www.microsoft.com/en-us/worklab/work-trend-index", "type": "article", "source": "Microsoft", "free": true }
+    ],
+    "project": "Write a one-page 'AI in our business' brief: list your five biggest areas of work, mark which tasks in each AI could assist or automate, note one competitor or peer example, and list the top three risks with a one-line guardrail for each."
+  },
+
+  "ai-use-cases": {
+    "summary": "Finding AI use cases means systematically spotting the tasks in your business where AI would save time, cut cost, or improve quality, and ranking them so you start with the ones most likely to pay off.",
+    "why": "Most failed AI projects picked the wrong problem: too vague, too risky, or not valuable enough. A simple discovery and scoring process gets you to quick wins and builds the confidence to tackle bigger ones.",
+    "depth": "Master a repeatable method: interview people, map tasks, score by value and feasibility, and run a small test. You don't need to estimate ROI to the dollar at this stage; a rough high/medium/low is enough to rank ideas.",
+    "hours": 8,
+    "outcomes": [
+      "You can run a discovery session with a team to surface AI opportunities.",
+      "You can break a process into tasks and spot the ones that suit AI.",
+      "You can score and rank use cases by value, feasibility, and risk.",
+      "You can design a small, time-boxed test to validate a top use case."
+    ],
+    "subtopics": [
+      {
+        "title": "Discovery: ask the people doing the work",
+        "desc": "Frontline staff know which tasks are repetitive, slow, or frustrating. Ask what eats their time, what they copy and paste, and what they'd hand to an assistant.",
+        "level": "core",
+        "resources": [
+          { "title": "Identifying and Scaling AI Use Cases", "url": "https://cdn.openai.com/business-guides-and-resources/identifying-and-scaling-ai-use-cases.pdf", "type": "article", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "Common use-case patterns",
+        "desc": "Most business uses fall into a few patterns: content creation, research and summarization, data extraction from documents, answering questions over your knowledge, coding, and analysis.",
+        "level": "core"
+      },
+      {
+        "title": "Process mapping",
+        "desc": "Draw the steps of a process and note inputs, outputs, time, and who checks the work. AI fits best on steps with clear inputs, repeatable patterns, and easy checking.",
+        "level": "core"
+      },
+      {
+        "title": "Scoring: value, feasibility, risk",
+        "desc": "Rate each idea on business value (hours saved, revenue impact), feasibility (data available, tool exists, simple integration), and risk (cost of a mistake). Plot them to find quick wins.",
+        "level": "core"
+      },
+      {
+        "title": "Small tests before big projects",
+        "desc": "Run a two to four week test with a few users, a clear success measure, and a before/after comparison. Kill or scale based on results, not enthusiasm.",
+        "level": "deep"
+      },
+      {
+        "title": "Learning from what people already do",
+        "desc": "Many employees already use AI quietly. Surveying and sharing these grassroots uses is often the fastest source of proven use cases.",
+        "level": "deep",
+        "resources": [
+          { "title": "Making AI Work: Leadership, Lab, and Crowd", "url": "https://www.oneusefulthing.org/p/making-ai-work-leadership-lab-and", "type": "article", "source": "Ethan Mollick", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Identifying and Scaling AI Use Cases", "url": "https://cdn.openai.com/business-guides-and-resources/identifying-and-scaling-ai-use-cases.pdf", "type": "article", "source": "OpenAI", "free": true },
+      { "title": "Real-world gen AI use cases from leading organizations", "url": "https://cloud.google.com/transform/101-real-world-generative-ai-use-cases-from-industry-leaders", "type": "article", "source": "Google Cloud", "free": true },
+      { "title": "Making AI Work: Leadership, Lab, and Crowd", "url": "https://www.oneusefulthing.org/p/making-ai-work-leadership-lab-and", "type": "article", "source": "Ethan Mollick", "free": true },
+      { "title": "Economic Index: Uneven AI adoption", "url": "https://www.anthropic.com/research/anthropic-economic-index-september-2025-report", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Generative AI for Everyone", "url": "https://www.deeplearning.ai/courses/generative-ai-for-everyone", "type": "course", "source": "DeepLearning.AI (Andrew Ng)", "free": true },
+      { "title": "How to Capitalize on Generative AI", "url": "https://hbr.org/2023/11/how-to-capitalize-on-generative-ai", "type": "article", "source": "Harvard Business Review", "free": false }
+    ],
+    "project": "Interview three people in your business (or three roles you play yourself) about their weekly tasks. Build a list of at least 10 AI use cases, score each on value, feasibility, and risk in a spreadsheet, pick the top one, and write a one-page plan for a two-week test with a clear success measure."
+  },
+
+  "ai-strategy": {
+    "summary": "AI strategy is deciding where AI fits in your business goals, what to invest in, in what order, and how you'll measure return on investment (ROI). It ties individual use cases into a plan with budget, owners, and milestones.",
+    "why": "Without a strategy, AI efforts become scattered pilots that never scale. A clear plan focuses money and attention on the few bets that matter, and gives you a way to prove results to leadership, investors, or yourself.",
+    "depth": "Master building a simple portfolio of use cases, estimating ROI honestly, and setting metrics. Know the bigger strategic questions (does AI change our competitive position or business model?) even if you act on them later.",
+    "hours": 12,
+    "outcomes": [
+      "You can write a one-page AI strategy linked to specific business goals.",
+      "You can estimate ROI for a use case, including hidden costs like checking time and change management.",
+      "You can define metrics that show whether an AI initiative is working.",
+      "You can balance quick wins with longer-term bets in a portfolio.",
+      "You can explain how AI might change your competitive position."
+    ],
+    "subtopics": [
+      {
+        "title": "Start from business goals",
+        "desc": "Begin with what the business needs (grow revenue, cut cycle time, improve service) and work back to where AI helps. Strategies that start from the technology tend to drift.",
+        "level": "core",
+        "resources": [
+          { "title": "AI For Everyone", "url": "https://www.deeplearning.ai/courses/ai-for-everyone", "type": "course", "source": "DeepLearning.AI (Andrew Ng)", "free": true }
+        ]
+      },
+      {
+        "title": "Estimating ROI honestly",
+        "desc": "ROI = (value gained minus total cost) divided by total cost. Count tool fees, setup, training, and the time spent reviewing outputs. Time saved only becomes value if it's redirected to something useful.",
+        "level": "core"
+      },
+      {
+        "title": "Metrics and baselines",
+        "desc": "Measure the 'before' first: time per task, error rate, cost per ticket, conversion rate. Then track the same numbers after rollout, plus adoption and user satisfaction.",
+        "level": "core"
+      },
+      {
+        "title": "Portfolio thinking",
+        "desc": "Mix quick wins (off-the-shelf tools for individual productivity) with process redesigns and a few longer-term bets. Review the portfolio every quarter because AI capability moves fast.",
+        "level": "core"
+      },
+      {
+        "title": "Prediction and competitive advantage",
+        "desc": "AI makes prediction and content cheap. Ask what becomes more valuable when that happens: your data, relationships, judgment, distribution. That is where durable advantage lives.",
+        "level": "deep",
+        "resources": [
+          { "title": "Prediction Machines", "url": "https://www.predictionmachines.ai/", "type": "book", "source": "Agrawal, Gans & Goldfarb", "free": false }
+        ]
+      },
+      {
+        "title": "Risk and governance in the plan",
+        "desc": "Build risk management in from the start with an owner, an acceptable-use policy, and a review process for higher-risk uses. Frameworks like the NIST AI RMF give a ready checklist.",
+        "level": "deep",
+        "resources": [
+          { "title": "AI Risk Management Framework", "url": "https://www.nist.gov/itl/ai-risk-management-framework", "type": "docs", "source": "NIST", "free": true }
+        ]
+      },
+      {
+        "title": "Watching market economics",
+        "desc": "Investor and analyst reports show where money is flowing and where it may be overheated. Useful context, but don't let market hype set your priorities.",
+        "level": "optional",
+        "resources": [
+          { "title": "AI's $600B Question", "url": "https://sequoiacap.com/article/ais-600b-question", "type": "article", "source": "Sequoia Capital", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "AI For Everyone", "url": "https://www.deeplearning.ai/courses/ai-for-everyone", "type": "course", "source": "DeepLearning.AI (Andrew Ng)", "free": true },
+      { "title": "AI in the Enterprise", "url": "https://cdn.openai.com/business-guides-and-resources/ai-in-the-enterprise.pdf", "type": "article", "source": "OpenAI", "free": true },
+      { "title": "Prediction Machines", "url": "https://www.predictionmachines.ai/", "type": "book", "source": "Agrawal, Gans & Goldfarb", "free": false },
+      { "title": "AI For Business Specialization", "url": "https://www.coursera.org/specializations/ai-for-business-wharton", "type": "course", "source": "Wharton (Coursera)", "free": false },
+      { "title": "How to Capitalize on Generative AI", "url": "https://hbr.org/2023/11/how-to-capitalize-on-generative-ai", "type": "article", "source": "Harvard Business Review", "free": false },
+      { "title": "AI Playbook for the UK Government", "url": "https://www.gov.uk/government/publications/ai-playbook-for-the-uk-government", "type": "docs", "source": "UK Government", "free": true }
+    ],
+    "project": "Write a one-page AI strategy for a real or sample business: three business goals, the five use cases that serve them, a rough ROI estimate for the top two (with all costs listed), the baseline metric you'll track for each, and a 90-day plan with owners."
+  },
+
+  "ai-product-design": {
+    "summary": "Designing AI products is about creating experiences where users understand what the AI can do, trust it the right amount, and can easily correct it when it's wrong. It covers interface patterns, setting expectations, feedback loops, and measuring quality.",
+    "why": "AI output is probabilistic: it varies and is sometimes wrong. Products that hide this lose user trust; products that design for it feel reliable. Good AI UX is often the difference between a demo and a product people keep using.",
+    "depth": "Master the core patterns: setting expectations, showing sources, human review of important actions, easy correction, and basic evals. You don't need to build models; you do need to understand enough about how LLMs fail to design around it.",
+    "hours": 15,
+    "outcomes": [
+      "You can choose the right interaction pattern (chat, inline suggestion, background agent) for a product problem.",
+      "You can design for errors with sources, confidence cues, undo, and human review.",
+      "You can write a product spec that includes AI-specific requirements and failure cases.",
+      "You can set up a simple evaluation process to judge AI output quality before and after launch.",
+      "You can design feedback mechanisms that help the product improve over time."
+    ],
+    "subtopics": [
+      {
+        "title": "Human-AI interaction guidelines",
+        "desc": "Well-tested principles: make clear what the system can do and how well, show why it did something, support efficient correction, and adapt carefully over time.",
+        "level": "core",
+        "resources": [
+          { "title": "Guidelines for Human-AI Interaction", "url": "https://www.microsoft.com/en-us/haxtoolkit/ai-guidelines/", "type": "docs", "source": "Microsoft HAX Toolkit", "free": true },
+          { "title": "People + AI Guidebook", "url": "https://pair.withgoogle.com/guidebook/", "type": "docs", "source": "Google PAIR", "free": true }
+        ]
+      },
+      {
+        "title": "Interaction patterns",
+        "desc": "Chat is only one option. Inline suggestions, one-click actions, side panels, and background agents that report back each fit different jobs. Pick the one that fits the user's workflow.",
+        "level": "core",
+        "resources": [
+          { "title": "The Shape of AI: UX patterns", "url": "https://www.shapeof.ai/", "type": "article", "source": "Shape of AI", "free": true }
+        ]
+      },
+      {
+        "title": "Designing for errors and trust",
+        "desc": "Show sources, make outputs easy to edit, ask for confirmation before irreversible actions, and offer an easy way out to a human. Aim for 'calibrated trust': users rely on AI where it's good and check it where it isn't.",
+        "level": "core"
+      },
+      {
+        "title": "Evals: measuring quality",
+        "desc": "Evals are tests that check AI output against what good looks like, using examples, rubrics, and sometimes another model as a judge. They let PMs know whether a change made the product better or worse.",
+        "level": "core",
+        "resources": [
+          { "title": "Your AI Product Needs Evals", "url": "https://hamel.dev/blog/posts/evals/", "type": "article", "source": "Hamel Husain", "free": true }
+        ]
+      },
+      {
+        "title": "Agentic UX",
+        "desc": "When AI takes actions over many steps, users need to see progress, approve risky steps, interrupt, and review what happened. Design for supervision, not just conversation.",
+        "level": "deep",
+        "resources": [
+          { "title": "Building effective agents", "url": "https://www.anthropic.com/engineering/building-effective-agents", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Cost, latency, and model choice",
+        "desc": "Bigger models are smarter but slower and pricier. Product decisions like streaming responses, caching, and using smaller models for simple steps shape both experience and margins.",
+        "level": "deep"
+      },
+      {
+        "title": "Feedback loops and data",
+        "desc": "Thumbs up/down, edits, and abandoned outputs are signals. Collect them with consent and use them to find failure patterns and improve prompts or retrieval.",
+        "level": "optional"
+      }
+    ],
+    "resources": [
+      { "title": "People + AI Guidebook", "url": "https://pair.withgoogle.com/guidebook/", "type": "docs", "source": "Google PAIR", "free": true },
+      { "title": "Guidelines for Human-AI Interaction", "url": "https://www.microsoft.com/en-us/haxtoolkit/ai-guidelines/", "type": "docs", "source": "Microsoft HAX Toolkit", "free": true },
+      { "title": "The Shape of AI: UX patterns", "url": "https://www.shapeof.ai/", "type": "article", "source": "Shape of AI", "free": true },
+      { "title": "Your AI Product Needs Evals", "url": "https://hamel.dev/blog/posts/evals/", "type": "article", "source": "Hamel Husain", "free": true },
+      { "title": "What We've Learned From A Year of Building with LLMs", "url": "https://applied-llms.org/", "type": "article", "source": "Yan, Bischof, Frye, Husain, Liu & Shankar", "free": true },
+      { "title": "Artificial Intelligence articles and research", "url": "https://www.nngroup.com/topic/ai/", "type": "article", "source": "Nielsen Norman Group", "free": true }
+    ],
+    "project": "Pick an AI feature for a product you know (for example, 'draft a reply' in a support tool). Write a two-page spec covering the user problem, interaction pattern, how errors are shown and corrected, what needs human approval, and 15 eval examples with expected outputs. Mock up the key screen on paper or in a design tool."
+  },
+
+  "ai-adoption": {
+    "summary": "Leading AI adoption means getting people to actually change how they work with AI: building skills, setting policy, finding champions, redesigning processes, and handling fears about jobs and quality.",
+    "why": "Buying licenses is easy; getting real use is hard. Many organizations see low adoption and little value because they treat AI as an IT rollout instead of a change in how people work.",
+    "depth": "Master the practical levers: clear policy, training by role, champions, shared wins, and measuring usage and outcomes. Know classic change-management models so you can use their language, but adapt them because AI changes fast and spreads bottom-up.",
+    "hours": 12,
+    "outcomes": [
+      "You can write a clear, permission-giving AI acceptable-use policy.",
+      "You can design a training and champions program for different roles.",
+      "You can address employee concerns about job security and quality honestly.",
+      "You can measure adoption and impact and report it to leadership.",
+      "You can redesign a team process around AI, not just add AI on top."
+    ],
+    "subtopics": [
+      {
+        "title": "Leadership, lab, and crowd",
+        "desc": "Successful adoption needs leaders who set direction and incentives, a small team that experiments and builds, and the whole workforce sharing what works. Each part fails without the others.",
+        "level": "core",
+        "resources": [
+          { "title": "Making AI Work: Leadership, Lab, and Crowd", "url": "https://www.oneusefulthing.org/p/making-ai-work-leadership-lab-and", "type": "article", "source": "Ethan Mollick", "free": true }
+        ]
+      },
+      {
+        "title": "Acceptable-use policy",
+        "desc": "Say which tools are approved, what data can and can't go in, when to disclose AI use, and who checks outputs. Policies that only say 'no' push people to hidden, riskier use.",
+        "level": "core"
+      },
+      {
+        "title": "Training by role",
+        "desc": "Generic 'intro to AI' sessions rarely change behavior. Hands-on training built around each team's real tasks, followed by practice and office hours, does.",
+        "level": "core",
+        "resources": [
+          { "title": "AI Fluency: Framework & Foundations", "url": "https://anthropic.skilljar.com/ai-fluency-framework-foundations", "type": "course", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Change management basics",
+        "desc": "Models like Kotter's 8 steps and Prosci's ADKAR (Awareness, Desire, Knowledge, Ability, Reinforcement) give a checklist for leading change. Use them to make sure you've covered motivation and reinforcement, not just tools.",
+        "level": "deep",
+        "resources": [
+          { "title": "The Prosci ADKAR Model", "url": "https://www.prosci.com/methodology/adkar", "type": "article", "source": "Prosci", "free": true }
+        ]
+      },
+      {
+        "title": "Jobs, fears, and incentives",
+        "desc": "People hide AI use if they fear being replaced or judged. Be honest about plans, reward people who share time-saving discoveries, and decide in advance what happens to freed-up time.",
+        "level": "core"
+      },
+      {
+        "title": "Measuring adoption and impact",
+        "desc": "Track active users and usage depth, but also business outcomes like cycle time and quality. High usage with no outcome change is a signal to redesign workflows.",
+        "level": "deep",
+        "resources": [
+          { "title": "Work Trend Index", "url": "https://www.microsoft.com/en-us/worklab/work-trend-index", "type": "article", "source": "Microsoft", "free": true }
+        ]
+      },
+      {
+        "title": "AI as a teammate",
+        "desc": "Research shows people working with AI can match the output of small teams. That raises bigger questions about team structure and roles worth exploring once basics are in place.",
+        "level": "optional",
+        "resources": [
+          { "title": "The Cybernetic Teammate", "url": "https://www.oneusefulthing.org/p/the-cybernetic-teammate", "type": "article", "source": "Ethan Mollick", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Making AI Work: Leadership, Lab, and Crowd", "url": "https://www.oneusefulthing.org/p/making-ai-work-leadership-lab-and", "type": "article", "source": "Ethan Mollick", "free": true },
+      { "title": "AI in the Enterprise", "url": "https://cdn.openai.com/business-guides-and-resources/ai-in-the-enterprise.pdf", "type": "article", "source": "OpenAI", "free": true },
+      { "title": "Work Trend Index", "url": "https://www.microsoft.com/en-us/worklab/work-trend-index", "type": "article", "source": "Microsoft", "free": true },
+      { "title": "The 8-Step Process for Leading Change", "url": "https://www.kotterinc.com/methodology/8-steps/", "type": "article", "source": "Kotter", "free": true },
+      { "title": "The Prosci ADKAR Model", "url": "https://www.prosci.com/methodology/adkar", "type": "article", "source": "Prosci", "free": true },
+      { "title": "Co-Intelligence: Living and Working with AI", "url": "https://www.penguinrandomhouse.com/books/741805/co-intelligence-by-ethan-mollick/", "type": "book", "source": "Ethan Mollick", "free": false }
+    ],
+    "project": "Create a 90-day adoption plan for one team: a one-page acceptable-use policy, two role-specific training sessions built on the team's real tasks, a champions group with a channel for sharing wins, and a simple dashboard of three metrics (active usage, time saved, one quality measure). Run the first 30 days and write up what you learned."
+  },
+
+  "build-vs-buy": {
+    "summary": "Build vs. buy is the decision between buying an off-the-shelf AI product, configuring a platform, or building your own solution on model APIs. Vendor selection is how you compare and choose the right provider safely.",
+    "why": "Building what you could buy wastes months; buying what should be core to your business can leave you dependent and undifferentiated. Picking the wrong vendor can expose your data or lock you in.",
+    "depth": "Master a decision framework and a vendor checklist covering data handling, security, pricing, and exit options. You don't need to be able to build AI systems; you do need to know roughly what building involves so you can judge quotes and claims.",
+    "hours": 10,
+    "outcomes": [
+      "You can decide whether to buy, configure, or build for a given use case and justify it.",
+      "You can run a structured vendor evaluation with a scorecard and a hands-on trial on your own data.",
+      "You can check a vendor's data use, security, and compliance claims.",
+      "You can estimate total cost of ownership, including usage-based pricing.",
+      "You can plan to avoid lock-in."
+    ],
+    "subtopics": [
+      {
+        "title": "The spectrum: buy, configure, build",
+        "desc": "Buy a finished product (an AI support desk). Configure a platform (custom assistants, no-code automations). Build on APIs (your own app using model APIs). Most companies use all three for different needs.",
+        "level": "core",
+        "resources": [
+          { "title": "How 100 Enterprise CIOs Are Building and Buying Gen AI in 2025", "url": "https://a16z.com/ai-enterprise-2025/", "type": "article", "source": "Andreessen Horowitz", "free": true }
+        ]
+      },
+      {
+        "title": "When to build",
+        "desc": "Build when the use case is core to your competitive advantage, uses proprietary data or processes, and no product fits. Buy when the need is common and speed matters more than differentiation.",
+        "level": "core"
+      },
+      {
+        "title": "Vendor evaluation and trials",
+        "desc": "Score vendors on fit, quality on your own test cases, integration, pricing, support, and viability. Always run a trial on real (safe) data; demos are tuned to look good.",
+        "level": "core"
+      },
+      {
+        "title": "Data, security, and compliance checks",
+        "desc": "Ask: is our data used for training? Where is it stored and for how long? What certifications (SOC 2, ISO 27001) and controls exist? Trust centers and privacy pages answer most of this.",
+        "level": "core",
+        "resources": [
+          { "title": "OWASP Top 10 for LLM Applications", "url": "https://genai.owasp.org/llm-top-10/", "type": "docs", "source": "OWASP", "free": true }
+        ]
+      },
+      {
+        "title": "Pricing and total cost of ownership",
+        "desc": "Compare seat-based and usage-based pricing at realistic volumes. Include integration, maintenance, staff time, and the cost of switching later.",
+        "level": "deep"
+      },
+      {
+        "title": "Avoiding lock-in",
+        "desc": "Prefer vendors that let you export data, swap underlying models, and use open standards like MCP. Model quality and prices change fast, so flexibility has real value.",
+        "level": "deep"
+      },
+      {
+        "title": "What building really involves",
+        "desc": "A real AI app needs prompts, retrieval over your data, evals, monitoring, and security work, not just an API call. Knowing this helps you judge build estimates and agency quotes.",
+        "level": "optional",
+        "resources": [
+          { "title": "Building A Generative AI Platform", "url": "https://huyenchip.com/2024/07/25/genai-platform.html", "type": "article", "source": "Chip Huyen", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "How 100 Enterprise CIOs Are Building and Buying Gen AI in 2025", "url": "https://a16z.com/ai-enterprise-2025/", "type": "article", "source": "Andreessen Horowitz", "free": true },
+      { "title": "2025: The State of Generative AI in the Enterprise", "url": "https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/", "type": "article", "source": "Menlo Ventures", "free": true },
+      { "title": "AI Risk Management Framework", "url": "https://www.nist.gov/itl/ai-risk-management-framework", "type": "docs", "source": "NIST", "free": true },
+      { "title": "OWASP Top 10 for LLM Applications", "url": "https://genai.owasp.org/llm-top-10/", "type": "docs", "source": "OWASP", "free": true },
+      { "title": "What We've Learned From A Year of Building with LLMs", "url": "https://applied-llms.org/", "type": "article", "source": "Yan, Bischof, Frye, Husain, Liu & Shankar", "free": true },
+      { "title": "Building A Generative AI Platform", "url": "https://huyenchip.com/2024/07/25/genai-platform.html", "type": "article", "source": "Chip Huyen", "free": true }
+    ],
+    "project": "For one real use case, compare three options: an off-the-shelf product, a configured platform, and a custom build. Create a scorecard covering fit, quality on 10 of your own test cases, data handling, security, 12-month total cost, and exit plan. Run trials of the top two and write a one-page recommendation."
+  },
+
+  "ai-native-business": {
+    "summary": "An AI-native business is designed from the ground up around AI: small teams with AI agents doing much of the routine work, processes built for human-AI collaboration, and products or services that would not be possible without AI.",
+    "why": "Companies that bolt AI onto old processes get modest gains. Those that redesign around it can run with far smaller teams, move faster, and offer new kinds of services, which changes how competitors, pricing, and whole industries work.",
+    "depth": "Go deep on operating model design: which work goes to agents, how humans supervise, and how roles, pricing, and data strategy change. You don't need to code agents yourself; you do need a sharp sense of what agents can reliably do today and how to keep them safe and accountable.",
+    "hours": 20,
+    "outcomes": [
+      "You can redesign a business function around AI agents with clear human oversight points.",
+      "You can describe new business models AI enables, such as selling outcomes instead of software seats.",
+      "You can plan how team structure, roles, and hiring change in an AI-native company.",
+      "You can identify which proprietary data, workflows, and relationships form a durable moat.",
+      "You can set up governance so AI-run processes stay accountable and auditable."
+    ],
+    "subtopics": [
+      {
+        "title": "Redesigning work around AI",
+        "desc": "Start from the outcome and ask how you'd do it if AI were available from day one, rather than which steps of today's process to automate. This often removes steps entirely.",
+        "level": "core",
+        "resources": [
+          { "title": "How Anthropic teams use Claude Code", "url": "https://www.anthropic.com/news/how-anthropic-teams-use-claude-code", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Agents as part of the workforce",
+        "desc": "Agents can now handle multi-step work like research, support tickets, bookkeeping, and coding. Treat them like team members with a defined scope, permissions, a manager, and performance reviews.",
+        "level": "core",
+        "resources": [
+          { "title": "A practical guide to building agents", "url": "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf", "type": "article", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "Service as software and new business models",
+        "desc": "AI lets companies sell completed work (a reviewed contract, a resolved ticket) rather than tools for people to use. This changes pricing toward outcomes and opens markets that were too labor-intensive before.",
+        "level": "core",
+        "resources": [
+          { "title": "AI leads a service as software paradigm shift", "url": "https://foundationcapital.com/ideas/ai-leads-a-service-as-software-paradigm-shift", "type": "article", "source": "Foundation Capital", "free": true }
+        ]
+      },
+      {
+        "title": "Small teams, new roles",
+        "desc": "AI-native teams are smaller and flatter, with people acting as editors, orchestrators, and owners of outcomes. Hiring shifts toward judgment, domain expertise, and the ability to direct AI well.",
+        "level": "core",
+        "resources": [
+          { "title": "The Cybernetic Teammate", "url": "https://www.oneusefulthing.org/p/the-cybernetic-teammate", "type": "article", "source": "Ethan Mollick", "free": true }
+        ]
+      },
+      {
+        "title": "Data and moats",
+        "desc": "When everyone has access to the same models, advantage comes from proprietary data, workflow integration, customer trust, and distribution. Design processes that capture useful data as a by-product.",
+        "level": "deep"
+      },
+      {
+        "title": "Governance for AI-run operations",
+        "desc": "Logging, audit trails, approval thresholds, incident response, and regulatory compliance (like the EU AI Act) matter more when AI acts on its own. Build these in early rather than retrofitting.",
+        "level": "deep",
+        "resources": [
+          { "title": "EU Artificial Intelligence Act", "url": "https://artificialintelligenceact.eu/", "type": "docs", "source": "Future of Life Institute", "free": true }
+        ]
+      },
+      {
+        "title": "Where startups see opportunity",
+        "desc": "Investor requests for startups and market reports show which AI-native ideas are attracting builders. Good for spotting trends in your industry early.",
+        "level": "optional",
+        "resources": [
+          { "title": "Requests for Startups", "url": "https://www.ycombinator.com/rfs", "type": "article", "source": "Y Combinator", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "A practical guide to building agents", "url": "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf", "type": "article", "source": "OpenAI", "free": true },
+      { "title": "Building effective agents", "url": "https://www.anthropic.com/engineering/building-effective-agents", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "AI leads a service as software paradigm shift", "url": "https://foundationcapital.com/ideas/ai-leads-a-service-as-software-paradigm-shift", "type": "article", "source": "Foundation Capital", "free": true },
+      { "title": "The Cybernetic Teammate", "url": "https://www.oneusefulthing.org/p/the-cybernetic-teammate", "type": "article", "source": "Ethan Mollick", "free": true },
+      { "title": "Prediction Machines", "url": "https://www.predictionmachines.ai/", "type": "book", "source": "Agrawal, Gans & Goldfarb", "free": false },
+      { "title": "AI Risk Management Framework", "url": "https://www.nist.gov/itl/ai-risk-management-framework", "type": "docs", "source": "NIST", "free": true },
+      { "title": "Requests for Startups", "url": "https://www.ycombinator.com/rfs", "type": "article", "source": "Y Combinator", "free": true }
+    ],
+    "project": "Pick one business function (for example, customer onboarding or monthly reporting) and design its AI-native version. Draw the new workflow showing which steps agents own, where humans approve or review, what gets logged, and how the team and its roles change. Estimate the cost and headcount difference versus today, and pilot one agent-run step for two weeks."
+  }
+}

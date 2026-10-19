@@ -1,0 +1,943 @@
+{
+  "python-basics": {
+    "summary": "Python is the main programming language of AI. This node covers the core language: variables, types, control flow, functions, data structures, files, and running code in a proper environment.",
+    "why": "Nearly every AI library, SDK, notebook, and tutorial assumes Python. Even if an AI assistant writes most of your code, you need to read it, run it, and fix it when it breaks.",
+    "depth": "Master the basics until you can write a 100-line script without looking things up: lists, dicts, loops, functions, imports, reading files, and handling errors. Classes, type hints, and packaging only need a working understanding at this stage. Decorators, generators, and async are things to recognize, not master yet.",
+    "hours": 40,
+    "outcomes": [
+      "You can write and run a Python script that reads a file, processes it, and writes results.",
+      "You can choose the right built-in data structure (list, dict, set, tuple) for a job.",
+      "You can create a virtual environment and install packages without breaking your system Python.",
+      "You can read a traceback and find the line and cause of an error.",
+      "You can read code an AI assistant wrote and explain what each part does."
+    ],
+    "subtopics": [
+      {
+        "title": "Values, types, and control flow",
+        "desc": "Numbers, strings, booleans, None, if/elif/else, for and while loops. This is the grammar every other topic builds on.",
+        "level": "core",
+        "resources": [
+          { "title": "The Python Tutorial: More Control Flow Tools", "url": "https://docs.python.org/3/tutorial/controlflow.html", "type": "docs", "source": "Python.org", "free": true }
+        ]
+      },
+      {
+        "title": "Built-in data structures",
+        "desc": "Lists, dicts, sets, and tuples, plus comprehensions. Dicts in particular show up everywhere in AI work because JSON maps directly onto them.",
+        "level": "core",
+        "resources": [
+          { "title": "The Python Tutorial: Data Structures", "url": "https://docs.python.org/3/tutorial/datastructures.html", "type": "docs", "source": "Python.org", "free": true }
+        ]
+      },
+      {
+        "title": "Functions, modules, and imports",
+        "desc": "Writing functions with arguments and return values, splitting code into files, and importing from libraries. This is how you keep scripts readable as they grow.",
+        "level": "core"
+      },
+      {
+        "title": "Files, errors, and exceptions",
+        "desc": "Reading and writing text, CSV, and JSON files, and using try/except so a script fails clearly instead of mysteriously.",
+        "level": "core",
+        "resources": [
+          { "title": "The Python Tutorial: Errors and Exceptions", "url": "https://docs.python.org/3/tutorial/errors.html", "type": "docs", "source": "Python.org", "free": true }
+        ]
+      },
+      {
+        "title": "Environments and packages (venv, pip, uv)",
+        "desc": "A virtual environment is an isolated folder of packages for one project. Learn to create one, install dependencies, and pin them in a requirements or pyproject file. uv is the fast modern tool most new projects use.",
+        "level": "core",
+        "resources": [
+          { "title": "Virtual Environments and Packages", "url": "https://docs.python.org/3/tutorial/venv.html", "type": "docs", "source": "Python.org", "free": true },
+          { "title": "uv documentation", "url": "https://docs.astral.sh/uv/", "type": "tool", "source": "Astral", "free": true }
+        ]
+      },
+      {
+        "title": "Classes and type hints",
+        "desc": "Classes bundle data with behavior. Type hints (like def f(x: int) -> str) document what a function expects and power tools like Pydantic, which LLM SDKs use heavily.",
+        "level": "deep",
+        "resources": [
+          { "title": "The Python Tutorial: Classes", "url": "https://docs.python.org/3/tutorial/classes.html", "type": "docs", "source": "Python.org", "free": true },
+          { "title": "typing: Support for type hints", "url": "https://docs.python.org/3/library/typing.html", "type": "docs", "source": "Python.org", "free": true }
+        ]
+      },
+      {
+        "title": "Generators, decorators, and async",
+        "desc": "Generators produce values lazily, decorators wrap functions, and async lets one program wait on many network calls at once. You will see all three in LLM SDKs and agent code. Recognize them now, learn them properly when you need them.",
+        "level": "optional"
+      }
+    ],
+    "resources": [
+      { "title": "CS50's Introduction to Programming with Python", "url": "https://cs50.harvard.edu/python/", "type": "course", "source": "Harvard", "free": true },
+      { "title": "The Python Tutorial", "url": "https://docs.python.org/3/tutorial/", "type": "docs", "source": "Python.org", "free": true },
+      { "title": "Automate the Boring Stuff with Python", "url": "https://automatetheboringstuff.com/", "type": "book", "source": "Al Sweigart", "free": true },
+      { "title": "Kaggle Learn: Python", "url": "https://www.kaggle.com/learn/python", "type": "interactive", "source": "Kaggle", "free": true },
+      { "title": "Python Tutor (visualize code execution)", "url": "https://pythontutor.com/", "type": "interactive", "source": "Python Tutor", "free": true },
+      { "title": "Learn Python - Full Course for Beginners", "url": "https://www.youtube.com/watch?v=rfscVS0vtbw", "type": "video", "source": "freeCodeCamp", "free": true },
+      { "title": "Exercism Python track", "url": "https://exercism.org/tracks/python", "type": "interactive", "source": "Exercism", "free": true }
+    ],
+    "project": "Write a command-line script that reads a folder of text files, counts word frequencies, ignores a list of stopwords, and saves the top 20 words per file to a JSON file. Run it inside a virtual environment."
+  },
+
+  "python-data": {
+    "summary": "NumPy and pandas are the Python libraries for working with numbers and tables. NumPy gives you fast arrays; pandas gives you DataFrames, which are spreadsheets you control with code.",
+    "why": "Every ML workflow starts with loading, cleaning, and reshaping data, and model inputs are NumPy arrays or tensors that behave the same way. If you can't move data around fluently, you spend your time fighting the tools instead of learning from the data.",
+    "depth": "Master pandas loading, filtering, groupby, merge, and handling missing values, plus NumPy array shapes, indexing, and broadcasting. These come up daily. Polars, DuckDB, and memory tuning are worth knowing about for large data but are not required to start.",
+    "hours": 35,
+    "outcomes": [
+      "You can load a CSV or Parquet file, inspect it, and clean obvious problems like missing values and wrong types.",
+      "You can answer questions with groupby, aggregation, and joins instead of loops.",
+      "You can predict the shape of a NumPy operation, including broadcasting, before running it.",
+      "You can work in a Jupyter notebook and keep it tidy enough for someone else to rerun."
+    ],
+    "subtopics": [
+      {
+        "title": "NumPy arrays, shapes, and indexing",
+        "desc": "An ndarray is a grid of numbers with a shape like (rows, columns). Slicing, boolean masks, and reshaping are the moves you will use constantly, and they carry over directly to PyTorch tensors.",
+        "level": "core",
+        "resources": [
+          { "title": "NumPy: the absolute basics for beginners", "url": "https://numpy.org/doc/stable/user/absolute_beginners.html", "type": "docs", "source": "NumPy", "free": true },
+          { "title": "Indexing on ndarrays", "url": "https://numpy.org/doc/stable/user/basics.indexing.html", "type": "docs", "source": "NumPy", "free": true }
+        ]
+      },
+      {
+        "title": "Vectorization and broadcasting",
+        "desc": "Vectorization means operating on whole arrays at once instead of looping, which is often 100x faster. Broadcasting is the rule for combining arrays of different shapes. Shape bugs are the most common bug in ML code.",
+        "level": "core",
+        "resources": [
+          { "title": "Broadcasting", "url": "https://numpy.org/doc/stable/user/basics.broadcasting.html", "type": "docs", "source": "NumPy", "free": true }
+        ]
+      },
+      {
+        "title": "pandas DataFrames: load, select, filter",
+        "desc": "Reading CSV, JSON, and Parquet, selecting columns, filtering rows with conditions, and using .loc and .iloc correctly.",
+        "level": "core",
+        "resources": [
+          { "title": "10 minutes to pandas", "url": "https://pandas.pydata.org/docs/user_guide/10min.html", "type": "docs", "source": "pandas", "free": true }
+        ]
+      },
+      {
+        "title": "Cleaning: missing values, types, duplicates",
+        "desc": "Real data has gaps, wrong types, and duplicate rows. Learn to find them, decide what to do about them, and document the choice.",
+        "level": "core",
+        "resources": [
+          { "title": "Working with missing data", "url": "https://pandas.pydata.org/docs/user_guide/missing_data.html", "type": "docs", "source": "pandas", "free": true }
+        ]
+      },
+      {
+        "title": "Groupby, merge, and reshape",
+        "desc": "Split-apply-combine with groupby, SQL-style joins with merge, and pivot/melt to switch between wide and long tables. This is where pandas starts to save you hours.",
+        "level": "core",
+        "resources": [
+          { "title": "Group by: split-apply-combine", "url": "https://pandas.pydata.org/docs/user_guide/groupby.html", "type": "docs", "source": "pandas", "free": true },
+          { "title": "Merge, join, concatenate and compare", "url": "https://pandas.pydata.org/docs/user_guide/merging.html", "type": "docs", "source": "pandas", "free": true }
+        ]
+      },
+      {
+        "title": "Dates and time series",
+        "desc": "Parsing dates, resampling to daily or monthly, and rolling windows. Needed for any data with a time dimension, such as sales, logs, or sensor readings.",
+        "level": "deep",
+        "resources": [
+          { "title": "Time series / date functionality", "url": "https://pandas.pydata.org/docs/user_guide/timeseries.html", "type": "docs", "source": "pandas", "free": true }
+        ]
+      },
+      {
+        "title": "Bigger data: Polars and DuckDB",
+        "desc": "When pandas gets slow or runs out of memory, Polars (a fast DataFrame library) and DuckDB (SQL on local files) handle millions of rows on a laptop. Good to know they exist.",
+        "level": "optional",
+        "resources": [
+          { "title": "Polars user guide", "url": "https://docs.pola.rs/", "type": "docs", "source": "Polars", "free": true },
+          { "title": "DuckDB documentation", "url": "https://duckdb.org/docs/stable/", "type": "docs", "source": "DuckDB", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Python for Data Analysis, 3rd Edition (open access)", "url": "https://wesmckinney.com/book/", "type": "book", "source": "Wes McKinney", "free": true },
+      { "title": "Kaggle Learn: Pandas", "url": "https://www.kaggle.com/learn/pandas", "type": "interactive", "source": "Kaggle", "free": true },
+      { "title": "Python Data Science Handbook", "url": "https://jakevdp.github.io/PythonDataScienceHandbook/", "type": "book", "source": "Jake VanderPlas", "free": true },
+      { "title": "pandas getting started tutorials", "url": "https://pandas.pydata.org/docs/getting_started/intro_tutorials/index.html", "type": "docs", "source": "pandas", "free": true },
+      { "title": "NumPy: Learn", "url": "https://numpy.org/learn/", "type": "docs", "source": "NumPy", "free": true },
+      { "title": "Project Jupyter", "url": "https://jupyter.org/", "type": "tool", "source": "Jupyter", "free": true }
+    ],
+    "project": "Take a public dataset with at least 50,000 rows (for example a city's open data on 311 calls or bike trips). Clean it, then answer five concrete questions using only vectorized pandas (no Python loops), such as busiest hour by neighborhood or month-over-month change."
+  },
+
+  "git-cli": {
+    "summary": "The command line, Git, and a good editor are the everyday environment of anyone who writes code. Git tracks every change to your code so you can undo mistakes and collaborate.",
+    "why": "You can't deploy, collaborate, run a remote GPU box, or safely let an AI agent edit your code without these. Git is also your safety net when an AI coding tool makes a large change you want to roll back.",
+    "depth": "Master the daily loop: navigate the terminal, edit files, git add/commit/push/pull, branches, and pull requests. Know how to recover from a bad commit. Rebasing, SSH config, and Docker are useful to understand but you can learn them as needed.",
+    "hours": 20,
+    "outcomes": [
+      "You can move around, search, and run programs from a terminal without a GUI.",
+      "You can commit work in small logical steps, push to GitHub, and open a pull request.",
+      "You can create a branch, merge it, and resolve a simple merge conflict.",
+      "You can undo a mistake with git restore, revert, or reset without losing work.",
+      "You can set up a project with an editor, a virtual environment, and a .gitignore that keeps secrets out of the repo."
+    ],
+    "subtopics": [
+      {
+        "title": "Shell basics",
+        "desc": "Paths, cd, ls, pipes, redirects, environment variables, and running scripts. The terminal is where AI tools, servers, and GPUs are controlled.",
+        "level": "core",
+        "resources": [
+          { "title": "Missing Semester: Course overview + the shell", "url": "https://missing.csail.mit.edu/2020/course-shell/", "type": "course", "source": "MIT", "free": true }
+        ]
+      },
+      {
+        "title": "Git fundamentals",
+        "desc": "The working directory, staging area, and commits. A commit is a saved snapshot with a message; history is a chain of those snapshots.",
+        "level": "core",
+        "resources": [
+          { "title": "Missing Semester: Version Control (Git)", "url": "https://missing.csail.mit.edu/2020/version-control/", "type": "course", "source": "MIT", "free": true },
+          { "title": "Pro Git book", "url": "https://git-scm.com/book/en/v2", "type": "book", "source": "git-scm.com", "free": true }
+        ]
+      },
+      {
+        "title": "Branches, merging, and pull requests",
+        "desc": "Branches let you try changes without touching main. Pull requests on GitHub are where changes get reviewed, tested, and merged.",
+        "level": "core",
+        "resources": [
+          { "title": "Learn Git Branching", "url": "https://learngitbranching.js.org/", "type": "interactive", "source": "Learn Git Branching", "free": true },
+          { "title": "GitHub Hello World", "url": "https://docs.github.com/en/get-started/using-github/hello-world", "type": "docs", "source": "GitHub", "free": true }
+        ]
+      },
+      {
+        "title": "Editor and project setup",
+        "desc": "A code editor like VS Code or Cursor with Python support, a linter/formatter like Ruff, and a .gitignore and .env file for secrets. API keys should never be committed.",
+        "level": "core",
+        "resources": [
+          { "title": "Getting Started with Python in VS Code", "url": "https://code.visualstudio.com/docs/python/python-tutorial", "type": "docs", "source": "Microsoft", "free": true },
+          { "title": "Ruff", "url": "https://docs.astral.sh/ruff/", "type": "tool", "source": "Astral", "free": true }
+        ]
+      },
+      {
+        "title": "Remote machines and SSH",
+        "desc": "Training and serving often happen on a remote Linux box with a GPU. SSH lets you log in, and your editor can work on remote files as if they were local.",
+        "level": "deep",
+        "resources": [
+          { "title": "Remote Development using SSH", "url": "https://code.visualstudio.com/docs/remote/ssh", "type": "docs", "source": "Microsoft", "free": true }
+        ]
+      },
+      {
+        "title": "Automation: CI and containers",
+        "desc": "GitHub Actions runs tests on every push. Docker packages your code with its dependencies so it runs the same everywhere. Both become core when you start shipping.",
+        "level": "optional",
+        "resources": [
+          { "title": "GitHub Actions documentation", "url": "https://docs.github.com/en/actions", "type": "docs", "source": "GitHub", "free": true },
+          { "title": "Docker: Get started", "url": "https://docs.docker.com/get-started/", "type": "docs", "source": "Docker", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "The Missing Semester of Your CS Education", "url": "https://missing.csail.mit.edu/", "type": "course", "source": "MIT", "free": true },
+      { "title": "Learn Git Branching", "url": "https://learngitbranching.js.org/", "type": "interactive", "source": "Learn Git Branching", "free": true },
+      { "title": "Git and GitHub for Beginners - Crash Course", "url": "https://www.youtube.com/watch?v=RGOj5yH7evk", "type": "video", "source": "freeCodeCamp", "free": true },
+      { "title": "Pro Git book", "url": "https://git-scm.com/book/en/v2", "type": "book", "source": "git-scm.com", "free": true },
+      { "title": "Atlassian Git Tutorials", "url": "https://www.atlassian.com/git/tutorials", "type": "article", "source": "Atlassian", "free": true },
+      { "title": "The Linux Command Line (free book)", "url": "https://linuxcommand.org/tlcl.php", "type": "book", "source": "William Shotts", "free": true }
+    ],
+    "project": "Put your Python projects on GitHub. Use a feature branch for one new feature, open a pull request against your own repo, add a GitHub Actions workflow that runs Ruff on every push, and merge it once the check passes."
+  },
+
+  "apis-json": {
+    "summary": "An API is a way for programs to talk to each other over the internet, usually by sending HTTP requests and getting back JSON. Every LLM, vector database, and SaaS tool is used through one.",
+    "why": "Calling Claude, OpenAI, or Gemini is an HTTP request with a JSON body. Tool calling, MCP, webhooks, and no-code automations are all built on the same ideas. Understanding them makes SDK errors and integration bugs easy to debug.",
+    "depth": "Master the request/response cycle: methods, URLs, headers, auth with API keys, status codes, and reading and writing JSON in Python. Learn to handle errors, timeouts, and rate limits. Building your own API with FastAPI and writing JSON Schema are the next step, not a requirement on day one.",
+    "hours": 15,
+    "outcomes": [
+      "You can call a REST API from Python and from curl, with headers and an API key.",
+      "You can read an API's docs and turn them into working code.",
+      "You can explain what a 401, 404, 429, and 500 mean and how your code should react to each.",
+      "You can parse nested JSON into Python objects and validate it.",
+      "You can build a tiny API endpoint of your own that returns JSON."
+    ],
+    "subtopics": [
+      {
+        "title": "How HTTP works",
+        "desc": "A client sends a request (method, URL, headers, optional body) and the server sends back a status code, headers, and a body. GET reads, POST creates or triggers, and so on.",
+        "level": "core",
+        "resources": [
+          { "title": "Overview of HTTP", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview", "type": "docs", "source": "MDN", "free": true },
+          { "title": "HTTP response status codes", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status", "type": "docs", "source": "MDN", "free": true }
+        ]
+      },
+      {
+        "title": "JSON in and out",
+        "desc": "JSON is text made of objects, arrays, strings, numbers, booleans, and null. In Python it maps to dicts and lists via the json module. LLM structured outputs and tool calls are all JSON.",
+        "level": "core",
+        "resources": [
+          { "title": "Introducing JSON", "url": "https://www.json.org/json-en.html", "type": "docs", "source": "json.org", "free": true },
+          { "title": "json: JSON encoder and decoder", "url": "https://docs.python.org/3/library/json.html", "type": "docs", "source": "Python.org", "free": true }
+        ]
+      },
+      {
+        "title": "Calling APIs from Python",
+        "desc": "Using requests or httpx to send calls, pass API keys in headers, and read responses. Keep keys in environment variables, never in code.",
+        "level": "core",
+        "resources": [
+          { "title": "Requests Quickstart", "url": "https://requests.readthedocs.io/en/latest/user/quickstart/", "type": "docs", "source": "Requests", "free": true },
+          { "title": "HTTPX", "url": "https://www.python-httpx.org/", "type": "docs", "source": "HTTPX", "free": true }
+        ]
+      },
+      {
+        "title": "Errors, retries, and rate limits",
+        "desc": "Real APIs time out, return 429 when you send too much, and fail now and then. Retry with exponential backoff, set timeouts, and log failures. This matters a lot with LLM APIs.",
+        "level": "core"
+      },
+      {
+        "title": "Validating data with Pydantic and JSON Schema",
+        "desc": "JSON Schema describes the shape JSON must have. Pydantic turns Python classes into validators and schemas. LLM SDKs use both for structured outputs and tool definitions.",
+        "level": "deep",
+        "resources": [
+          { "title": "Pydantic documentation", "url": "https://pydantic.dev/docs/validation/latest/get-started/", "type": "docs", "source": "Pydantic", "free": true },
+          { "title": "JSON Schema: Creating your first schema", "url": "https://json-schema.org/learn/getting-started-step-by-step", "type": "docs", "source": "JSON Schema", "free": true }
+        ]
+      },
+      {
+        "title": "Building your own API",
+        "desc": "FastAPI lets you expose a Python function as an HTTP endpoint in a few lines, with automatic docs. It is the usual way to wrap a model or an LLM workflow as a service.",
+        "level": "deep",
+        "resources": [
+          { "title": "FastAPI Tutorial - User Guide", "url": "https://fastapi.tiangolo.com/tutorial/", "type": "docs", "source": "FastAPI", "free": true }
+        ]
+      },
+      {
+        "title": "Webhooks, streaming, and auth flows",
+        "desc": "Webhooks are APIs calling you when something happens. Streaming (server-sent events) is how LLM responses arrive token by token. OAuth is how apps get permission to act for a user. Know what they are.",
+        "level": "optional"
+      }
+    ],
+    "resources": [
+      { "title": "Python and REST APIs: Interacting With Web Services", "url": "https://realpython.com/api-integration-in-python/", "type": "article", "source": "Real Python", "free": true },
+      { "title": "Overview of HTTP", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview", "type": "docs", "source": "MDN", "free": true },
+      { "title": "FastAPI Tutorial - User Guide", "url": "https://fastapi.tiangolo.com/tutorial/", "type": "docs", "source": "FastAPI", "free": true },
+      { "title": "Working with JSON", "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON", "type": "docs", "source": "MDN", "free": true },
+      { "title": "curl tutorial", "url": "https://curl.se/docs/tutorial.html", "type": "docs", "source": "curl", "free": true },
+      { "title": "JSONPlaceholder (free fake API for practice)", "url": "https://jsonplaceholder.typicode.com/", "type": "tool", "source": "JSONPlaceholder", "free": true }
+    ],
+    "project": "Build a small FastAPI service with one endpoint that takes a city name, calls a free public weather API, validates the response with Pydantic, handles errors and timeouts cleanly, and returns a simplified JSON summary. Test it with curl."
+  },
+
+  "sql": {
+    "summary": "SQL is the language for asking questions of databases. Most company data lives in relational databases and warehouses, and SQL is how you get it out.",
+    "why": "Data scientists spend a large share of their time writing SQL. AI engineers need it for app data, logs, and Postgres with pgvector. PMs and analysts use it to answer their own questions instead of waiting on someone else.",
+    "depth": "Master SELECT, WHERE, GROUP BY, JOINs, subqueries, CTEs, and window functions until you can answer a business question in one query. Schema design and indexes need a working understanding. Query planners, transactions, and database internals are only for people who run databases.",
+    "hours": 25,
+    "outcomes": [
+      "You can write queries that filter, aggregate, and join several tables correctly.",
+      "You can use CTEs and window functions for running totals, rankings, and period-over-period changes.",
+      "You can spot when a join is silently duplicating or dropping rows.",
+      "You can design a simple schema with primary and foreign keys for a small app.",
+      "You can query a local file or database from Python."
+    ],
+    "subtopics": [
+      {
+        "title": "Querying a single table",
+        "desc": "SELECT, WHERE, ORDER BY, LIMIT, and aggregate functions like COUNT, SUM, and AVG with GROUP BY and HAVING.",
+        "level": "core",
+        "resources": [
+          { "title": "SQLBolt interactive lessons", "url": "https://sqlbolt.com/", "type": "interactive", "source": "SQLBolt", "free": true }
+        ]
+      },
+      {
+        "title": "Joins and relationships",
+        "desc": "INNER, LEFT, and FULL joins combine tables by keys. Getting joins wrong is the most common way SQL gives confidently wrong answers.",
+        "level": "core",
+        "resources": [
+          { "title": "Select Star SQL", "url": "https://selectstarsql.com/", "type": "interactive", "source": "Select Star SQL", "free": true }
+        ]
+      },
+      {
+        "title": "CTEs and window functions",
+        "desc": "CTEs (WITH clauses) break a big query into readable steps. Window functions compute things like rank, running total, or previous value without collapsing rows. They are what separates basic from fluent SQL.",
+        "level": "core",
+        "resources": [
+          { "title": "PostgreSQL Tutorial: Window Functions", "url": "https://www.postgresql.org/docs/current/tutorial-window.html", "type": "docs", "source": "PostgreSQL", "free": true }
+        ]
+      },
+      {
+        "title": "Schema design and data modeling",
+        "desc": "Tables, primary keys, foreign keys, and normalization. Knowing how data is shaped tells you how to query it and where it can go wrong.",
+        "level": "deep",
+        "resources": [
+          { "title": "PostgreSQL Tutorial", "url": "https://www.postgresql.org/docs/current/tutorial.html", "type": "docs", "source": "PostgreSQL", "free": true }
+        ]
+      },
+      {
+        "title": "Indexes and performance",
+        "desc": "An index is a lookup structure that makes queries fast. Learn why some queries take milliseconds and others take minutes, and how to read an EXPLAIN plan.",
+        "level": "deep",
+        "resources": [
+          { "title": "Use The Index, Luke", "url": "https://use-the-index-luke.com/", "type": "book", "source": "Markus Winand", "free": true }
+        ]
+      },
+      {
+        "title": "SQL for AI apps: Postgres, pgvector, DuckDB",
+        "desc": "Postgres with the pgvector extension stores embeddings next to normal data, a common choice for RAG. DuckDB runs fast SQL directly on CSV and Parquet files on your laptop.",
+        "level": "optional",
+        "resources": [
+          { "title": "pgvector", "url": "https://github.com/pgvector/pgvector", "type": "tool", "source": "GitHub", "free": true },
+          { "title": "DuckDB documentation", "url": "https://duckdb.org/docs/stable/", "type": "docs", "source": "DuckDB", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "SQLBolt", "url": "https://sqlbolt.com/", "type": "interactive", "source": "SQLBolt", "free": true },
+      { "title": "Kaggle Learn: Intro to SQL", "url": "https://www.kaggle.com/learn/intro-to-sql", "type": "interactive", "source": "Kaggle", "free": true },
+      { "title": "Kaggle Learn: Advanced SQL", "url": "https://www.kaggle.com/learn/advanced-sql", "type": "interactive", "source": "Kaggle", "free": true },
+      { "title": "ThoughtSpot (formerly Mode) SQL Tutorial", "url": "https://www.thoughtspot.com/sql-tutorial", "type": "course", "source": "ThoughtSpot", "free": true },
+      { "title": "SQL Tutorial - Full Database Course for Beginners", "url": "https://www.youtube.com/watch?v=HXV3zeQKqGY", "type": "video", "source": "freeCodeCamp", "free": true },
+      { "title": "CS 186: Introduction to Database Systems", "url": "https://cs186berkeley.net/", "type": "course", "source": "UC Berkeley", "free": true }
+    ],
+    "project": "Load a public multi-table dataset (for example an e-commerce orders, customers, and products dataset) into SQLite or DuckDB. Write queries for monthly revenue, each customer's first and latest order, the top 3 products per category by revenue, and 30-day repeat purchase rate."
+  },
+
+  "algorithms-ds": {
+    "summary": "Data structures are ways to organize data in memory (arrays, hash maps, trees, graphs). Algorithms are step-by-step methods to solve problems with them. Big-O notation describes how their cost grows as inputs grow.",
+    "why": "It helps you write code that stays fast when data grows from 1,000 rows to 100 million, and it is the vocabulary of technical interviews. Many AI ideas are built on these basics: vector search is nearest-neighbor search, beam search is a search algorithm, and tokenizers use tries and merges.",
+    "depth": "Implement yourself and understand deeply: arrays vs linked lists, hash maps, stacks and queues, binary search, sorting (know how merge sort works), recursion, BFS and DFS on trees and graphs, and Big-O analysis. Know how to use but not implement: heaps and priority queues, balanced trees, Dijkstra, tries, and dynamic programming patterns (practice these if you are interviewing). Just know they exist: red-black trees, B-trees, union-find, advanced graph algorithms, and approximate nearest-neighbor indexes like HNSW (covered later under vector databases).",
+    "hours": 40,
+    "outcomes": [
+      "You can state the Big-O time and memory of common operations and spot an accidental O(n^2) loop.",
+      "You can pick a list, dict, set, heap, or deque for a task and justify it.",
+      "You can implement binary search, BFS, and DFS from scratch without bugs.",
+      "You can solve typical easy and medium coding interview problems in Python.",
+      "You can explain in plain words why approximate nearest-neighbor search exists."
+    ],
+    "subtopics": [
+      {
+        "title": "Big-O and complexity (implement and master)",
+        "desc": "How time and memory grow with input size: O(1), O(log n), O(n), O(n log n), O(n^2). You should be able to analyze any code you write this way.",
+        "level": "core",
+        "resources": [
+          { "title": "Big-O Cheat Sheet", "url": "https://www.bigocheatsheet.com/", "type": "article", "source": "Eric Rowell", "free": true }
+        ]
+      },
+      {
+        "title": "Core structures: arrays, hash maps, sets, stacks, queues (implement and master)",
+        "desc": "Know what Python's list, dict, set, and collections.deque do under the hood and what each operation costs. Build a stack and a queue yourself once. Hash maps are the single most useful structure in practice.",
+        "level": "core",
+        "resources": [
+          { "title": "collections: Container datatypes", "url": "https://docs.python.org/3/library/collections.html", "type": "docs", "source": "Python.org", "free": true }
+        ]
+      },
+      {
+        "title": "Searching, sorting, and recursion (implement and master)",
+        "desc": "Write binary search and merge sort by hand and understand why sorting is O(n log n). Learn recursion well enough to trace it on paper. In real work you call sorted(), but you should know what it costs.",
+        "level": "core",
+        "resources": [
+          { "title": "Problem Solving with Algorithms and Data Structures using Python", "url": "https://runestone.academy/ns/books/published/pythonds/index.html", "type": "book", "source": "Runestone Academy", "free": true }
+        ]
+      },
+      {
+        "title": "Trees and graphs: BFS and DFS (implement and master)",
+        "desc": "Trees and graphs model hierarchies, networks, and dependencies. Implement breadth-first and depth-first search yourself. Agent workflows, knowledge graphs, and computation graphs in deep learning all use these ideas.",
+        "level": "core",
+        "resources": [
+          { "title": "VisuAlgo", "url": "https://visualgo.net/en", "type": "interactive", "source": "NUS", "free": true }
+        ]
+      },
+      {
+        "title": "Heaps, tries, Dijkstra, and dynamic programming (use and understand)",
+        "desc": "Use heapq for top-k and priority queues, know what a trie is (prefix trees used in autocomplete and tokenizers), know Dijkstra finds shortest paths, and recognize dynamic programming (solving big problems by caching subproblems). Practice implementing these only if you are preparing for interviews.",
+        "level": "deep",
+        "resources": [
+          { "title": "heapq: Heap queue algorithm", "url": "https://docs.python.org/3/library/heapq.html", "type": "docs", "source": "Python.org", "free": true }
+        ]
+      },
+      {
+        "title": "Interview practice patterns",
+        "desc": "Two pointers, sliding window, hashing, BFS/DFS, and DP cover most interview problems. A structured problem list beats random grinding.",
+        "level": "optional",
+        "resources": [
+          { "title": "NeetCode Roadmap", "url": "https://neetcode.io/roadmap", "type": "interactive", "source": "NeetCode", "free": true },
+          { "title": "LeetCode", "url": "https://leetcode.com/", "type": "interactive", "source": "LeetCode", "free": true }
+        ]
+      },
+      {
+        "title": "Advanced structures (just know they exist)",
+        "desc": "B-trees power database indexes, union-find groups connected items, and graph-based approximate nearest-neighbor indexes (like HNSW) power vector search. Know the names and what problem each solves; you will almost never implement them.",
+        "level": "optional"
+      }
+    ],
+    "resources": [
+      { "title": "MIT 6.006 Introduction to Algorithms (Spring 2020)", "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/", "type": "course", "source": "MIT OCW", "free": true },
+      { "title": "Algorithms and Data Structures Tutorial - Full Course for Beginners", "url": "https://www.youtube.com/watch?v=8hly31xKli0", "type": "video", "source": "freeCodeCamp", "free": true },
+      { "title": "Grokking Algorithms, Second Edition", "url": "https://www.manning.com/books/grokking-algorithms-second-edition", "type": "book", "source": "Manning", "free": false },
+      { "title": "Problem Solving with Algorithms and Data Structures using Python", "url": "https://runestone.academy/ns/books/published/pythonds/index.html", "type": "book", "source": "Runestone Academy", "free": true },
+      { "title": "VisuAlgo", "url": "https://visualgo.net/en", "type": "interactive", "source": "NUS", "free": true },
+      { "title": "NeetCode Roadmap", "url": "https://neetcode.io/roadmap", "type": "interactive", "source": "NeetCode", "free": true },
+      { "title": "Algorithms by Jeff Erickson", "url": "https://jeffe.cs.illinois.edu/teaching/algorithms/", "type": "book", "source": "UIUC", "free": true }
+    ],
+    "project": "Build a tiny search engine over a folder of text files: an inverted index using dicts, top-k results with heapq, and a brute-force nearest-neighbor search over word-count vectors. Time each part as the corpus grows 10x and explain the results in Big-O terms."
+  },
+
+  "data-viz-eda": {
+    "summary": "Exploratory data analysis (EDA) is getting to know a dataset before modeling it: distributions, missing values, outliers, and relationships. Data visualization is how you see those patterns and show them to others.",
+    "why": "Most modeling mistakes, like leakage, broken labels, and skewed samples, are visible in a few plots before you train anything. Clear charts are also how data work turns into decisions people actually act on.",
+    "depth": "Master a repeatable EDA checklist and the core chart types (histogram, box plot, scatter, line, bar, heatmap) in one library, plus the judgment to pick the right one. Interactive dashboards and design theory are worth exploring later. Auto-profiling tools are helpful shortcuts but don't replace looking yourself.",
+    "hours": 25,
+    "outcomes": [
+      "You can run a structured first pass on a new dataset and list its quality problems.",
+      "You can choose a chart type that fits the question and the data type.",
+      "You can make clean, labeled plots with matplotlib or seaborn.",
+      "You can spot outliers, skew, and suspicious correlations that would mislead a model.",
+      "You can turn an analysis into a short visual story for a non-technical reader."
+    ],
+    "subtopics": [
+      {
+        "title": "The EDA checklist",
+        "desc": "Shape, types, missing values, duplicates, summary statistics, distributions of each column, then relationships between columns and the target. Do it in the same order every time.",
+        "level": "core",
+        "resources": [
+          { "title": "R for Data Science: Exploratory data analysis (concepts carry over to Python)", "url": "https://r4ds.hadley.nz/", "type": "book", "source": "Hadley Wickham", "free": true }
+        ]
+      },
+      {
+        "title": "Plotting with matplotlib and seaborn",
+        "desc": "matplotlib is the base plotting library; seaborn sits on top and makes statistical plots in one line. Learn figures, axes, and how to label everything.",
+        "level": "core",
+        "resources": [
+          { "title": "Matplotlib Quick start guide", "url": "https://matplotlib.org/stable/users/explain/quick_start.html", "type": "docs", "source": "Matplotlib", "free": true },
+          { "title": "seaborn user guide and tutorial", "url": "https://seaborn.pydata.org/tutorial.html", "type": "docs", "source": "seaborn", "free": true }
+        ]
+      },
+      {
+        "title": "Choosing the right chart",
+        "desc": "Distributions call for histograms or box plots, trends for lines, comparisons for bars, relationships for scatter plots. A decision tree of chart types saves a lot of guessing.",
+        "level": "core",
+        "resources": [
+          { "title": "From Data to Viz", "url": "https://www.data-to-viz.com/", "type": "interactive", "source": "data-to-viz.com", "free": true }
+        ]
+      },
+      {
+        "title": "Outliers, skew, and data quality",
+        "desc": "Find impossible values, long tails that need a log scale, and leakage hints like a feature that predicts the target suspiciously well.",
+        "level": "core"
+      },
+      {
+        "title": "Design principles for clear charts",
+        "desc": "Remove clutter, label directly, use color with purpose, and start from the message you want the reader to take away.",
+        "level": "deep",
+        "resources": [
+          { "title": "Fundamentals of Data Visualization", "url": "https://clauswilke.com/dataviz/", "type": "book", "source": "Claus O. Wilke", "free": true }
+        ]
+      },
+      {
+        "title": "Interactive charts and profiling tools",
+        "desc": "Plotly and Altair make interactive charts; ydata-profiling generates an automatic report of a DataFrame. LLM-powered data analysis in chat tools can speed up a first look, but always check its claims.",
+        "level": "optional",
+        "resources": [
+          { "title": "Plotly Python", "url": "https://plotly.com/python/", "type": "docs", "source": "Plotly", "free": true },
+          { "title": "ydata-profiling", "url": "https://docs.profiling.ydata.ai/latest/", "type": "tool", "source": "YData", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Kaggle Learn: Data Visualization", "url": "https://www.kaggle.com/learn/data-visualization", "type": "interactive", "source": "Kaggle", "free": true },
+      { "title": "Fundamentals of Data Visualization", "url": "https://clauswilke.com/dataviz/", "type": "book", "source": "Claus O. Wilke", "free": true },
+      { "title": "Python Data Science Handbook (Visualization with Matplotlib chapter)", "url": "https://jakevdp.github.io/PythonDataScienceHandbook/", "type": "book", "source": "Jake VanderPlas", "free": true },
+      { "title": "seaborn user guide and tutorial", "url": "https://seaborn.pydata.org/tutorial.html", "type": "docs", "source": "seaborn", "free": true },
+      { "title": "From Data to Viz", "url": "https://www.data-to-viz.com/", "type": "interactive", "source": "data-to-viz.com", "free": true },
+      { "title": "Storytelling with Data (books)", "url": "https://www.storytellingwithdata.com/books", "type": "book", "source": "Cole Nussbaumer Knaflic", "free": false }
+    ],
+    "project": "Pick a messy public dataset and write a notebook that follows your EDA checklist, finds at least three data quality issues, and ends with a one-page summary of five charts, each with a one-sentence takeaway a manager could act on."
+  },
+
+  "ai-coding-tools": {
+    "summary": "AI coding assistants write, edit, explain, and debug code for you. They range from autocomplete in your editor to agents like Claude Code, Codex, and Cursor's agent that read your repo, run commands, and make multi-file changes.",
+    "why": "In 2026 most professional code is written with AI help, and agentic tools can take on whole tasks. The skill is no longer typing code fast; it is giving clear instructions, managing context, and reviewing output so you ship working code instead of plausible-looking bugs.",
+    "depth": "Master one agentic tool deeply: how to scope a task, give it context (project instruction files, docs, tests), review diffs, and use git to stay safe. Know the main tool categories and their trade-offs. Advanced setups like custom MCP servers, subagents, and parallel agents are worth learning once the basics are habit.",
+    "hours": 15,
+    "outcomes": [
+      "You can use an agentic coding tool to implement a feature across several files and verify it with tests.",
+      "You can write a project instruction file (like CLAUDE.md or AGENTS.md) that makes the agent follow your conventions.",
+      "You can review AI-written code critically and catch wrong assumptions, security issues, and invented APIs.",
+      "You can use git checkpoints so any agent change is easy to inspect or roll back.",
+      "You can choose between autocomplete, chat, and autonomous agents for a given task."
+    ],
+    "subtopics": [
+      {
+        "title": "The tool landscape",
+        "desc": "Inline completion (Copilot), AI-first editors (Cursor and similar), terminal and cloud agents (Claude Code, OpenAI Codex, Aider), and app builders. They differ in autonomy, context access, and how much you review.",
+        "level": "core",
+        "resources": [
+          { "title": "Claude Code overview", "url": "https://code.claude.com/docs/en/overview", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "GitHub Copilot documentation", "url": "https://docs.github.com/en/copilot", "type": "docs", "source": "GitHub", "free": true }
+        ]
+      },
+      {
+        "title": "Scoping tasks and giving context",
+        "desc": "Agents do best with a clear goal, constraints, and a way to check their work. Ask for a plan first on bigger tasks, point to relevant files, and break work into reviewable steps.",
+        "level": "core",
+        "resources": [
+          { "title": "Best practices for Claude Code", "url": "https://code.claude.com/docs/en/best-practices", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Project instructions and memory files",
+        "desc": "Files like CLAUDE.md, AGENTS.md, or Cursor rules tell the agent how your project works: commands, style, and do's and don'ts. Short and specific beats long and vague.",
+        "level": "core",
+        "resources": [
+          { "title": "AGENTS.md", "url": "https://agents.md/", "type": "docs", "source": "agents.md", "free": true }
+        ]
+      },
+      {
+        "title": "Reviewing and verifying AI code",
+        "desc": "Read every diff. Have the agent write and run tests. Watch for invented library functions, silent error swallowing, deleted tests, and leaked secrets. You own the code it writes.",
+        "level": "core",
+        "resources": [
+          { "title": "Here's how I use LLMs to help me write code", "url": "https://simonwillison.net/2025/Mar/11/using-llms-for-code/", "type": "article", "source": "Simon Willison", "free": true }
+        ]
+      },
+      {
+        "title": "Safety: permissions, sandboxes, and git",
+        "desc": "Agents can run shell commands. Use permission settings, work on a branch, commit often, and be careful with untrusted repos or web content, which can contain prompt injection.",
+        "level": "deep"
+      },
+      {
+        "title": "Extending agents: MCP, subagents, and parallel work",
+        "desc": "MCP servers connect your agent to tools like databases, issue trackers, and docs. Subagents and parallel sessions split big tasks. Powerful, but only after the basics are solid.",
+        "level": "optional",
+        "resources": [
+          { "title": "Model Context Protocol", "url": "https://modelcontextprotocol.io/", "type": "docs", "source": "MCP", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Best practices for Claude Code", "url": "https://code.claude.com/docs/en/best-practices", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Simon Willison on AI-assisted programming", "url": "https://simonwillison.net/tags/ai-assisted-programming/", "type": "article", "source": "Simon Willison", "free": true },
+      { "title": "Vibe engineering", "url": "https://simonwillison.net/2025/Oct/7/vibe-engineering/", "type": "article", "source": "Simon Willison", "free": true },
+      { "title": "Andrej Karpathy: Software Is Changing (Again)", "url": "https://www.youtube.com/watch?v=LCEmiRjPEtQ", "type": "video", "source": "Y Combinator", "free": true },
+      { "title": "Cursor Docs", "url": "https://cursor.com/docs", "type": "docs", "source": "Cursor", "free": true },
+      { "title": "OpenAI Codex (open-source CLI)", "url": "https://github.com/openai/codex", "type": "tool", "source": "OpenAI", "free": true },
+      { "title": "Aider: AI pair programming in your terminal", "url": "https://aider.chat/", "type": "tool", "source": "Aider", "free": true }
+    ],
+    "project": "Use an agentic coding tool to add a real feature to one of your own repos. Write a project instruction file first, ask for a plan, have it write tests, and review every diff. Then write a short log of what it got wrong and how you caught it."
+  },
+
+  "ml-concepts": {
+    "summary": "Machine learning is getting a computer to learn patterns from examples instead of following hand-written rules. This node covers the core ideas: data, features, labels, models, loss, training, and generalization.",
+    "why": "These concepts are the shared language of all AI work, from a spreadsheet-sized regression to training an LLM. Once they click, you can read any ML docs or paper intro and judge whether a model's results can be trusted.",
+    "depth": "Master the vocabulary and intuitions: supervised vs unsupervised, training vs inference, loss functions, gradient descent as 'adjust weights to reduce error', overfitting, and why we hold out test data. You don't need the math in detail yet. You should be able to explain each idea in plain words and sketch it on a whiteboard.",
+    "hours": 20,
+    "outcomes": [
+      "You can explain the difference between supervised, unsupervised, and reinforcement learning with an example of each.",
+      "You can describe what happens during training, from loss to gradient to weight update, in plain words.",
+      "You can explain overfitting and underfitting and why train, validation, and test splits exist.",
+      "You can frame a real problem as an ML task: inputs, target, success metric, and data needed.",
+      "You can tell when a problem does not need ML at all."
+    ],
+    "subtopics": [
+      {
+        "title": "Types of learning",
+        "desc": "Supervised learning learns from labeled examples (spam or not). Unsupervised learning finds structure without labels (clusters). Reinforcement learning learns from rewards. Self-supervised learning, which trains LLMs, makes labels from the data itself.",
+        "level": "core",
+        "resources": [
+          { "title": "Google: Introduction to Machine Learning", "url": "https://developers.google.com/machine-learning/intro-to-ml", "type": "course", "source": "Google", "free": true }
+        ]
+      },
+      {
+        "title": "Features, labels, and models",
+        "desc": "Features are the inputs, the label is what you want to predict, and a model is a function with adjustable parameters that maps one to the other. Regression predicts numbers; classification predicts categories.",
+        "level": "core",
+        "resources": [
+          { "title": "A Gentle Introduction to Machine Learning", "url": "https://www.youtube.com/watch?v=Gv9_4yMHFhI", "type": "video", "source": "StatQuest", "free": true }
+        ]
+      },
+      {
+        "title": "Loss and gradient descent",
+        "desc": "A loss function scores how wrong the model is. Gradient descent nudges each parameter in the direction that lowers the loss, repeated many times. The same loop trains neural networks and LLMs.",
+        "level": "core",
+        "resources": [
+          { "title": "Google ML Crash Course: Linear regression", "url": "https://developers.google.com/machine-learning/crash-course/linear-regression", "type": "course", "source": "Google", "free": true }
+        ]
+      },
+      {
+        "title": "Generalization, overfitting, and the bias-variance trade-off",
+        "desc": "The goal is to do well on new data, not memorize the training set. Too simple a model underfits, too flexible a model overfits. Holding out data is how you find out which is happening.",
+        "level": "core",
+        "resources": [
+          { "title": "The Bias Variance Tradeoff", "url": "https://mlu-explain.github.io/bias-variance/", "type": "interactive", "source": "Amazon MLU", "free": true },
+          { "title": "Google ML Crash Course: Datasets, generalization, and overfitting", "url": "https://developers.google.com/machine-learning/crash-course/overfitting", "type": "course", "source": "Google", "free": true }
+        ]
+      },
+      {
+        "title": "The ML workflow end to end",
+        "desc": "Frame the problem, get and clean data, pick a baseline, train, evaluate, iterate, deploy, and monitor. Most of the effort goes into data and evaluation, not the model.",
+        "level": "deep",
+        "resources": [
+          { "title": "Rules of Machine Learning", "url": "https://developers.google.com/machine-learning/guides/rules-of-ml", "type": "article", "source": "Google", "free": true }
+        ]
+      },
+      {
+        "title": "Classic ML vs deep learning vs foundation models",
+        "desc": "Tabular data often works best with classic models like gradient boosting. Images, audio, and text favor deep learning. For many language tasks today, prompting a pre-trained LLM beats training anything. Knowing which to reach for saves weeks.",
+        "level": "deep"
+      }
+    ],
+    "resources": [
+      { "title": "Google Machine Learning Crash Course", "url": "https://developers.google.com/machine-learning/crash-course", "type": "course", "source": "Google", "free": true },
+      { "title": "Machine Learning Specialization", "url": "https://www.coursera.org/specializations/machine-learning-introduction", "type": "course", "source": "DeepLearning.AI / Stanford", "free": false },
+      { "title": "StatQuest: Machine Learning playlist", "url": "https://www.youtube.com/playlist?list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF", "type": "video", "source": "StatQuest", "free": true },
+      { "title": "MLU-Explain: visual essays on ML concepts", "url": "https://mlu-explain.github.io/", "type": "interactive", "source": "Amazon MLU", "free": true },
+      { "title": "Kaggle Learn: Intro to Machine Learning", "url": "https://www.kaggle.com/learn/intro-to-machine-learning", "type": "interactive", "source": "Kaggle", "free": true },
+      { "title": "An Introduction to Statistical Learning (Python edition)", "url": "https://www.statlearning.com/", "type": "book", "source": "James, Witten, Hastie, Tibshirani, Taylor", "free": true }
+    ],
+    "project": "Pick three problems from your work or life. For each, write a one-page ML framing: input features, label, type of task, success metric, where the data would come from, a simple non-ML baseline, and the biggest risk of overfitting or bad data."
+  },
+
+  "ml-algorithms": {
+    "summary": "Classic machine learning algorithms are the workhorses that came before deep learning: linear and logistic regression, decision trees, random forests, gradient boosting, k-nearest neighbors, clustering, and dimensionality reduction.",
+    "why": "On tabular business data (customers, transactions, sensors) these models are often more accurate, cheaper, and easier to explain than neural networks. They are also the fastest way to build a strong baseline before trying anything fancier.",
+    "depth": "Implement from scratch and understand deeply: linear regression and logistic regression (with gradient descent), and how a decision tree chooses splits. Understand the ideas and use fluently in scikit-learn: regularization (L1/L2), random forests, gradient boosting (XGBoost/LightGBM), k-means, and PCA. Just know what they are and when they fit: SVMs, naive Bayes, k-nearest neighbors, DBSCAN, hierarchical clustering, and t-SNE/UMAP.",
+    "hours": 50,
+    "outcomes": [
+      "You can implement linear and logistic regression from scratch in NumPy and match scikit-learn's results.",
+      "You can explain how a decision tree splits, and why random forests and boosting beat a single tree.",
+      "You can train, tune, and compare several models on a tabular dataset with scikit-learn pipelines.",
+      "You can choose a sensible first model for a new problem and justify the choice.",
+      "You can use k-means and PCA to explore unlabeled data and explain what they found."
+    ],
+    "subtopics": [
+      {
+        "title": "Linear and logistic regression (implement from scratch)",
+        "desc": "Linear regression fits a weighted sum to predict a number; logistic regression squashes it through a sigmoid to predict a probability. Build both in NumPy with gradient descent. Nearly every later model, including neural networks, extends these ideas.",
+        "level": "core",
+        "resources": [
+          { "title": "Linear Regression (visual essay)", "url": "https://mlu-explain.github.io/linear-regression/", "type": "interactive", "source": "Amazon MLU", "free": true },
+          { "title": "StatQuest: Logistic Regression", "url": "https://www.youtube.com/watch?v=yIYKR4sgzI8", "type": "video", "source": "StatQuest", "free": true }
+        ]
+      },
+      {
+        "title": "Regularization: L1, L2 (understand deeply)",
+        "desc": "Regularization adds a penalty for large weights so the model doesn't overfit. Ridge (L2) shrinks weights, Lasso (L1) can zero them out. Know what the penalty does to the model; one scikit-learn parameter turns it on.",
+        "level": "core",
+        "resources": [
+          { "title": "Regularization Part 1: Ridge (L2) Regression", "url": "https://www.youtube.com/watch?v=Q81RR3yKn30", "type": "video", "source": "StatQuest", "free": true }
+        ]
+      },
+      {
+        "title": "Decision trees (implement a simple one)",
+        "desc": "A tree asks yes/no questions about features to split the data into purer groups. Writing a small one yourself (Gini or entropy splits, max depth) makes ensembles easy to understand.",
+        "level": "core",
+        "resources": [
+          { "title": "Decision Trees (visual essay)", "url": "https://mlu-explain.github.io/decision-tree/", "type": "interactive", "source": "Amazon MLU", "free": true },
+          { "title": "Decision and Classification Trees, Clearly Explained", "url": "https://www.youtube.com/watch?v=_L39rN6gz7Y", "type": "video", "source": "StatQuest", "free": true }
+        ]
+      },
+      {
+        "title": "Random forests and gradient boosting (understand and use)",
+        "desc": "Random forests average many trees trained on random subsets. Gradient boosting adds trees one at a time, each fixing the last one's errors. XGBoost and LightGBM are still the best default for tabular data. Understand the idea and the key hyperparameters; don't implement them.",
+        "level": "core",
+        "resources": [
+          { "title": "Gradient Boost Part 1: Regression Main Ideas", "url": "https://www.youtube.com/watch?v=3CC4N4z3GJc", "type": "video", "source": "StatQuest", "free": true },
+          { "title": "XGBoost: Introduction to Boosted Trees", "url": "https://xgboost.readthedocs.io/en/stable/tutorials/model.html", "type": "docs", "source": "XGBoost", "free": true }
+        ]
+      },
+      {
+        "title": "Unsupervised: k-means and PCA (understand and use)",
+        "desc": "k-means groups points into k clusters around centers. PCA compresses many features into a few directions that keep the most variance. Both are everyday tools for exploring data and embeddings.",
+        "level": "deep",
+        "resources": [
+          { "title": "StatQuest: K-means clustering", "url": "https://www.youtube.com/watch?v=4b5d3muPQmA", "type": "video", "source": "StatQuest", "free": true },
+          { "title": "StatQuest: PCA Step-by-Step", "url": "https://www.youtube.com/watch?v=FgakZw6K1QQ", "type": "video", "source": "StatQuest", "free": true }
+        ]
+      },
+      {
+        "title": "The wider toolbox (know they exist)",
+        "desc": "SVMs find the widest margin between classes, naive Bayes is a fast probabilistic text classifier, k-nearest neighbors predicts from the closest examples, DBSCAN finds clusters of any shape, and t-SNE/UMAP make 2D maps of high-dimensional data. Know when each fits; reach for docs when you need one.",
+        "level": "optional",
+        "resources": [
+          { "title": "scikit-learn: Choosing the right estimator", "url": "https://scikit-learn.org/stable/machine_learning_map.html", "type": "docs", "source": "scikit-learn", "free": true }
+        ]
+      },
+      {
+        "title": "scikit-learn fluency",
+        "desc": "The fit/predict/transform API, Pipelines, and hyperparameter search. Once you know the pattern, every model works the same way.",
+        "level": "core",
+        "resources": [
+          { "title": "scikit-learn MOOC", "url": "https://inria.github.io/scikit-learn-mooc/", "type": "course", "source": "Inria", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "An Introduction to Statistical Learning (Python edition)", "url": "https://www.statlearning.com/", "type": "book", "source": "James, Witten, Hastie, Tibshirani, Taylor", "free": true },
+      { "title": "StatQuest: Machine Learning playlist", "url": "https://www.youtube.com/playlist?list=PLblh5JKOoLUICTaGLRoHQDuF_7q2GfuJF", "type": "video", "source": "StatQuest", "free": true },
+      { "title": "scikit-learn User Guide", "url": "https://scikit-learn.org/stable/user_guide.html", "type": "docs", "source": "scikit-learn", "free": true },
+      { "title": "scikit-learn MOOC", "url": "https://inria.github.io/scikit-learn-mooc/", "type": "course", "source": "Inria", "free": true },
+      { "title": "Machine Learning Specialization", "url": "https://www.coursera.org/specializations/machine-learning-introduction", "type": "course", "source": "DeepLearning.AI / Stanford", "free": false },
+      { "title": "Stanford CS229: Machine Learning", "url": "https://cs229.stanford.edu/", "type": "course", "source": "Stanford", "free": true },
+      { "title": "The Elements of Statistical Learning", "url": "https://hastie.su.domains/ElemStatLearn/", "type": "book", "source": "Hastie, Tibshirani, Friedman", "free": true }
+    ],
+    "project": "Implement logistic regression from scratch in NumPy and check it against scikit-learn on a binary classification dataset. Then compare it with a decision tree, random forest, and LightGBM in proper pipelines with cross-validation, and write a short note on which won and why."
+  },
+
+  "model-eval-ml": {
+    "summary": "Model evaluation is measuring how well a model will work on data it has never seen, using the right metrics and the right data splits. Validation is the process that keeps those numbers honest.",
+    "why": "A model with 99% accuracy can be useless or harmful if the metric or split is wrong. Good evaluation is what lets you trust a result, compare models fairly, and catch problems before users do. The same discipline carries straight into LLM evals.",
+    "depth": "Master train/validation/test splits, cross-validation, the confusion matrix, precision/recall/F1, ROC-AUC, and regression metrics like MAE and RMSE, plus how to spot data leakage. Calibration, statistical tests between models, and fairness metrics need a working understanding. Advanced resampling theory is optional.",
+    "hours": 20,
+    "outcomes": [
+      "You can set up splits and cross-validation that match how the model will be used, including time-based splits.",
+      "You can choose a metric that matches the business cost of each kind of error.",
+      "You can read a confusion matrix and explain the precision-recall trade-off to a non-expert.",
+      "You can detect data leakage and explain why a suspiciously good score is suspicious.",
+      "You can compare two models and say whether the difference is real or noise."
+    ],
+    "subtopics": [
+      {
+        "title": "Splits and cross-validation",
+        "desc": "Train on one part, tune on validation, report on a test set you touch once. Cross-validation rotates the held-out fold to get a more stable estimate. Use time-based splits for time-ordered data and grouped splits when rows from one user must stay together.",
+        "level": "core",
+        "resources": [
+          { "title": "Train, Test, and Validation Sets", "url": "https://mlu-explain.github.io/train-test-validation/", "type": "interactive", "source": "Amazon MLU", "free": true },
+          { "title": "StatQuest: Cross Validation", "url": "https://www.youtube.com/watch?v=fSytzGwwBVw", "type": "video", "source": "StatQuest", "free": true }
+        ]
+      },
+      {
+        "title": "Classification metrics",
+        "desc": "Accuracy, precision (how many flagged items were right), recall (how many true items you caught), F1, and the confusion matrix. Accuracy misleads on imbalanced data like fraud.",
+        "level": "core",
+        "resources": [
+          { "title": "Google ML Crash Course: Accuracy, recall, precision", "url": "https://developers.google.com/machine-learning/crash-course/classification/accuracy-precision-recall", "type": "course", "source": "Google", "free": true },
+          { "title": "Precision and Recall", "url": "https://mlu-explain.github.io/precision-recall/", "type": "interactive", "source": "Amazon MLU", "free": true }
+        ]
+      },
+      {
+        "title": "Thresholds, ROC, and PR curves",
+        "desc": "A classifier outputs a score; the threshold turns it into a decision. ROC-AUC and precision-recall curves show performance across all thresholds so you can pick one that fits your costs.",
+        "level": "core",
+        "resources": [
+          { "title": "ROC and AUC, Clearly Explained", "url": "https://www.youtube.com/watch?v=4jRBRDbJemM", "type": "video", "source": "StatQuest", "free": true },
+          { "title": "ROC and AUC (visual essay)", "url": "https://mlu-explain.github.io/roc-auc/", "type": "interactive", "source": "Amazon MLU", "free": true }
+        ]
+      },
+      {
+        "title": "Regression metrics",
+        "desc": "MAE (average error size), RMSE (punishes big errors more), and R-squared. Pick the one whose errors match what hurts in practice.",
+        "level": "core",
+        "resources": [
+          { "title": "scikit-learn: Metrics and scoring", "url": "https://scikit-learn.org/stable/modules/model_evaluation.html", "type": "docs", "source": "scikit-learn", "free": true }
+        ]
+      },
+      {
+        "title": "Data leakage and common pitfalls",
+        "desc": "Leakage is when information from the test set or the future sneaks into training, giving great scores that collapse in production. Fitting preprocessing on all data before splitting is the classic mistake.",
+        "level": "core",
+        "resources": [
+          { "title": "scikit-learn: Common pitfalls and recommended practices", "url": "https://scikit-learn.org/stable/common_pitfalls.html", "type": "docs", "source": "scikit-learn", "free": true },
+          { "title": "Kaggle: Data Leakage", "url": "https://www.kaggle.com/code/alexisbcook/data-leakage", "type": "interactive", "source": "Kaggle", "free": true }
+        ]
+      },
+      {
+        "title": "Tuning, learning curves, and calibration",
+        "desc": "Hyperparameter search with cross-validation, learning curves that show whether more data would help, and calibration, which checks that a predicted 70% really happens about 70% of the time.",
+        "level": "deep",
+        "resources": [
+          { "title": "scikit-learn: Tuning the hyper-parameters of an estimator", "url": "https://scikit-learn.org/stable/modules/grid_search.html", "type": "docs", "source": "scikit-learn", "free": true },
+          { "title": "scikit-learn: Probability calibration", "url": "https://scikit-learn.org/stable/modules/calibration.html", "type": "docs", "source": "scikit-learn", "free": true }
+        ]
+      },
+      {
+        "title": "Comparing models and statistical significance",
+        "desc": "Small score differences are often noise. Confidence intervals, repeated cross-validation, and paired tests tell you whether a model is really better.",
+        "level": "optional",
+        "resources": [
+          { "title": "Model Evaluation, Model Selection, and Algorithm Selection in Machine Learning", "url": "https://arxiv.org/abs/1811.12808", "type": "paper", "source": "Sebastian Raschka (arXiv)", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Google ML Crash Course: Classification", "url": "https://developers.google.com/machine-learning/crash-course/classification", "type": "course", "source": "Google", "free": true },
+      { "title": "scikit-learn: Cross-validation", "url": "https://scikit-learn.org/stable/modules/cross_validation.html", "type": "docs", "source": "scikit-learn", "free": true },
+      { "title": "MLU-Explain: visual essays on ML concepts", "url": "https://mlu-explain.github.io/", "type": "interactive", "source": "Amazon MLU", "free": true },
+      { "title": "Machine Learning Fundamentals: The Confusion Matrix", "url": "https://www.youtube.com/watch?v=Kdsp6soqA7o", "type": "video", "source": "StatQuest", "free": true },
+      { "title": "Model Evaluation, Model Selection, and Algorithm Selection in Machine Learning", "url": "https://arxiv.org/abs/1811.12808", "type": "paper", "source": "Sebastian Raschka (arXiv)", "free": true },
+      { "title": "Kaggle Learn: Intermediate Machine Learning", "url": "https://www.kaggle.com/learn/intermediate-machine-learning", "type": "interactive", "source": "Kaggle", "free": true }
+    ],
+    "project": "On an imbalanced dataset (like credit card fraud), compare accuracy, F1, ROC-AUC, and PR-AUC for two models. Then deliberately introduce a leak, show how much it inflates the score, fix it with a proper pipeline, and pick a decision threshold based on an assumed cost for false positives and false negatives."
+  },
+
+  "feature-engineering": {
+    "summary": "Feature engineering is turning raw data into the inputs a model learns from: cleaning, encoding categories, scaling numbers, building new columns from domain knowledge, and choosing which features to keep.",
+    "why": "On tabular data, good features usually matter more than the choice of algorithm. A thoughtful ratio, time-since, or aggregate feature can beat weeks of model tuning, and doing it carelessly is the main source of data leakage.",
+    "depth": "Master handling missing values, encoding categorical variables, scaling, date and aggregate features, and doing all of it inside a scikit-learn Pipeline so it never leaks. Feature selection and importance methods need a working understanding. Automated feature tools and feature stores are good to know about but rarely needed early.",
+    "hours": 20,
+    "outcomes": [
+      "You can build a preprocessing pipeline with imputation, encoding, and scaling that fits only on training data.",
+      "You can create useful features from dates, text, and grouped aggregates.",
+      "You can choose an encoding for a categorical column based on its cardinality and the model.",
+      "You can use permutation importance or SHAP to check which features a model really relies on.",
+      "You can show with cross-validation that a new feature actually helped."
+    ],
+    "subtopics": [
+      {
+        "title": "Missing values and imputation",
+        "desc": "Fill gaps with a median, a constant, or a model, and often add a 'was missing' flag, because missingness itself can be a signal.",
+        "level": "core",
+        "resources": [
+          { "title": "scikit-learn: Imputation of missing values", "url": "https://scikit-learn.org/stable/modules/impute.html", "type": "docs", "source": "scikit-learn", "free": true }
+        ]
+      },
+      {
+        "title": "Encoding categorical data",
+        "desc": "One-hot encoding for few categories, ordinal or target encoding for many. Tree models and linear models want different things. Watch for categories that appear only in test data.",
+        "level": "core",
+        "resources": [
+          { "title": "Google ML Crash Course: Working with categorical data", "url": "https://developers.google.com/machine-learning/crash-course/categorical-data", "type": "course", "source": "Google", "free": true }
+        ]
+      },
+      {
+        "title": "Scaling and transforming numbers",
+        "desc": "Standardizing, min-max scaling, log transforms for skewed values, and binning. Linear models, k-NN, and neural nets need scaling; tree models mostly don't.",
+        "level": "core",
+        "resources": [
+          { "title": "Google ML Crash Course: Working with numerical data", "url": "https://developers.google.com/machine-learning/crash-course/numerical-data", "type": "course", "source": "Google", "free": true },
+          { "title": "scikit-learn: Preprocessing data", "url": "https://scikit-learn.org/stable/modules/preprocessing.html", "type": "docs", "source": "scikit-learn", "free": true }
+        ]
+      },
+      {
+        "title": "Pipelines and ColumnTransformer",
+        "desc": "Bundle every preprocessing step with the model so cross-validation and production apply exactly the same transformations, fitted only on training data. This is the main defense against leakage.",
+        "level": "core",
+        "resources": [
+          { "title": "scikit-learn: Pipelines and composite estimators", "url": "https://scikit-learn.org/stable/modules/compose.html", "type": "docs", "source": "scikit-learn", "free": true }
+        ]
+      },
+      {
+        "title": "Domain features: dates, aggregates, ratios, text",
+        "desc": "Day of week, time since last purchase, a customer's average order value, price per square meter. Text can become counts, TF-IDF, or LLM embeddings. This is where domain knowledge pays off most.",
+        "level": "deep",
+        "resources": [
+          { "title": "Kaggle Learn: Feature Engineering", "url": "https://www.kaggle.com/learn/feature-engineering", "type": "interactive", "source": "Kaggle", "free": true },
+          { "title": "scikit-learn: Feature extraction", "url": "https://scikit-learn.org/stable/modules/feature_extraction.html", "type": "docs", "source": "scikit-learn", "free": true }
+        ]
+      },
+      {
+        "title": "Feature selection and importance",
+        "desc": "Drop features that add noise or leak the target. Permutation importance and SHAP show what the model actually uses, which also helps explain it to stakeholders.",
+        "level": "deep",
+        "resources": [
+          { "title": "scikit-learn: Permutation feature importance", "url": "https://scikit-learn.org/stable/modules/permutation_importance.html", "type": "docs", "source": "scikit-learn", "free": true },
+          { "title": "SHAP documentation", "url": "https://shap.readthedocs.io/en/latest/", "type": "docs", "source": "SHAP", "free": true }
+        ]
+      },
+      {
+        "title": "Feature stores and automated tools",
+        "desc": "Feature stores share and serve features consistently across teams in production. Libraries like skrub automate parts of preprocessing for messy DataFrames. Know they exist.",
+        "level": "optional",
+        "resources": [
+          { "title": "skrub: Machine learning with dataframes", "url": "https://skrub-data.org/stable/", "type": "tool", "source": "skrub", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Kaggle Learn: Feature Engineering", "url": "https://www.kaggle.com/learn/feature-engineering", "type": "interactive", "source": "Kaggle", "free": true },
+      { "title": "Feature Engineering and Selection: A Practical Approach for Predictive Models", "url": "https://feat.engineering/", "type": "book", "source": "Max Kuhn and Kjell Johnson", "free": true },
+      { "title": "scikit-learn: Pipelines and composite estimators", "url": "https://scikit-learn.org/stable/modules/compose.html", "type": "docs", "source": "scikit-learn", "free": true },
+      { "title": "Google ML Crash Course: Working with numerical data", "url": "https://developers.google.com/machine-learning/crash-course/numerical-data", "type": "course", "source": "Google", "free": true },
+      { "title": "Interpretable Machine Learning", "url": "https://christophm.github.io/interpretable-ml-book/", "type": "book", "source": "Christoph Molnar", "free": true },
+      { "title": "Kaggle Learn: Intermediate Machine Learning", "url": "https://www.kaggle.com/learn/intermediate-machine-learning", "type": "interactive", "source": "Kaggle", "free": true }
+    ],
+    "project": "Take a tabular dataset with dates, categories, and missing values (for example house prices). Build a baseline pipeline with minimal features, then add five engineered features one at a time, measuring each with cross-validation. Keep only those that help, and explain the final model with permutation importance."
+  }
+}

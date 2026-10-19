@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- BUILD:HEAD -->
+<title>AI Learning Atlas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<!-- BUILD:END -->
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- BUILD:BODY -->
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="5" r="3.2"/><circle cx="7" cy="16" r="3.2"/><circle cx="25" cy="16" r="3.2"/><circle cx="12" cy="27" r="3.2"/><circle cx="22" cy="27" r="3.2"/>
+        <path d="M16 8 7 13M16 8l9 5M7 19l5 5M25 19l-3 5M7 19l15 5" fill="none" stroke-width="1.6"/>
+      </svg>
+      <div>
+        <div class="brand-name">AI Learning Atlas</div>
+        <div class="brand-sub">Every AI skill, in the order you need it</div>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <label class="sr-only" for="search">Search topics</label>
+      <input id="search" type="search" placeholder="Search topics, e.g. RAG, LoRA, evals" autocomplete="off">
+      <kbd class="search-kbd">/</kbd>
+      <ul class="search-results" id="searchResults" hidden></ul>
+    </div>
+
+    <div class="top-actions">
+      <div class="seg" role="tablist" aria-label="View">
+        <button id="viewMap" role="tab" aria-selected="true">Map</button>
+        <button id="viewPath" role="tab" aria-selected="false">Path</button>
+      </div>
+      <button class="btn ghost" id="skillCheckBtn">What I already know</button>
+      <button class="btn icon" id="helpBtn" aria-label="How to use this site">?</button>
+    </div>
+  </header>
+
+  <nav class="roles" aria-label="Choose a learning path">
+    <span class="roles-label">Path</span>
+    <div class="role-chips" id="roleChips"></div>
+    <div class="progress" id="progress"></div>
+  </nav>
+
+  <main class="stage">
+    <section class="map-view" id="mapView">
+      <div class="viewport" id="viewport">
+        <div class="world" id="world">
+          <svg class="edges" id="edges"></svg>
+          <div class="nodes" id="nodes"></div>
+        </div>
+      </div>
+      <div class="map-controls">
+        <button class="btn icon" id="zoomIn" aria-label="Zoom in">+</button>
+        <button class="btn icon" id="zoomOut" aria-label="Zoom out">&minus;</button>
+        <button class="btn icon wide" id="zoomFit" aria-label="Fit to screen">Fit</button>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="role-banner" id="roleBanner" hidden></div>
+    </section>
+
+    <section class="path-view" id="pathView" hidden></section>
+
+    <aside class="drawer" id="drawer" aria-label="Topic details" hidden>
+      <div class="drawer-inner" id="drawerInner"></div>
+    </aside>
+  </main>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast" hidden></div>
+</div>
+<!-- BUILD:END -->
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

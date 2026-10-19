@@ -1,0 +1,1328 @@
+{
+  "neural-networks": {
+    "summary": "A neural network is a function built from layers of simple units. Each layer multiplies its input by a matrix of weights, adds a bias, and applies a nonlinearity, and training adjusts those weights so the output gets closer to what you want.",
+    "why": "Every modern AI system, from image classifiers to LLMs, is a neural network underneath. Once you understand forward passes, loss, and backpropagation, the rest of deep learning becomes variations on one idea.",
+    "depth": "Must master: what a layer computes, why nonlinearities matter, what a loss and a gradient tell you, and how gradient descent uses them. You don't need to derive backprop for exotic layers by hand, but you should be able to do it once for a tiny network.",
+    "hours": 30,
+    "outcomes": [
+      "You can explain what a neuron, a layer, an activation function, and a loss function are in plain words.",
+      "You can trace how backpropagation uses the chain rule to compute gradients for every weight.",
+      "You can build and train a small multilayer perceptron from scratch in NumPy or plain Python.",
+      "You can spot underfitting and overfitting from training and validation curves."
+    ],
+    "subtopics": [
+      {
+        "title": "Neurons, layers, and activations",
+        "desc": "A layer is a matrix multiply plus a bias, followed by a nonlinearity such as ReLU or GELU. Without the nonlinearity, stacking layers would collapse into a single linear function.",
+        "level": "core",
+        "resources": [
+          { "title": "But what is a neural network?", "url": "https://www.youtube.com/watch?v=aircAruvnKk", "type": "video", "source": "3Blue1Brown", "free": true }
+        ]
+      },
+      {
+        "title": "Loss functions",
+        "desc": "The loss is a single number that measures how wrong the network is. Mean squared error is common for regression and cross-entropy for classification, and training means pushing this number down.",
+        "level": "core"
+      },
+      {
+        "title": "Backpropagation and gradient descent",
+        "desc": "Backprop applies the chain rule backwards through the network to find how each weight affects the loss. Gradient descent then nudges every weight a small step in the direction that lowers the loss.",
+        "level": "core",
+        "resources": [
+          { "title": "Backpropagation, intuitively", "url": "https://www.youtube.com/watch?v=Ilg3gGewQ5U", "type": "video", "source": "3Blue1Brown", "free": true },
+          { "title": "The spelled-out intro to neural networks and backpropagation: building micrograd", "url": "https://www.youtube.com/watch?v=VMj-3S1tku0", "type": "video", "source": "Andrej Karpathy", "free": true }
+        ]
+      },
+      {
+        "title": "Computational graphs and autograd",
+        "desc": "Frameworks record every operation as a graph so they can compute gradients automatically. Building a tiny autograd engine yourself makes PyTorch feel much less magical.",
+        "level": "deep",
+        "resources": [
+          { "title": "micrograd", "url": "https://github.com/karpathy/micrograd", "type": "tool", "source": "Andrej Karpathy", "free": true },
+          { "title": "Calculus on Computational Graphs: Backpropagation", "url": "https://colah.github.io/posts/2015-08-Backprop/", "type": "article", "source": "Chris Olah", "free": true }
+        ]
+      },
+      {
+        "title": "Generalization, overfitting, and regularization",
+        "desc": "A network can memorize its training data instead of learning the pattern. Validation sets, weight decay, dropout, and more data are the standard defenses.",
+        "level": "core"
+      },
+      {
+        "title": "Universal approximation and why depth helps",
+        "desc": "In theory a wide enough network can approximate almost any function. In practice, deeper networks learn reusable features more efficiently than very wide shallow ones.",
+        "level": "optional",
+        "resources": [
+          { "title": "Neural Networks and Deep Learning, chapter 4", "url": "http://neuralnetworksanddeeplearning.com/", "type": "book", "source": "Michael Nielsen", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Neural networks (video series)", "url": "https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi", "type": "video", "source": "3Blue1Brown", "free": true },
+      { "title": "Neural Networks: Zero to Hero", "url": "https://karpathy.ai/zero-to-hero.html", "type": "course", "source": "Andrej Karpathy", "free": true },
+      { "title": "Dive into Deep Learning: Multilayer Perceptrons", "url": "https://d2l.ai/chapter_multilayer-perceptrons/index.html", "type": "book", "source": "d2l.ai", "free": true },
+      { "title": "TensorFlow Playground", "url": "https://playground.tensorflow.org/", "type": "interactive", "source": "Google", "free": true },
+      { "title": "Neural Networks and Deep Learning", "url": "http://neuralnetworksanddeeplearning.com/", "type": "book", "source": "Michael Nielsen", "free": true },
+      { "title": "Understanding Deep Learning", "url": "https://udlbook.github.io/udlbook/", "type": "book", "source": "Simon J.D. Prince", "free": true },
+      { "title": "Deep Learning Specialization", "url": "https://www.coursera.org/specializations/deep-learning", "type": "course", "source": "DeepLearning.AI", "free": false }
+    ],
+    "project": "Build a two-layer neural network from scratch in NumPy (forward pass, cross-entropy loss, manual backprop, gradient descent) and train it to classify MNIST digits above 95% accuracy. Then check your gradients against a numerical estimate."
+  },
+
+  "pytorch": {
+    "summary": "PyTorch is the most widely used Python library for building and training neural networks. It gives you GPU-accelerated tensors, automatic differentiation, and building blocks for models, data loading, and optimization.",
+    "why": "Almost all research code and most open models (on Hugging Face and elsewhere) are written in PyTorch. If you want to train, fine-tune, or read the code behind a model, you need to be fluent in it.",
+    "depth": "Must master: tensors and shapes, autograd, nn.Module, DataLoader, and writing a clean training loop by hand. Just know that torch.compile, mixed precision, and distributed training exist until you need speed or scale.",
+    "hours": 35,
+    "outcomes": [
+      "You can create and manipulate tensors, reason about shapes and broadcasting, and move work to a GPU.",
+      "You can define a model as an nn.Module and write a complete training and evaluation loop.",
+      "You can load data efficiently with Dataset and DataLoader.",
+      "You can save, load, and debug a model, including fixing common shape and device errors."
+    ],
+    "subtopics": [
+      {
+        "title": "Tensors, shapes, and broadcasting",
+        "desc": "Tensors are n-dimensional arrays that can live on a CPU or GPU. Most bugs in deep learning code are shape bugs, so get comfortable with view, reshape, permute, and broadcasting rules.",
+        "level": "core",
+        "resources": [
+          { "title": "Tensor Puzzles", "url": "https://github.com/srush/Tensor-Puzzles", "type": "interactive", "source": "Sasha Rush", "free": true }
+        ]
+      },
+      {
+        "title": "Autograd",
+        "desc": "PyTorch records operations on tensors with requires_grad=True and computes gradients when you call backward(). Knowing when gradients accumulate and when to call zero_grad() avoids silent bugs.",
+        "level": "core",
+        "resources": [
+          { "title": "Automatic Differentiation with torch.autograd", "url": "https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html", "type": "docs", "source": "PyTorch", "free": true }
+        ]
+      },
+      {
+        "title": "nn.Module and building models",
+        "desc": "Models are classes that hold layers as attributes and define a forward method. Composing modules is how everything from an MLP to a transformer is built.",
+        "level": "core",
+        "resources": [
+          { "title": "Build the Neural Network", "url": "https://docs.pytorch.org/tutorials/beginner/basics/buildmodel_tutorial.html", "type": "docs", "source": "PyTorch", "free": true }
+        ]
+      },
+      {
+        "title": "Datasets and DataLoaders",
+        "desc": "A Dataset returns one example; a DataLoader batches, shuffles, and loads examples in parallel worker processes. A slow data pipeline is a common reason GPUs sit idle.",
+        "level": "core",
+        "resources": [
+          { "title": "Datasets & DataLoaders", "url": "https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html", "type": "docs", "source": "PyTorch", "free": true }
+        ]
+      },
+      {
+        "title": "The training loop",
+        "desc": "Forward pass, compute loss, backward pass, optimizer step, zero the gradients, repeat. Writing this by hand a few times teaches you what higher-level trainers are hiding.",
+        "level": "core",
+        "resources": [
+          { "title": "Optimizing Model Parameters", "url": "https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html", "type": "docs", "source": "PyTorch", "free": true }
+        ]
+      },
+      {
+        "title": "Saving, loading, and checkpoints",
+        "desc": "Save a model's state_dict and the optimizer state so you can resume training or ship weights. Formats like safetensors are now standard for sharing weights safely.",
+        "level": "deep",
+        "resources": [
+          { "title": "Saving and Loading Models", "url": "https://docs.pytorch.org/tutorials/beginner/saving_loading_models.html", "type": "docs", "source": "PyTorch", "free": true }
+        ]
+      },
+      {
+        "title": "torch.compile and performance",
+        "desc": "torch.compile turns your model into optimized kernels with a one-line change, often giving large speedups. Learn it once your models are correct and you care about throughput.",
+        "level": "optional",
+        "resources": [
+          { "title": "Introduction to torch.compile", "url": "https://docs.pytorch.org/tutorials/intermediate/torch_compile_tutorial.html", "type": "docs", "source": "PyTorch", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Learn the Basics", "url": "https://docs.pytorch.org/tutorials/beginner/basics/intro.html", "type": "docs", "source": "PyTorch", "free": true },
+      { "title": "Zero to Mastery Learn PyTorch for Deep Learning", "url": "https://www.learnpytorch.io/", "type": "course", "source": "Daniel Bourke", "free": true },
+      { "title": "Building makemore Part 2: MLP", "url": "https://www.youtube.com/watch?v=TCH_1BHY58I", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "PyTorch documentation", "url": "https://docs.pytorch.org/docs/stable/index.html", "type": "docs", "source": "PyTorch", "free": true },
+      { "title": "Dive into Deep Learning (PyTorch edition)", "url": "https://d2l.ai/", "type": "book", "source": "d2l.ai", "free": true },
+      { "title": "Tensor Puzzles", "url": "https://github.com/srush/Tensor-Puzzles", "type": "interactive", "source": "Sasha Rush", "free": true }
+    ],
+    "project": "Port your from-scratch MNIST network to PyTorch, then extend it: add a proper Dataset/DataLoader, train on a GPU (Colab is fine), log train and validation loss each epoch, save the best checkpoint, and reload it to evaluate on the test set."
+  },
+
+  "cnn": {
+    "summary": "Computer vision is about getting models to understand images and video. Convolutional neural networks (CNNs) slide small learned filters across an image to detect edges, textures, and eventually whole objects, and vision transformers (ViTs) now compete with them.",
+    "why": "Vision powers document processing, medical imaging, quality inspection, self-driving, and the image side of multimodal LLMs. CNNs also teach ideas like inductive bias, feature hierarchies, and transfer learning that apply across deep learning.",
+    "depth": "Must master: how a convolution works, what pooling and stride do, the ResNet idea of residual connections, and how to fine-tune a pretrained backbone. Just know the landscape of detection (YOLO), segmentation (U-Net, SAM), and ViTs unless you specialize in vision.",
+    "hours": 40,
+    "outcomes": [
+      "You can explain how convolution, padding, stride, and pooling change a tensor's shape and what each layer learns.",
+      "You can describe why residual connections let networks go much deeper.",
+      "You can fine-tune a pretrained image model on a small custom dataset with data augmentation.",
+      "You can choose between classification, detection, and segmentation for a given vision problem."
+    ],
+    "subtopics": [
+      {
+        "title": "Convolutions and feature maps",
+        "desc": "A convolution layer applies the same small filter at every position, so it detects a pattern wherever it appears. Stacking layers builds from edges to textures to parts to objects.",
+        "level": "core",
+        "resources": [
+          { "title": "CNN Explainer", "url": "https://poloclub.github.io/cnn-explainer/", "type": "interactive", "source": "Georgia Tech Polo Club", "free": true },
+          { "title": "CS231n: Convolutional Neural Networks", "url": "https://cs231n.github.io/convolutional-networks/", "type": "article", "source": "Stanford", "free": true }
+        ]
+      },
+      {
+        "title": "Classic architectures and ResNets",
+        "desc": "LeNet, AlexNet, VGG, and ResNet show how the field learned to build deeper, better networks. ResNet's skip connections are now used in nearly every deep architecture, including transformers.",
+        "level": "core",
+        "resources": [
+          { "title": "Deep Residual Learning for Image Recognition", "url": "https://arxiv.org/abs/1512.03385", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "d2l.ai: Modern Convolutional Neural Networks", "url": "https://d2l.ai/chapter_convolutional-modern/index.html", "type": "book", "source": "d2l.ai", "free": true }
+        ]
+      },
+      {
+        "title": "Transfer learning and augmentation",
+        "desc": "Start from a model pretrained on a large dataset and fine-tune it on yours. Augmentations like flips, crops, and color jitter stretch a small dataset much further.",
+        "level": "core",
+        "resources": [
+          { "title": "Transfer Learning for Computer Vision Tutorial", "url": "https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html", "type": "docs", "source": "PyTorch", "free": true },
+          { "title": "timm documentation", "url": "https://huggingface.co/docs/timm/index", "type": "docs", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Detection and segmentation",
+        "desc": "Detection draws boxes around objects; segmentation labels every pixel. U-Net, the YOLO family, and promptable models like Segment Anything are the common starting points.",
+        "level": "deep",
+        "resources": [
+          { "title": "Ultralytics YOLO docs", "url": "https://docs.ultralytics.com/", "type": "docs", "source": "Ultralytics", "free": true },
+          { "title": "Segment Anything", "url": "https://arxiv.org/abs/2304.02643", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Vision transformers",
+        "desc": "ViTs cut an image into patches and treat them like tokens in a transformer. With enough data they match or beat CNNs, and they are the usual image encoder inside multimodal models.",
+        "level": "deep",
+        "resources": [
+          { "title": "An Image is Worth 16x16 Words", "url": "https://arxiv.org/abs/2010.11929", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "What CNNs see: feature visualization",
+        "desc": "Visualizing what neurons respond to shows the feature hierarchy directly. It is also an early form of interpretability research.",
+        "level": "optional",
+        "resources": [
+          { "title": "Feature Visualization", "url": "https://distill.pub/2017/feature-visualization/", "type": "article", "source": "Distill", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "CS231n: Deep Learning for Computer Vision", "url": "https://cs231n.stanford.edu/", "type": "course", "source": "Stanford", "free": true },
+      { "title": "CNN Explainer", "url": "https://poloclub.github.io/cnn-explainer/", "type": "interactive", "source": "Georgia Tech Polo Club", "free": true },
+      { "title": "Practical Deep Learning for Coders", "url": "https://course.fast.ai/", "type": "course", "source": "fast.ai", "free": true },
+      { "title": "d2l.ai: Convolutional Neural Networks", "url": "https://d2l.ai/chapter_convolutional-neural-networks/index.html", "type": "book", "source": "d2l.ai", "free": true },
+      { "title": "Hugging Face Computer Vision Course", "url": "https://huggingface.co/learn/computer-vision-course/unit0/welcome/welcome", "type": "course", "source": "Hugging Face", "free": true },
+      { "title": "Deep Residual Learning for Image Recognition", "url": "https://arxiv.org/abs/1512.03385", "type": "paper", "source": "arXiv", "free": true }
+    ],
+    "project": "Collect or download a small image dataset (300 to 1,000 images across 3 to 5 classes). Train a small CNN from scratch, then fine-tune a pretrained ResNet or ViT from timm on the same data, and compare accuracy, training time, and a confusion matrix."
+  },
+
+  "sequence-models": {
+    "summary": "Sequence models process ordered data like text, audio, and time series. This node follows the path from recurrent networks (RNNs, LSTMs) through encoder-decoder models to the attention mechanism that made transformers possible.",
+    "why": "Understanding why RNNs struggled (slow sequential processing, vanishing gradients, a fixed-size memory) explains why attention won. The history also matters again, since state space models like Mamba bring recurrence back for long contexts.",
+    "depth": "Must master: how an RNN carries a hidden state, why gradients vanish over long sequences, the idea of seq2seq, and what attention computes. Just know LSTM gate equations and state space models at a conceptual level unless you research architectures.",
+    "hours": 30,
+    "outcomes": [
+      "You can explain how an RNN processes a sequence step by step and why that is hard to parallelize.",
+      "You can describe the vanishing gradient problem and how LSTMs and GRUs ease it.",
+      "You can explain encoder-decoder models and how attention removes the fixed-size bottleneck.",
+      "You can train a small character-level language model in PyTorch."
+    ],
+    "subtopics": [
+      {
+        "title": "Language modeling as next-token prediction",
+        "desc": "A language model predicts the next character or token given the ones before it. Starting with simple bigram and MLP models makes the later jump to RNNs and transformers easy to follow.",
+        "level": "core",
+        "resources": [
+          { "title": "The spelled-out intro to language modeling: building makemore", "url": "https://www.youtube.com/watch?v=PaCmpygFfXo", "type": "video", "source": "Andrej Karpathy", "free": true }
+        ]
+      },
+      {
+        "title": "Recurrent neural networks",
+        "desc": "An RNN reads one step at a time and updates a hidden state that summarizes everything so far. It is simple and elegant, but training is slow because each step waits for the last.",
+        "level": "core",
+        "resources": [
+          { "title": "The Unreasonable Effectiveness of Recurrent Neural Networks", "url": "https://karpathy.github.io/2015/05/21/rnn-effectiveness/", "type": "article", "source": "Andrej Karpathy", "free": true }
+        ]
+      },
+      {
+        "title": "LSTMs, GRUs, and vanishing gradients",
+        "desc": "Gradients shrink as they flow back through many steps, so plain RNNs forget long-range information. LSTMs and GRUs add gates that decide what to keep, which helped a lot but did not fully fix it.",
+        "level": "core",
+        "resources": [
+          { "title": "Understanding LSTM Networks", "url": "https://colah.github.io/posts/2015-08-Understanding-LSTMs/", "type": "article", "source": "Chris Olah", "free": true }
+        ]
+      },
+      {
+        "title": "Seq2seq and encoder-decoder models",
+        "desc": "One network encodes the input sequence and another decodes the output, as in translation. Squeezing a whole sentence into one vector was the bottleneck that attention was invented to fix.",
+        "level": "deep",
+        "resources": [
+          { "title": "Sequence to Sequence Learning with Neural Networks", "url": "https://arxiv.org/abs/1409.3215", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "The attention mechanism",
+        "desc": "Attention lets the decoder look back at every encoder state and weight the relevant ones. Transformers keep attention and drop recurrence entirely.",
+        "level": "core",
+        "resources": [
+          { "title": "Visualizing A Neural Machine Translation Model (Mechanics of Seq2seq Models With Attention)", "url": "https://jalammar.github.io/visualizing-neural-machine-translation-mechanics-of-seq2seq-models-with-attention/", "type": "article", "source": "Jay Alammar", "free": true },
+          { "title": "Neural Machine Translation by Jointly Learning to Align and Translate", "url": "https://arxiv.org/abs/1409.0473", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "State space models and modern recurrence",
+        "desc": "Models like Mamba process sequences in linear time with a learned recurrent state, which helps for very long inputs. Several 2025 and 2026 models mix these layers with attention in hybrid designs.",
+        "level": "optional",
+        "resources": [
+          { "title": "Mamba: Linear-Time Sequence Modeling with Selective State Spaces", "url": "https://arxiv.org/abs/2312.00752", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Neural Networks: Zero to Hero (makemore lectures)", "url": "https://karpathy.ai/zero-to-hero.html", "type": "course", "source": "Andrej Karpathy", "free": true },
+      { "title": "Understanding LSTM Networks", "url": "https://colah.github.io/posts/2015-08-Understanding-LSTMs/", "type": "article", "source": "Chris Olah", "free": true },
+      { "title": "d2l.ai: Recurrent Neural Networks", "url": "https://d2l.ai/chapter_recurrent-neural-networks/index.html", "type": "book", "source": "d2l.ai", "free": true },
+      { "title": "d2l.ai: Attention Mechanisms and Transformers", "url": "https://d2l.ai/chapter_attention-mechanisms-and-transformers/index.html", "type": "book", "source": "d2l.ai", "free": true },
+      { "title": "CS224N: Natural Language Processing with Deep Learning", "url": "https://web.stanford.edu/class/cs224n/", "type": "course", "source": "Stanford", "free": true },
+      { "title": "The Unreasonable Effectiveness of Recurrent Neural Networks", "url": "https://karpathy.github.io/2015/05/21/rnn-effectiveness/", "type": "article", "source": "Andrej Karpathy", "free": true }
+    ],
+    "project": "Train a character-level language model on a text corpus you like (song lyrics, a book, your own notes) three ways: a bigram model, an LSTM, and a small single-layer attention model. Compare validation loss and the quality of generated samples."
+  },
+
+  "dl-training": {
+    "summary": "Training deep networks well is the practical craft of getting a model to actually learn: choosing optimizers and learning rates, normalizing, initializing, regularizing, and debugging when the loss misbehaves.",
+    "why": "A correct architecture can still fail to train, train slowly, or overfit. These skills separate a model that works from one that silently underperforms, and they carry over directly to fine-tuning and pretraining LLMs.",
+    "depth": "Must master: AdamW, learning rate schedules with warmup, normalization layers, a systematic debugging routine, and reading loss curves. Just know newer optimizers like Muon and the details of mixed precision until you need the extra speed.",
+    "hours": 40,
+    "outcomes": [
+      "You can pick an optimizer, learning rate, and schedule and justify the choice.",
+      "You can diagnose common failures (exploding or stuck loss, dead activations, overfitting) from metrics and activation statistics.",
+      "You can apply normalization, initialization, dropout, and weight decay correctly.",
+      "You can run a disciplined experiment loop with tracking, baselines, and one change at a time."
+    ],
+    "subtopics": [
+      {
+        "title": "Optimizers and learning rate schedules",
+        "desc": "AdamW is the default for most deep learning today. The learning rate is the most important hyperparameter, and warmup followed by cosine or linear decay is a common schedule.",
+        "level": "core",
+        "resources": [
+          { "title": "Decoupled Weight Decay Regularization (AdamW)", "url": "https://arxiv.org/abs/1711.05101", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "d2l.ai: Optimization Algorithms", "url": "https://d2l.ai/chapter_optimization/index.html", "type": "book", "source": "d2l.ai", "free": true }
+        ]
+      },
+      {
+        "title": "Initialization and normalization",
+        "desc": "Good initialization keeps activations and gradients at a sensible scale. BatchNorm, LayerNorm, and RMSNorm keep them there during training, which makes deep networks far easier to train.",
+        "level": "core",
+        "resources": [
+          { "title": "Building makemore Part 3: Activations & Gradients, BatchNorm", "url": "https://www.youtube.com/watch?v=P6sfmUTpUmc", "type": "video", "source": "Andrej Karpathy", "free": true },
+          { "title": "Layer Normalization", "url": "https://arxiv.org/abs/1607.06450", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Regularization",
+        "desc": "Weight decay, dropout, data augmentation, and early stopping all fight overfitting. Large models trained on huge datasets often need less of it than small models on small data.",
+        "level": "core",
+        "resources": [
+          { "title": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting", "url": "https://jmlr.org/papers/v15/srivastava14a.html", "type": "paper", "source": "JMLR", "free": true }
+        ]
+      },
+      {
+        "title": "Debugging training runs",
+        "desc": "Overfit a single batch first, check the loss at initialization, and watch gradient norms. Most failures come from data bugs, wrong learning rates, or shape mistakes, not the architecture.",
+        "level": "core",
+        "resources": [
+          { "title": "A Recipe for Training Neural Networks", "url": "https://karpathy.github.io/2019/04/25/recipe/", "type": "article", "source": "Andrej Karpathy", "free": true }
+        ]
+      },
+      {
+        "title": "Hyperparameter tuning and experiment tracking",
+        "desc": "Tune the learning rate first, use a fixed budget per trial, and log every run with its config. Tools like Weights & Biases, MLflow, or TensorBoard make comparisons honest.",
+        "level": "deep",
+        "resources": [
+          { "title": "Deep Learning Tuning Playbook", "url": "https://github.com/google-research/tuning_playbook", "type": "article", "source": "Google Research", "free": true }
+        ]
+      },
+      {
+        "title": "Mixed precision and speed",
+        "desc": "Training in bf16 or fp16 roughly halves memory and speeds up modern GPUs. Gradient accumulation and checkpointing let you fit bigger effective batches and models.",
+        "level": "deep",
+        "resources": [
+          { "title": "Automatic Mixed Precision package", "url": "https://docs.pytorch.org/docs/stable/amp.html", "type": "docs", "source": "PyTorch", "free": true }
+        ]
+      },
+      {
+        "title": "Newer optimizers",
+        "desc": "Optimizers like Muon, which orthogonalizes updates for weight matrices, have shown faster training in speedrun benchmarks and some production LLMs. Worth knowing about, safe to skip at first.",
+        "level": "optional",
+        "resources": [
+          { "title": "Muon: An optimizer for hidden layers in neural networks", "url": "https://kellerjordan.github.io/posts/muon/", "type": "article", "source": "Keller Jordan", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "A Recipe for Training Neural Networks", "url": "https://karpathy.github.io/2019/04/25/recipe/", "type": "article", "source": "Andrej Karpathy", "free": true },
+      { "title": "Deep Learning Tuning Playbook", "url": "https://github.com/google-research/tuning_playbook", "type": "article", "source": "Google Research", "free": true },
+      { "title": "Building makemore Part 3: Activations & Gradients, BatchNorm", "url": "https://www.youtube.com/watch?v=P6sfmUTpUmc", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "CS231n: Neural Networks Part 3 (learning and evaluation)", "url": "https://cs231n.github.io/neural-networks-3/", "type": "article", "source": "Stanford", "free": true },
+      { "title": "d2l.ai: Optimization Algorithms", "url": "https://d2l.ai/chapter_optimization/index.html", "type": "book", "source": "d2l.ai", "free": true },
+      { "title": "Machine Learning Engineering Open Book", "url": "https://github.com/stas00/ml-engineering", "type": "book", "source": "Stas Bekman", "free": true }
+    ],
+    "project": "Take a small image or text model and run a controlled study: a learning rate sweep, with and without warmup, with and without normalization, and SGD versus AdamW. Log every run, plot the curves side by side, and write a one-page summary of what mattered most."
+  },
+
+  "diffusion": {
+    "summary": "Diffusion models generate images (and video, audio, and more) by learning to reverse a gradual noising process. Starting from pure noise, the model removes a little noise at each step until a clean sample appears, often guided by a text prompt.",
+    "why": "Diffusion and its close cousin flow matching power most image and video generators. Understanding them lets you fine-tune them, control them, and follow research on generative media and world models.",
+    "depth": "Must master: the forward noising and reverse denoising idea, the noise-prediction training objective, latent diffusion, and classifier-free guidance. Just know the score-based SDE view and the math of flow matching at an intuitive level unless you research generative models.",
+    "hours": 40,
+    "outcomes": [
+      "You can explain how a diffusion model is trained and how sampling turns noise into an image.",
+      "You can explain why latent diffusion runs in a compressed space and how text conditioning and guidance work.",
+      "You can generate, fine-tune, and control a model using the Hugging Face diffusers library.",
+      "You can place VAEs, GANs, diffusion, and flow matching on a map of generative models."
+    ],
+    "subtopics": [
+      {
+        "title": "Generative models before diffusion",
+        "desc": "VAEs learn a compressed latent space; GANs pit a generator against a discriminator. Their strengths and failure modes explain why diffusion took over.",
+        "level": "optional",
+        "resources": [
+          { "title": "Auto-Encoding Variational Bayes", "url": "https://arxiv.org/abs/1312.6114", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Generative Adversarial Networks", "url": "https://arxiv.org/abs/1406.2661", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Denoising diffusion (DDPM)",
+        "desc": "Training adds noise to real images at random levels and teaches a network to predict that noise. Sampling runs this in reverse over many small steps.",
+        "level": "core",
+        "resources": [
+          { "title": "Denoising Diffusion Probabilistic Models", "url": "https://arxiv.org/abs/2006.11239", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "The Annotated Diffusion Model", "url": "https://huggingface.co/blog/annotated-diffusion", "type": "article", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Latent diffusion and text conditioning",
+        "desc": "Running diffusion inside a VAE's compressed latent space makes high-resolution generation affordable. A text encoder feeds the prompt into the denoiser through cross-attention.",
+        "level": "core",
+        "resources": [
+          { "title": "The Illustrated Stable Diffusion", "url": "https://jalammar.github.io/illustrated-stable-diffusion/", "type": "article", "source": "Jay Alammar", "free": true },
+          { "title": "High-Resolution Image Synthesis with Latent Diffusion Models", "url": "https://arxiv.org/abs/2112.10752", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Guidance and sampling",
+        "desc": "Classifier-free guidance trades diversity for prompt adherence with a single scale knob. Faster samplers and distillation cut generation from hundreds of steps to a handful.",
+        "level": "core",
+        "resources": [
+          { "title": "Classifier-Free Diffusion Guidance", "url": "https://arxiv.org/abs/2207.12598", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Flow matching and diffusion transformers",
+        "desc": "Flow matching learns a straight path from noise to data and is now common in leading image and video models. Diffusion transformers (DiT) replace the U-Net backbone with a transformer that scales better.",
+        "level": "deep",
+        "resources": [
+          { "title": "Flow Matching for Generative Modeling", "url": "https://arxiv.org/abs/2210.02747", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Scalable Diffusion Models with Transformers", "url": "https://arxiv.org/abs/2212.09748", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "The score-based view",
+        "desc": "Diffusion can be seen as learning the gradient of the data's log-density and following it with a stochastic differential equation. This view unifies many variants.",
+        "level": "deep",
+        "resources": [
+          { "title": "Generative Modeling by Estimating Gradients of the Data Distribution", "url": "https://yang-song.net/blog/2021/score/", "type": "article", "source": "Yang Song", "free": true }
+        ]
+      },
+      {
+        "title": "Fine-tuning and control",
+        "desc": "LoRA adapters, DreamBooth-style personalization, and control networks let you teach a model new styles or subjects and steer layout. These are the everyday tools of applied image generation.",
+        "level": "optional",
+        "resources": [
+          { "title": "Diffusers documentation", "url": "https://huggingface.co/docs/diffusers/index", "type": "docs", "source": "Hugging Face", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "What are Diffusion Models?", "url": "https://lilianweng.github.io/posts/2021-07-11-diffusion-models/", "type": "article", "source": "Lilian Weng", "free": true },
+      { "title": "The Illustrated Stable Diffusion", "url": "https://jalammar.github.io/illustrated-stable-diffusion/", "type": "article", "source": "Jay Alammar", "free": true },
+      { "title": "Hugging Face Diffusion Models Course", "url": "https://huggingface.co/learn/diffusion-course/unit0/1", "type": "course", "source": "Hugging Face", "free": true },
+      { "title": "MIT 6.S184: Generative AI with Stochastic Differential Equations", "url": "https://diffusion.csail.mit.edu/", "type": "course", "source": "MIT", "free": true },
+      { "title": "Practical Deep Learning for Coders, Part 2", "url": "https://course.fast.ai/Lessons/part2.html", "type": "course", "source": "fast.ai", "free": true },
+      { "title": "Denoising Diffusion Probabilistic Models", "url": "https://arxiv.org/abs/2006.11239", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Diffusers documentation", "url": "https://huggingface.co/docs/diffusers/index", "type": "docs", "source": "Hugging Face", "free": true }
+    ],
+    "project": "Implement a small DDPM from scratch in PyTorch and train it on MNIST or Fashion-MNIST until samples look recognizable. Then use diffusers to train a LoRA on 15 to 30 images of a style or object and compare outputs at different guidance scales."
+  },
+
+  "multimodal-models": {
+    "summary": "Multimodal models take in and produce more than one kind of data, such as text, images, audio, and video. Architectures range from gluing a vision encoder onto an LLM to natively multimodal models trained on mixed token streams from the start.",
+    "why": "Frontier assistants now see screenshots, read documents, hear speech, and generate images. Knowing how the pieces connect explains their strengths and blind spots, and it is where much current research and product work happens.",
+    "depth": "Must master: contrastive image-text training (CLIP), the encoder-plus-projector-plus-LLM recipe, and the difference between late fusion and early fusion. Just know the details of audio tokenizers, real-time speech models, and unified generation models unless you research them.",
+    "hours": 35,
+    "outcomes": [
+      "You can explain how CLIP aligns images and text in a shared embedding space.",
+      "You can sketch how a vision-language model turns image patches into tokens an LLM can attend to.",
+      "You can compare adapter-style, early-fusion, and unified understanding-plus-generation architectures.",
+      "You can read a recent multimodal model report and identify its encoders, connector, data mix, and training stages."
+    ],
+    "subtopics": [
+      {
+        "title": "Contrastive pretraining (CLIP, SigLIP)",
+        "desc": "Train an image encoder and a text encoder so matching pairs land close together in embedding space. These encoders power zero-shot classification, search, and the vision side of many VLMs.",
+        "level": "core",
+        "resources": [
+          { "title": "Learning Transferable Visual Models From Natural Language Supervision", "url": "https://arxiv.org/abs/2103.00020", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Sigmoid Loss for Language Image Pre-Training", "url": "https://arxiv.org/abs/2303.15343", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Vision-language models with adapters",
+        "desc": "Take a pretrained vision encoder, project its outputs into the LLM's embedding space, and train on image-text instruction data. LLaVA made this recipe simple and popular.",
+        "level": "core",
+        "resources": [
+          { "title": "Visual Instruction Tuning (LLaVA)", "url": "https://arxiv.org/abs/2304.08485", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Understanding Multimodal LLMs", "url": "https://magazine.sebastianraschka.com/p/understanding-multimodal-llms", "type": "article", "source": "Sebastian Raschka", "free": true }
+        ]
+      },
+      {
+        "title": "Cross-attention and resampler designs",
+        "desc": "Instead of feeding image tokens straight in, some models let the LLM attend to visual features through extra cross-attention layers. Flamingo and BLIP-2 are the reference designs.",
+        "level": "deep",
+        "resources": [
+          { "title": "Flamingo: a Visual Language Model for Few-Shot Learning", "url": "https://arxiv.org/abs/2204.14198", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "BLIP-2", "url": "https://arxiv.org/abs/2301.12597", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Early fusion and unified generation",
+        "desc": "Natively multimodal models train on interleaved text and image tokens from the start, and some can generate images as well as read them. Chameleon and Transfusion show two approaches: discrete image tokens versus mixing next-token prediction with diffusion.",
+        "level": "deep",
+        "resources": [
+          { "title": "Chameleon: Mixed-Modal Early-Fusion Foundation Models", "url": "https://arxiv.org/abs/2405.09818", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Transfusion", "url": "https://arxiv.org/abs/2408.11039", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Speech and audio",
+        "desc": "Whisper showed that large-scale weakly supervised training makes robust speech recognition. Newer speech-to-speech models handle listening and talking in real time with audio tokens.",
+        "level": "optional",
+        "resources": [
+          { "title": "Robust Speech Recognition via Large-Scale Weak Supervision (Whisper)", "url": "https://arxiv.org/abs/2212.04356", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Moshi: a speech-text foundation model for real-time dialogue", "url": "https://arxiv.org/abs/2410.00037", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Multimodal data and evaluation",
+        "desc": "Data quality (captions, interleaved documents, OCR-heavy images) often matters more than architecture. Benchmarks for charts, documents, and video reasoning reveal where models still fail.",
+        "level": "optional",
+        "resources": [
+          { "title": "Vision Language Models (Better, Faster, Stronger)", "url": "https://huggingface.co/blog/vlms-2025", "type": "article", "source": "Hugging Face", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Multimodality and Large Multimodal Models (LMMs)", "url": "https://huyenchip.com/2023/10/10/multimodal.html", "type": "article", "source": "Chip Huyen", "free": true },
+      { "title": "Understanding Multimodal LLMs", "url": "https://magazine.sebastianraschka.com/p/understanding-multimodal-llms", "type": "article", "source": "Sebastian Raschka", "free": true },
+      { "title": "Generalized Visual Language Models", "url": "https://lilianweng.github.io/posts/2022-06-09-vlm/", "type": "article", "source": "Lilian Weng", "free": true },
+      { "title": "Vision Language Models Explained", "url": "https://huggingface.co/blog/vlms", "type": "article", "source": "Hugging Face", "free": true },
+      { "title": "Learning Transferable Visual Models From Natural Language Supervision (CLIP)", "url": "https://arxiv.org/abs/2103.00020", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Visual Instruction Tuning (LLaVA)", "url": "https://arxiv.org/abs/2304.08485", "type": "paper", "source": "arXiv", "free": true }
+    ],
+    "project": "Build a tiny vision-language model: freeze a pretrained SigLIP or CLIP image encoder and a small open LLM, train only a projection layer (then optionally LoRA) on an image-caption dataset, and evaluate how well it captions and answers simple questions about held-out images."
+  },
+
+  "world-models": {
+    "summary": "A world model is a learned simulator: given the current state and an action, it predicts what happens next. Embodied AI puts such models, plus vision-language-action policies, into robots and agents that act in physical or virtual worlds.",
+    "why": "Many researchers see world models as a path past text-only intelligence, toward agents that plan, imagine consequences, and handle the physical world. Interactive video generators and robot foundation models made this an active frontier in 2025 and 2026.",
+    "depth": "This is frontier research. Must understand: the core idea of learning dynamics and planning inside a model, the difference between generative (pixel-predicting) and latent (JEPA-style) world models, and how vision-language-action models work. Just follow the rest through papers and lab blogs.",
+    "hours": 50,
+    "outcomes": [
+      "You can explain what a world model is and how an agent can learn or plan inside one.",
+      "You can compare pixel-level generative world models with latent predictive approaches like JEPA.",
+      "You can describe how vision-language-action models turn camera input and instructions into robot actions.",
+      "You can read a current world-model or robotics paper and identify its data, model, and evaluation setup."
+    ],
+    "subtopics": [
+      {
+        "title": "Model-based reinforcement learning basics",
+        "desc": "Model-free RL learns what to do by trial and error; model-based RL first learns how the world responds, then plans or trains inside that model. You need the RL vocabulary of states, actions, rewards, and policies.",
+        "level": "core",
+        "resources": [
+          { "title": "Reinforcement Learning: An Introduction", "url": "http://incompleteideas.net/book/the-book-2nd.html", "type": "book", "source": "Sutton & Barto", "free": true },
+          { "title": "Spinning Up in Deep RL", "url": "https://spinningup.openai.com/en/latest/", "type": "course", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "Learning to dream: World Models, Dreamer, MuZero",
+        "desc": "Agents learn a compact model of their environment and practice inside it. Dreamer and MuZero showed that planning in a learned latent space can master games and control tasks.",
+        "level": "core",
+        "resources": [
+          { "title": "World Models (interactive paper)", "url": "https://worldmodels.github.io/", "type": "interactive", "source": "Ha & Schmidhuber", "free": true },
+          { "title": "Mastering Diverse Domains through World Models (DreamerV3)", "url": "https://arxiv.org/abs/2301.04104", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Interactive video world models",
+        "desc": "Large video models trained on huge amounts of footage can generate explorable, controllable worlds frame by frame. Genie and similar systems hint at simulators for training agents.",
+        "level": "deep",
+        "resources": [
+          { "title": "Genie: Generative Interactive Environments", "url": "https://arxiv.org/abs/2402.15391", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Genie 3: A new frontier for world models", "url": "https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/", "type": "article", "source": "Google DeepMind", "free": true }
+        ]
+      },
+      {
+        "title": "Latent predictive models (JEPA)",
+        "desc": "Instead of predicting every pixel, JEPA-style models predict abstract representations of what comes next. Proponents argue this is more efficient and better for planning.",
+        "level": "deep",
+        "resources": [
+          { "title": "Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture", "url": "https://arxiv.org/abs/2301.08243", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "V-JEPA 2", "url": "https://arxiv.org/abs/2506.09985", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Vision-language-action models for robots",
+        "desc": "VLAs start from a vision-language model and learn to output robot actions, so web knowledge transfers to physical tasks. RT-2, OpenVLA, and pi-zero are key examples.",
+        "level": "core",
+        "resources": [
+          { "title": "RT-2: Vision-Language-Action Models", "url": "https://arxiv.org/abs/2307.15818", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "OpenVLA: An Open-Source Vision-Language-Action Model", "url": "https://arxiv.org/abs/2406.09246", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Simulation, sim-to-real, and robot data",
+        "desc": "Robot data is scarce, so teams combine simulation, teleoperation, and synthetic video from world foundation models. Open toolkits make it possible to experiment with low-cost arms.",
+        "level": "optional",
+        "resources": [
+          { "title": "LeRobot", "url": "https://huggingface.co/docs/lerobot/index", "type": "tool", "source": "Hugging Face", "free": true },
+          { "title": "Cosmos World Foundation Model Platform for Physical AI", "url": "https://arxiv.org/abs/2501.03575", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "World Models (interactive paper)", "url": "https://worldmodels.github.io/", "type": "interactive", "source": "Ha & Schmidhuber", "free": true },
+      { "title": "Genie 3: A new frontier for world models", "url": "https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/", "type": "article", "source": "Google DeepMind", "free": true },
+      { "title": "Mastering Diverse Domains through World Models (DreamerV3)", "url": "https://arxiv.org/abs/2301.04104", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "V-JEPA 2: Self-Supervised Video Models Enable Understanding, Prediction and Planning", "url": "https://arxiv.org/abs/2506.09985", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "pi-zero: A Vision-Language-Action Flow Model for General Robot Control", "url": "https://arxiv.org/abs/2410.24164", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "LeRobot", "url": "https://github.com/huggingface/lerobot", "type": "tool", "source": "Hugging Face", "free": true }
+    ],
+    "project": "Reproduce a mini world model: collect rollouts from a simple Gymnasium environment (like CarRacing or a grid world), train a VAE plus a recurrent dynamics model on them, and train a small controller entirely inside the learned model. Then test it in the real environment and note where the dream and reality diverge."
+  },
+
+  "llm-basics": {
+    "summary": "A large language model (LLM) is a neural network trained on huge amounts of text to predict the next token. Scaled up and then tuned to follow instructions, that simple objective produces assistants that can write, reason, code, and use tools.",
+    "why": "Having a correct mental model of LLMs helps you use them well and judge them fairly. It explains why they hallucinate, why prompts and context matter so much, why they have knowledge cutoffs, and why outputs vary between runs.",
+    "depth": "Must master: next-token prediction, tokens, the context window, pretraining versus post-training, and sampling with temperature. You don't need the math of attention yet; you do need to know the model only sees what is in its context.",
+    "hours": 8,
+    "outcomes": [
+      "You can explain in plain words how an LLM generates text one token at a time.",
+      "You can describe the stages that turn a raw pretrained model into a helpful assistant.",
+      "You can explain context windows, knowledge cutoffs, and why models hallucinate.",
+      "You can predict how settings like temperature change a model's output."
+    ],
+    "subtopics": [
+      {
+        "title": "Next-token prediction",
+        "desc": "The model reads the text so far and outputs a probability for every possible next token. Generation is just picking a token, appending it, and repeating.",
+        "level": "core",
+        "resources": [
+          { "title": "Large Language Models explained briefly", "url": "https://www.youtube.com/watch?v=LPZh9BOjkQs", "type": "video", "source": "3Blue1Brown", "free": true }
+        ]
+      },
+      {
+        "title": "Pretraining and post-training",
+        "desc": "Pretraining on web-scale text gives the model broad knowledge and skill at continuing documents. Post-training (instruction tuning, RLHF, and reinforcement learning on tasks) shapes it into a helpful, safer assistant that can reason and use tools.",
+        "level": "core",
+        "resources": [
+          { "title": "Deep Dive into LLMs like ChatGPT", "url": "https://www.youtube.com/watch?v=7xTGNNLPyMI", "type": "video", "source": "Andrej Karpathy", "free": true }
+        ]
+      },
+      {
+        "title": "Tokens and the context window",
+        "desc": "Models read tokens (word pieces), not letters or words. The context window is the maximum number of tokens the model can consider at once, and it is all the model knows about your conversation.",
+        "level": "core"
+      },
+      {
+        "title": "Sampling and temperature",
+        "desc": "Temperature and top-p control how adventurous the token choices are. Low temperature gives more predictable output; higher gives more variety and more risk of errors.",
+        "level": "core"
+      },
+      {
+        "title": "Why LLMs hallucinate",
+        "desc": "The model produces plausible continuations, not looked-up facts. Without grounding in retrieved sources or tools, fluent but false answers are a natural failure mode.",
+        "level": "core",
+        "resources": [
+          { "title": "What Is ChatGPT Doing and Why Does It Work?", "url": "https://writings.stephenwolfram.com/2023/02/what-is-chatgpt-doing-and-why-does-it-work/", "type": "article", "source": "Stephen Wolfram", "free": true }
+        ]
+      },
+      {
+        "title": "What happens inside (a first look)",
+        "desc": "Words become vectors, attention lets tokens share information, and stacked layers refine meaning. Interpretability research is starting to show the internal steps models take.",
+        "level": "optional",
+        "resources": [
+          { "title": "Large language models, explained with a minimum of math and jargon", "url": "https://www.understandingai.org/p/large-language-models-explained-with", "type": "article", "source": "Understanding AI", "free": true },
+          { "title": "Tracing the thoughts of a large language model", "url": "https://www.anthropic.com/research/tracing-thoughts-language-model", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Large Language Models explained briefly", "url": "https://www.youtube.com/watch?v=LPZh9BOjkQs", "type": "video", "source": "3Blue1Brown", "free": true },
+      { "title": "Intro to Large Language Models", "url": "https://www.youtube.com/watch?v=zjkBMFhNj_g", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "Generative AI exists because of the transformer", "url": "https://ig.ft.com/generative-ai/", "type": "interactive", "source": "Financial Times", "free": true },
+      { "title": "Large language models, explained with a minimum of math and jargon", "url": "https://www.understandingai.org/p/large-language-models-explained-with", "type": "article", "source": "Understanding AI", "free": true },
+      { "title": "Deep Dive into LLMs like ChatGPT", "url": "https://www.youtube.com/watch?v=7xTGNNLPyMI", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "Hugging Face LLM Course, Chapter 1", "url": "https://huggingface.co/learn/llm-course/chapter1/1", "type": "course", "source": "Hugging Face", "free": true }
+    ],
+    "project": "Run the same three prompts (a fact question, a creative task, and a question about a recent event) through two different assistants at low and high temperature if you can. Write a one-page explainer for a non-technical friend that uses what you saw to explain tokens, next-token prediction, knowledge cutoffs, and hallucination."
+  },
+
+  "tokens-embeddings": {
+    "summary": "Tokens are the chunks of text a model actually reads, produced by a tokenizer such as byte-pair encoding. Embeddings are vectors that represent tokens, sentences, or documents so that similar meanings sit close together.",
+    "why": "Tokens determine cost, context limits, and odd failures like miscounting letters or weak handling of some languages. Embeddings power semantic search, RAG, clustering, recommendations, and deduplication.",
+    "depth": "Must master: how BPE tokenization works at a high level, counting tokens, what an embedding is, cosine similarity, and how to pick an embedding model. Just know Matryoshka embeddings, multi-vector retrieval, and tokenizer training details exist until a project needs them.",
+    "hours": 15,
+    "outcomes": [
+      "You can explain how text becomes tokens and estimate token counts and costs.",
+      "You can explain why tokenization causes quirks like trouble with spelling, arithmetic, or some languages.",
+      "You can generate embeddings with an API or open model and compare them with cosine similarity.",
+      "You can choose an embedding model using benchmarks plus a test on your own data."
+    ],
+    "subtopics": [
+      {
+        "title": "Tokenization and BPE",
+        "desc": "Byte-pair encoding starts from bytes and repeatedly merges the most common pairs into new tokens. Common words become one token while rare words split into several pieces.",
+        "level": "core",
+        "resources": [
+          { "title": "Let's build the GPT Tokenizer", "url": "https://www.youtube.com/watch?v=zduSFxRajkE", "type": "video", "source": "Andrej Karpathy", "free": true },
+          { "title": "Tiktokenizer", "url": "https://tiktokenizer.vercel.app/", "type": "interactive", "source": "Tiktokenizer", "free": true }
+        ]
+      },
+      {
+        "title": "Counting tokens, cost, and limits",
+        "desc": "APIs price and limit by tokens, and different models use different tokenizers. Count tokens before you send big documents so you can budget and avoid truncation.",
+        "level": "core",
+        "resources": [
+          { "title": "Token counting", "url": "https://platform.claude.com/docs/en/build-with-claude/token-counting", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "tiktoken", "url": "https://github.com/openai/tiktoken", "type": "tool", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "Word embeddings and vector space",
+        "desc": "word2vec showed that training to predict nearby words yields vectors where directions carry meaning. It is the intuition behind every modern embedding.",
+        "level": "core",
+        "resources": [
+          { "title": "The Illustrated Word2vec", "url": "https://jalammar.github.io/illustrated-word2vec/", "type": "article", "source": "Jay Alammar", "free": true }
+        ]
+      },
+      {
+        "title": "Sentence and document embeddings",
+        "desc": "Embedding models turn whole passages into one vector for semantic search and RAG. Similarity is usually measured with cosine similarity or dot product.",
+        "level": "core",
+        "resources": [
+          { "title": "Embeddings: What they are and why they matter", "url": "https://simonwillison.net/2023/Oct/23/embeddings/", "type": "article", "source": "Simon Willison", "free": true },
+          { "title": "Sentence Transformers", "url": "https://sbert.net/", "type": "docs", "source": "Sentence Transformers", "free": true }
+        ]
+      },
+      {
+        "title": "Choosing an embedding model",
+        "desc": "Leaderboards compare models on retrieval, clustering, and more, but your own data is the real test. Weigh quality against dimension size, speed, languages, and price.",
+        "level": "deep",
+        "resources": [
+          { "title": "MTEB Leaderboard", "url": "https://huggingface.co/spaces/mteb/leaderboard", "type": "tool", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Advanced embedding tricks",
+        "desc": "Matryoshka embeddings can be truncated to fewer dimensions with little quality loss, and quantized embeddings save storage. Useful at scale, safe to skip at first.",
+        "level": "optional",
+        "resources": [
+          { "title": "Matryoshka Representation Learning", "url": "https://arxiv.org/abs/2205.13147", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Let's build the GPT Tokenizer", "url": "https://www.youtube.com/watch?v=zduSFxRajkE", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "Embeddings: What they are and why they matter", "url": "https://simonwillison.net/2023/Oct/23/embeddings/", "type": "article", "source": "Simon Willison", "free": true },
+      { "title": "The Illustrated Word2vec", "url": "https://jalammar.github.io/illustrated-word2vec/", "type": "article", "source": "Jay Alammar", "free": true },
+      { "title": "Hugging Face LLM Course: The Tokenizers library", "url": "https://huggingface.co/learn/llm-course/chapter6/1", "type": "course", "source": "Hugging Face", "free": true },
+      { "title": "Tiktokenizer", "url": "https://tiktokenizer.vercel.app/", "type": "interactive", "source": "Tiktokenizer", "free": true },
+      { "title": "Vector embeddings guide", "url": "https://developers.openai.com/api/docs/guides/embeddings", "type": "docs", "source": "OpenAI", "free": true },
+      { "title": "Neural Machine Translation of Rare Words with Subword Units (BPE)", "url": "https://arxiv.org/abs/1508.07909", "type": "paper", "source": "arXiv", "free": true }
+    ],
+    "project": "Embed 200 to 1,000 short texts you care about (notes, product reviews, FAQs) with two different embedding models. Build a tiny semantic search script, compare top results for ten test queries, and plot a 2D projection (UMAP or PCA) of the vectors colored by topic."
+  },
+
+  "context-engineering": {
+    "summary": "Context engineering is the practice of deciding exactly what goes into a model's context window at each step: instructions, examples, retrieved documents, tool definitions, tool results, memory, and conversation history. It extends prompt engineering from writing one good prompt to managing a whole information pipeline.",
+    "why": "Models can only use what they can see, and long, cluttered contexts degrade quality, raise cost, and slow responses. For agents that run many steps, good context management is often the difference between a system that works and one that drifts.",
+    "depth": "Must master: treating context as a limited budget, structuring system prompts, selecting and trimming retrieved content, summarizing or compacting history, and using prompt caching. Just know the research on long-context failure modes and advanced memory architectures at a conceptual level.",
+    "hours": 15,
+    "outcomes": [
+      "You can design the context layout for an LLM feature: system prompt, tools, examples, retrieved data, and history.",
+      "You can explain context rot and lost-in-the-middle effects and design around them.",
+      "You can apply compaction, summarization, structured notes, and sub-agents to keep long-running tasks on track.",
+      "You can use prompt caching and token budgets to reduce cost and latency."
+    ],
+    "subtopics": [
+      {
+        "title": "Context as a finite budget",
+        "desc": "Every token competes for the model's attention, and more is not always better. The goal is the smallest set of high-signal tokens that gets the job done.",
+        "level": "core",
+        "resources": [
+          { "title": "Effective context engineering for AI agents", "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Long-context failure modes",
+        "desc": "Models often use information at the start and end of a long context better than the middle, and performance drops as inputs grow. Distracting or conflicting content can poison later steps.",
+        "level": "core",
+        "resources": [
+          { "title": "Context Rot", "url": "https://www.trychroma.com/research/context-rot", "type": "article", "source": "Chroma", "free": true },
+          { "title": "Lost in the Middle: How Language Models Use Long Contexts", "url": "https://arxiv.org/abs/2307.03172", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Structuring system prompts and tools",
+        "desc": "Clear sections, the right level of specificity, and a small, well-described set of tools make model behavior more reliable. Put long documents first and the question last for long-context prompts.",
+        "level": "core",
+        "resources": [
+          { "title": "Prompting best practices: long context prompting", "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#long-context-prompting", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Write, select, compress, isolate",
+        "desc": "Common strategies are to write notes outside the context, select only relevant pieces, compress history with summaries, and isolate work in sub-agents with their own clean context.",
+        "level": "core",
+        "resources": [
+          { "title": "Context Engineering for Agents", "url": "https://www.langchain.com/blog/context-engineering-for-agents", "type": "article", "source": "LangChain", "free": true },
+          { "title": "How Long Contexts Fail", "url": "https://www.dbreunig.com/2025/06/22/how-contexts-fail-and-how-to-fix-them.html", "type": "article", "source": "Drew Breunig", "free": true }
+        ]
+      },
+      {
+        "title": "Prompt caching and cost",
+        "desc": "Keeping a stable prefix (system prompt, tools, large documents) lets providers cache it, which cuts cost and latency a lot. Design contexts so the stable part comes first and changes go at the end.",
+        "level": "deep",
+        "resources": [
+          { "title": "Prompt caching", "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Memory and long-running agents",
+        "desc": "Agents that run for hours need persistent memory such as files, to-do lists, and progress notes they can reload. Lessons from production agents show how to keep the context lean over hundreds of steps.",
+        "level": "deep",
+        "resources": [
+          { "title": "Context Engineering for AI Agents: Lessons from Building Manus", "url": "https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus", "type": "article", "source": "Manus", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Effective context engineering for AI agents", "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Context Engineering for Agents", "url": "https://www.langchain.com/blog/context-engineering-for-agents", "type": "article", "source": "LangChain", "free": true },
+      { "title": "Context Rot", "url": "https://www.trychroma.com/research/context-rot", "type": "article", "source": "Chroma", "free": true },
+      { "title": "Context engineering", "url": "https://simonwillison.net/2025/Jun/27/context-engineering/", "type": "article", "source": "Simon Willison", "free": true },
+      { "title": "Context windows", "url": "https://platform.claude.com/docs/en/build-with-claude/context-windows", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Context Engineering for AI Agents: Lessons from Building Manus", "url": "https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus", "type": "article", "source": "Manus", "free": true }
+    ],
+    "project": "Take a long task (for example, answering 20 questions about a 100-page document or a multi-step research job). Build two versions: one that stuffs everything into the context, and one that retrieves only relevant chunks, keeps a running notes file, and compacts history. Compare accuracy, token usage, and cost."
+  },
+
+  "transformers": {
+    "summary": "The transformer is the neural network architecture behind modern LLMs. It processes all tokens in parallel and uses self-attention so every token can pull in information from every other token, stacked with feed-forward layers, residual connections, and normalization.",
+    "why": "Knowing the transformer lets you read model cards and papers, reason about context length, memory, and speed, and understand fine-tuning, inference optimization, and interpretability. It is the single most important architecture in current AI.",
+    "depth": "Must master: queries, keys, and values; multi-head attention; causal masking; positional information; the residual stream; and the decoder-only block. You should be able to implement a small GPT. Just know the zoo of modern variants (RoPE, GQA, MoE, FlashAttention) well enough to read a model card.",
+    "hours": 40,
+    "outcomes": [
+      "You can explain self-attention with queries, keys, and values and compute it by hand for a tiny example.",
+      "You can draw a decoder-only transformer block and explain what each part does.",
+      "You can implement and train a small GPT-style model from scratch in PyTorch.",
+      "You can read a modern model's architecture description and explain choices like RoPE, grouped-query attention, and mixture of experts."
+    ],
+    "subtopics": [
+      {
+        "title": "Self-attention: queries, keys, and values",
+        "desc": "Each token makes a query, compares it with every other token's key, and uses the resulting weights to mix their values. This lets meaning flow between tokens regardless of distance.",
+        "level": "core",
+        "resources": [
+          { "title": "Attention in transformers, step-by-step", "url": "https://www.youtube.com/watch?v=eMlx5fFNoYc", "type": "video", "source": "3Blue1Brown", "free": true },
+          { "title": "The Illustrated Transformer", "url": "https://jalammar.github.io/illustrated-transformer/", "type": "article", "source": "Jay Alammar", "free": true }
+        ]
+      },
+      {
+        "title": "Multi-head attention and masking",
+        "desc": "Several attention heads run in parallel, each free to track a different kind of relationship. A causal mask stops tokens from seeing the future, which is what makes next-token training work.",
+        "level": "core"
+      },
+      {
+        "title": "The block: MLPs, residuals, and normalization",
+        "desc": "Each block pairs attention with a feed-forward network, wrapped in residual connections and normalization. The residual stream is a running sum that every layer reads from and writes to.",
+        "level": "core",
+        "resources": [
+          { "title": "Transformers, the tech behind LLMs", "url": "https://www.youtube.com/watch?v=wjZofJX0v4M", "type": "video", "source": "3Blue1Brown", "free": true }
+        ]
+      },
+      {
+        "title": "Building a GPT from scratch",
+        "desc": "Writing a small decoder-only model end to end is the best way to make every piece concrete. Karpathy's walkthrough and nanoGPT are the standard path.",
+        "level": "core",
+        "resources": [
+          { "title": "Let's build GPT: from scratch, in code, spelled out", "url": "https://www.youtube.com/watch?v=kCc8FmEb1nY", "type": "video", "source": "Andrej Karpathy", "free": true },
+          { "title": "nanoGPT", "url": "https://github.com/karpathy/nanoGPT", "type": "tool", "source": "Andrej Karpathy", "free": true }
+        ]
+      },
+      {
+        "title": "Encoder, decoder, and encoder-decoder",
+        "desc": "The original transformer had both an encoder and a decoder. BERT-style encoders are still used for classification and embeddings, while generative LLMs are almost all decoder-only.",
+        "level": "deep",
+        "resources": [
+          { "title": "Hugging Face LLM Course: How do Transformers work?", "url": "https://huggingface.co/learn/llm-course/chapter1/4", "type": "course", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Modern variants",
+        "desc": "Today's models use rotary position embeddings (RoPE), grouped-query attention to shrink the KV cache, RMSNorm, SwiGLU activations, and often mixture-of-experts layers. FlashAttention computes attention faster without changing the math.",
+        "level": "deep",
+        "resources": [
+          { "title": "The Big LLM Architecture Comparison", "url": "https://magazine.sebastianraschka.com/p/the-big-llm-architecture-comparison", "type": "article", "source": "Sebastian Raschka", "free": true },
+          { "title": "FlashAttention", "url": "https://arxiv.org/abs/2205.14135", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Transformers as circuits",
+        "desc": "Viewing attention heads and MLPs as components that read and write the residual stream is the foundation of mechanistic interpretability.",
+        "level": "optional",
+        "resources": [
+          { "title": "A Mathematical Framework for Transformer Circuits", "url": "https://transformer-circuits.pub/2021/framework/index.html", "type": "paper", "source": "Anthropic", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "The Illustrated Transformer", "url": "https://jalammar.github.io/illustrated-transformer/", "type": "article", "source": "Jay Alammar", "free": true },
+      { "title": "Let's build GPT: from scratch, in code, spelled out", "url": "https://www.youtube.com/watch?v=kCc8FmEb1nY", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "Attention in transformers, step-by-step", "url": "https://www.youtube.com/watch?v=eMlx5fFNoYc", "type": "video", "source": "3Blue1Brown", "free": true },
+      { "title": "Transformer Explainer", "url": "https://poloclub.github.io/transformer-explainer/", "type": "interactive", "source": "Georgia Tech Polo Club", "free": true },
+      { "title": "Attention Is All You Need", "url": "https://arxiv.org/abs/1706.03762", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Build a Large Language Model (From Scratch) code repository", "url": "https://github.com/rasbt/LLMs-from-scratch", "type": "book", "source": "Sebastian Raschka", "free": true },
+      { "title": "LLM Visualization", "url": "https://bbycroft.net/llm", "type": "interactive", "source": "Brendan Bycroft", "free": true }
+    ],
+    "project": "Implement a small GPT (about 10M parameters) from scratch in PyTorch, train it on a text dataset such as TinyShakespeare or TinyStories, and generate samples. Then add one modern change (RoPE or grouped-query attention) and compare validation loss and speed."
+  },
+
+  "fine-tuning": {
+    "summary": "Fine-tuning continues training a pretrained model on your own examples so it adopts a format, style, or skill. Parameter-efficient fine-tuning (PEFT) methods like LoRA train only small adapter weights, which makes this affordable on a single GPU.",
+    "why": "Fine-tuning is the right tool when prompting and retrieval are not enough: enforcing a strict output format, teaching a narrow task cheaply with a small model, matching a voice, or distilling a big model's behavior into a smaller one. It is often the wrong tool for adding fresh facts, where RAG is better.",
+    "depth": "Must master: when to fine-tune versus prompt or use RAG, preparing chat-formatted data, supervised fine-tuning with LoRA or QLoRA, and evaluating against a baseline. Just know full fine-tuning, distillation pipelines, and the details of adapter variants until you need them.",
+    "hours": 30,
+    "outcomes": [
+      "You can decide whether a problem needs prompting, RAG, or fine-tuning, and justify it.",
+      "You can build a clean instruction dataset in the right chat template.",
+      "You can fine-tune an open model with LoRA or QLoRA using TRL, PEFT, or Unsloth.",
+      "You can evaluate the tuned model against the base model and catch overfitting or lost general skills."
+    ],
+    "subtopics": [
+      {
+        "title": "When to fine-tune (and when not to)",
+        "desc": "Fine-tuning changes behavior and format well but is a poor way to inject knowledge that changes. Try strong prompts and retrieval first, and fine-tune when you have a clear, repeated task and good examples.",
+        "level": "core",
+        "resources": [
+          { "title": "Practical Tips for Finetuning LLMs Using LoRA", "url": "https://magazine.sebastianraschka.com/p/practical-tips-for-finetuning-llms", "type": "article", "source": "Sebastian Raschka", "free": true }
+        ]
+      },
+      {
+        "title": "Data preparation and chat templates",
+        "desc": "A few hundred to a few thousand high-quality examples often beat a large noisy set. Format them with the model's exact chat template, and hold out a test set.",
+        "level": "core",
+        "resources": [
+          { "title": "LIMA: Less Is More for Alignment", "url": "https://arxiv.org/abs/2305.11206", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "LoRA and QLoRA",
+        "desc": "LoRA freezes the original weights and learns small low-rank update matrices. QLoRA does the same on a 4-bit quantized base model, letting you tune larger models on a single consumer GPU.",
+        "level": "core",
+        "resources": [
+          { "title": "LoRA: Low-Rank Adaptation of Large Language Models", "url": "https://arxiv.org/abs/2106.09685", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "QLoRA: Efficient Finetuning of Quantized LLMs", "url": "https://arxiv.org/abs/2305.14314", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Supervised fine-tuning tooling",
+        "desc": "Hugging Face TRL and PEFT are the standard libraries; Unsloth and Axolotl wrap them for speed and convenience. Hosted fine-tuning APIs are an option when you do not want to manage GPUs.",
+        "level": "core",
+        "resources": [
+          { "title": "TRL: SFT Trainer", "url": "https://huggingface.co/docs/trl/sft_trainer", "type": "docs", "source": "Hugging Face", "free": true },
+          { "title": "Unsloth documentation", "url": "https://unsloth.ai/docs", "type": "docs", "source": "Unsloth", "free": true }
+        ]
+      },
+      {
+        "title": "Hyperparameters and evaluation",
+        "desc": "Rank, learning rate, and number of epochs matter most. Always compare to the base model on a held-out set and spot-check general abilities to catch forgetting.",
+        "level": "deep",
+        "resources": [
+          { "title": "LoRA Without Regret", "url": "https://thinkingmachines.ai/blog/lora/", "type": "article", "source": "Thinking Machines Lab", "free": true }
+        ]
+      },
+      {
+        "title": "Distillation",
+        "desc": "Use a large model to generate outputs, then fine-tune a small model to imitate them. It is how many fast, cheap production models are made.",
+        "level": "deep",
+        "resources": [
+          { "title": "Distilling the Knowledge in a Neural Network", "url": "https://arxiv.org/abs/1503.02531", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Merging and serving adapters",
+        "desc": "LoRA adapters can be merged into the base weights or swapped at serving time, so one base model can host many fine-tunes.",
+        "level": "optional",
+        "resources": [
+          { "title": "PEFT documentation", "url": "https://huggingface.co/docs/peft/index", "type": "docs", "source": "Hugging Face", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Hugging Face LLM Course: Fine-tuning LLMs", "url": "https://huggingface.co/learn/llm-course/chapter11/1", "type": "course", "source": "Hugging Face", "free": true },
+      { "title": "LoRA: Low-Rank Adaptation of Large Language Models", "url": "https://arxiv.org/abs/2106.09685", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Practical Tips for Finetuning LLMs Using LoRA", "url": "https://magazine.sebastianraschka.com/p/practical-tips-for-finetuning-llms", "type": "article", "source": "Sebastian Raschka", "free": true },
+      { "title": "Unsloth documentation", "url": "https://unsloth.ai/docs", "type": "docs", "source": "Unsloth", "free": true },
+      { "title": "PEFT documentation", "url": "https://huggingface.co/docs/peft/index", "type": "docs", "source": "Hugging Face", "free": true },
+      { "title": "Finetuning Large Language Models", "url": "https://www.deeplearning.ai/courses/finetuning-large-language-models", "type": "course", "source": "DeepLearning.AI", "free": true },
+      { "title": "LoRA Without Regret", "url": "https://thinkingmachines.ai/blog/lora/", "type": "article", "source": "Thinking Machines Lab", "free": true }
+    ],
+    "project": "Pick a narrow task (for example, turning messy support emails into a fixed JSON schema). Build 500 or more examples, QLoRA-fine-tune a small open model (1B to 8B) on a free or rented GPU, and compare it to the base model with a good prompt on 50 held-out examples for accuracy, format validity, and latency."
+  },
+
+  "open-models": {
+    "summary": "Open-weight models are LLMs whose weights you can download and run yourself, such as the Llama, Qwen, Mistral, Gemma, DeepSeek, and gpt-oss families. Tools like Ollama, LM Studio, llama.cpp, and vLLM make it practical to run them on a laptop or your own server.",
+    "why": "Running models yourself gives you privacy, offline use, no per-token bills, full control over versions, and the ability to fine-tune. It is also the best way to understand quantization, memory limits, and inference speed firsthand.",
+    "depth": "Must master: estimating memory from parameter count and quantization, running a model with Ollama or llama.cpp, using an OpenAI-compatible local endpoint, and reading model cards and licenses. Just know serving engines like vLLM and SGLang and the details of quantization formats until you deploy at scale.",
+    "hours": 15,
+    "outcomes": [
+      "You can estimate whether a given model and quantization will fit on your hardware.",
+      "You can run open models locally with Ollama, LM Studio, or llama.cpp and call them from code.",
+      "You can explain quantization formats like GGUF and their quality and speed trade-offs.",
+      "You can compare open models using benchmarks, licenses, and your own test prompts."
+    ],
+    "subtopics": [
+      {
+        "title": "The open model landscape",
+        "desc": "Open-weight families are released in many sizes, from under 1B to hundreds of billions of parameters, often as mixture-of-experts. 'Open weights' is not the same as open source, so read the license and what data and code were released.",
+        "level": "core",
+        "resources": [
+          { "title": "Hugging Face model hub", "url": "https://huggingface.co/models", "type": "tool", "source": "Hugging Face", "free": true },
+          { "title": "The Open Source AI Definition", "url": "https://opensource.org/ai/open-source-ai-definition", "type": "article", "source": "Open Source Initiative", "free": true }
+        ]
+      },
+      {
+        "title": "Memory math and hardware",
+        "desc": "A rough rule: weight memory is parameters times bytes per parameter, so an 8B model needs about 16 GB at 16-bit and about 5 GB at 4-bit, plus room for the KV cache. Apple Silicon unified memory and consumer GPUs set the practical limits.",
+        "level": "core"
+      },
+      {
+        "title": "Quantization",
+        "desc": "Quantization stores weights in fewer bits (8, 6, 4, or lower) to save memory and speed things up, with some quality loss. GGUF is the common format for llama.cpp and Ollama.",
+        "level": "core",
+        "resources": [
+          { "title": "A Visual Guide to Quantization", "url": "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization", "type": "article", "source": "Maarten Grootendorst", "free": true },
+          { "title": "GGUF", "url": "https://huggingface.co/docs/hub/gguf", "type": "docs", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Desktop runners",
+        "desc": "Ollama and LM Studio download and run models with one command or click, and expose an OpenAI-compatible API so existing code just works. llama.cpp is the engine underneath many of them.",
+        "level": "core",
+        "resources": [
+          { "title": "Ollama documentation", "url": "https://docs.ollama.com/", "type": "docs", "source": "Ollama", "free": true },
+          { "title": "llama.cpp", "url": "https://github.com/ggml-org/llama.cpp", "type": "tool", "source": "ggml-org", "free": true }
+        ]
+      },
+      {
+        "title": "Server-grade inference",
+        "desc": "vLLM and SGLang serve many users at once using techniques like paged attention and continuous batching. Use them when a local runner is too slow for real traffic.",
+        "level": "deep",
+        "resources": [
+          { "title": "vLLM documentation", "url": "https://docs.vllm.ai/en/latest/", "type": "docs", "source": "vLLM", "free": true }
+        ]
+      },
+      {
+        "title": "Evaluating and choosing a model",
+        "desc": "Public leaderboards are a starting point, but test on your own prompts for quality, speed (tokens per second), and tool-use reliability. Check context length and license before committing.",
+        "level": "deep",
+        "resources": [
+          { "title": "Artificial Analysis", "url": "https://artificialanalysis.ai/", "type": "tool", "source": "Artificial Analysis", "free": true }
+        ]
+      },
+      {
+        "title": "Apple Silicon and MLX",
+        "desc": "MLX is Apple's array framework, and mlx-lm runs and fine-tunes LLMs efficiently on Macs.",
+        "level": "optional",
+        "resources": [
+          { "title": "mlx-lm", "url": "https://github.com/ml-explore/mlx-lm", "type": "tool", "source": "Apple", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Ollama", "url": "https://ollama.com/", "type": "tool", "source": "Ollama", "free": true },
+      { "title": "LM Studio", "url": "https://lmstudio.ai/", "type": "tool", "source": "LM Studio", "free": true },
+      { "title": "llama.cpp", "url": "https://github.com/ggml-org/llama.cpp", "type": "tool", "source": "ggml-org", "free": true },
+      { "title": "A Visual Guide to Quantization", "url": "https://newsletter.maartengrootendorst.com/p/a-visual-guide-to-quantization", "type": "article", "source": "Maarten Grootendorst", "free": true },
+      { "title": "Hugging Face Transformers documentation", "url": "https://huggingface.co/docs/transformers/index", "type": "docs", "source": "Hugging Face", "free": true },
+      { "title": "LLM command-line tool", "url": "https://llm.datasette.io/en/stable/", "type": "tool", "source": "Simon Willison", "free": true },
+      { "title": "vLLM documentation", "url": "https://docs.vllm.ai/en/latest/", "type": "docs", "source": "vLLM", "free": true }
+    ],
+    "project": "Run three open models of different sizes locally (for example 1B to 4B, 7B to 8B, and the largest that fits) at two quantization levels each. Measure memory use and tokens per second, score them on ten of your own prompts, and point a small script at the local OpenAI-compatible endpoint to answer the same questions."
+  },
+
+  "pretraining": {
+    "summary": "Pretraining is the first and most expensive stage of building an LLM: training a transformer from scratch on trillions of tokens to predict the next token. Scaling laws describe how loss improves predictably as you grow parameters, data, and compute.",
+    "why": "Pretraining decides most of a model's knowledge and raw ability, and scaling laws drive billion-dollar decisions about model size and data. Understanding them helps you read frontier model reports and reason about where capabilities come from.",
+    "depth": "Must master: the pretraining objective, data pipelines (filtering, deduplication, mixing), compute-optimal scaling (Chinchilla), and the basic training-stability tricks. Just know the specifics of parallelism strategies and hyperparameter transfer (muP) unless you train large models yourself.",
+    "hours": 50,
+    "outcomes": [
+      "You can explain how data quantity and quality, model size, and compute trade off under scaling laws.",
+      "You can describe how a web-scale pretraining dataset is collected, filtered, deduplicated, and mixed.",
+      "You can pretrain a small GPT end to end and track loss against compute.",
+      "You can read a frontier model technical report and summarize its data, architecture, and training recipe."
+    ],
+    "subtopics": [
+      {
+        "title": "Scaling laws",
+        "desc": "Loss falls as a smooth power law in parameters, data, and compute. Kaplan et al. found the first laws; Chinchilla showed that many models were undertrained and that data should grow with model size.",
+        "level": "core",
+        "resources": [
+          { "title": "Scaling Laws for Neural Language Models", "url": "https://arxiv.org/abs/2001.08361", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Training Compute-Optimal Large Language Models (Chinchilla)", "url": "https://arxiv.org/abs/2203.15556", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Pretraining data",
+        "desc": "Most text comes from filtered web crawls plus code, books, papers, and math. Quality filtering, deduplication, and the data mix often matter as much as the architecture.",
+        "level": "core",
+        "resources": [
+          { "title": "FineWeb: decanting the web for the finest text data at scale", "url": "https://huggingface.co/spaces/HuggingFaceFW/blogpost-fineweb-v1", "type": "article", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Training a GPT end to end",
+        "desc": "Reproducing a small model like GPT-2 teaches the full loop: tokenized data shards, the model, the optimizer, learning rate schedule, evaluation, and checkpointing.",
+        "level": "core",
+        "resources": [
+          { "title": "Let's reproduce GPT-2 (124M)", "url": "https://www.youtube.com/watch?v=l8pRSuU81PU", "type": "video", "source": "Andrej Karpathy", "free": true },
+          { "title": "nanochat", "url": "https://github.com/karpathy/nanochat", "type": "tool", "source": "Andrej Karpathy", "free": true }
+        ]
+      },
+      {
+        "title": "Stability and hyperparameters at scale",
+        "desc": "Large runs suffer loss spikes and divergence, handled with careful initialization, normalization, learning rate warmup, and monitoring. Methods like muP let you tune on small models and transfer settings to big ones.",
+        "level": "deep",
+        "resources": [
+          { "title": "Tensor Programs V: Tuning Large Neural Networks via Zero-Shot Hyperparameter Transfer", "url": "https://arxiv.org/abs/2203.03466", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "The Smol Training Playbook", "url": "https://huggingface.co/spaces/HuggingFaceTB/smol-training-playbook", "type": "article", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Parallelism and infrastructure",
+        "desc": "Big models are split across many GPUs with data, tensor, pipeline, and expert parallelism. Throughput metrics like MFU tell you how well you are using the hardware.",
+        "level": "deep",
+        "resources": [
+          { "title": "The Ultra-Scale Playbook", "url": "https://huggingface.co/spaces/nanotron/ultrascale-playbook", "type": "article", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Reading frontier technical reports",
+        "desc": "Reports from open model labs reveal real recipes: data sizes, mixtures, annealing phases, long-context extension, and mixture-of-experts designs.",
+        "level": "optional",
+        "resources": [
+          { "title": "The Llama 3 Herd of Models", "url": "https://arxiv.org/abs/2407.21783", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "DeepSeek-V3 Technical Report", "url": "https://arxiv.org/abs/2412.19437", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Let's reproduce GPT-2 (124M)", "url": "https://www.youtube.com/watch?v=l8pRSuU81PU", "type": "video", "source": "Andrej Karpathy", "free": true },
+      { "title": "CS336: Language Modeling from Scratch", "url": "http://cs336.stanford.edu/spring2025/", "type": "course", "source": "Stanford", "free": true },
+      { "title": "Training Compute-Optimal Large Language Models (Chinchilla)", "url": "https://arxiv.org/abs/2203.15556", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "The Smol Training Playbook", "url": "https://huggingface.co/spaces/HuggingFaceTB/smol-training-playbook", "type": "article", "source": "Hugging Face", "free": true },
+      { "title": "Scaling Laws for Neural Language Models", "url": "https://arxiv.org/abs/2001.08361", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "OLMo (fully open models, data, and code)", "url": "https://allenai.org/olmo", "type": "tool", "source": "Allen Institute for AI", "free": true },
+      { "title": "The Ultra-Scale Playbook", "url": "https://huggingface.co/spaces/nanotron/ultrascale-playbook", "type": "article", "source": "Hugging Face", "free": true }
+    ],
+    "project": "Train a family of four or five small GPT models (for example 1M to 50M parameters) on a fixed slice of FineWeb with different compute budgets. Plot final loss against compute, fit a simple power law, and use it to predict the loss of a slightly larger model before training it to check."
+  },
+
+  "rlhf": {
+    "summary": "Alignment training (post-training) turns a pretrained model into a helpful, honest, and safer assistant. RLHF trains a reward model on human preference comparisons and then optimizes the LLM against it, while DPO and related methods learn directly from preference pairs without a separate reward model.",
+    "why": "This stage is where models learn to follow instructions, refuse harmful requests, and match a desired personality. It is also where many failure modes like sycophancy and reward hacking come from, so it matters for both capability and safety work.",
+    "depth": "Must master: the SFT, reward model, and RL pipeline from InstructGPT; how DPO simplifies it; and what reward hacking is. Just know the math of PPO, the many DPO variants, and the details of constitutional and AI-feedback methods unless you do post-training research.",
+    "hours": 40,
+    "outcomes": [
+      "You can explain the three-stage InstructGPT pipeline and what each stage contributes.",
+      "You can explain how DPO turns preference data into a simple classification-style loss.",
+      "You can run a small DPO training job with TRL and evaluate the result.",
+      "You can describe reward hacking, sycophancy, and how AI feedback and constitutions are used in practice."
+    ],
+    "subtopics": [
+      {
+        "title": "Preference data and reward models",
+        "desc": "Humans compare two model responses and pick the better one. A reward model learns to predict those preferences and score new responses.",
+        "level": "core",
+        "resources": [
+          { "title": "Deep reinforcement learning from human preferences", "url": "https://arxiv.org/abs/1706.03741", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "RLHF with PPO",
+        "desc": "The model generates responses, the reward model scores them, and PPO updates the model while a KL penalty keeps it close to the original. InstructGPT showed a small aligned model could beat a much larger raw one in human ratings.",
+        "level": "core",
+        "resources": [
+          { "title": "Training language models to follow instructions with human feedback (InstructGPT)", "url": "https://arxiv.org/abs/2203.02155", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Illustrating Reinforcement Learning from Human Feedback (RLHF)", "url": "https://huggingface.co/blog/rlhf", "type": "article", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Direct Preference Optimization",
+        "desc": "DPO shows the RLHF objective can be optimized directly from preference pairs with a simple loss, no reward model or RL loop needed. It is cheap, stable, and widely used in open models.",
+        "level": "core",
+        "resources": [
+          { "title": "Direct Preference Optimization", "url": "https://arxiv.org/abs/2305.18290", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "TRL: DPO Trainer", "url": "https://huggingface.co/docs/trl/dpo_trainer", "type": "docs", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "AI feedback and Constitutional AI",
+        "desc": "Instead of only human labels, a model critiques and ranks outputs against a written set of principles. This scales feedback and makes the target values explicit.",
+        "level": "deep",
+        "resources": [
+          { "title": "Constitutional AI: Harmlessness from AI Feedback", "url": "https://arxiv.org/abs/2212.08073", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Reward hacking and sycophancy",
+        "desc": "Models learn to exploit flaws in the reward signal, for example by flattering users or gaming tests. Spotting and mitigating this is a core alignment problem.",
+        "level": "deep",
+        "resources": [
+          { "title": "Reward Hacking in Reinforcement Learning", "url": "https://lilianweng.github.io/posts/2024-11-28-reward-hacking/", "type": "article", "source": "Lilian Weng", "free": true }
+        ]
+      },
+      {
+        "title": "Modern post-training recipes",
+        "desc": "Current pipelines combine SFT, preference tuning, and reinforcement learning with verifiable rewards (RLVR) for math and code, often using GRPO. Open recipes like Tulu 3 document the full process.",
+        "level": "deep",
+        "resources": [
+          { "title": "Tulu 3: Pushing Frontiers in Open Language Model Post-Training", "url": "https://arxiv.org/abs/2411.15124", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "DeepSeekMath (introduces GRPO)", "url": "https://arxiv.org/abs/2402.03300", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "PPO in depth",
+        "desc": "Proximal Policy Optimization keeps each update small with a clipped objective. You only need its internals if you implement RL training yourself.",
+        "level": "optional",
+        "resources": [
+          { "title": "Proximal Policy Optimization Algorithms", "url": "https://arxiv.org/abs/1707.06347", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Reinforcement Learning from Human Feedback (book)", "url": "https://rlhfbook.com/", "type": "book", "source": "Nathan Lambert", "free": true },
+      { "title": "Illustrating Reinforcement Learning from Human Feedback (RLHF)", "url": "https://huggingface.co/blog/rlhf", "type": "article", "source": "Hugging Face", "free": true },
+      { "title": "RLHF: Reinforcement Learning from Human Feedback", "url": "https://huyenchip.com/2023/05/02/rlhf.html", "type": "article", "source": "Chip Huyen", "free": true },
+      { "title": "Training language models to follow instructions with human feedback (InstructGPT)", "url": "https://arxiv.org/abs/2203.02155", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Direct Preference Optimization", "url": "https://arxiv.org/abs/2305.18290", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "TRL documentation", "url": "https://huggingface.co/docs/trl/index", "type": "docs", "source": "Hugging Face", "free": true }
+    ],
+    "project": "Start from a small instruction-tuned open model. Build or download a preference dataset of a few thousand pairs that reward a specific behavior (for example, concise answers or polite refusals), train with DPO using TRL and LoRA, and compare before and after with an LLM judge plus your own blind ratings on 50 prompts."
+  },
+
+  "reasoning-models": {
+    "summary": "Reasoning models are LLMs trained to think through a problem in a long chain of thought before answering. They improve by spending more compute at inference time (test-time compute), and are mostly trained with reinforcement learning on tasks with checkable answers.",
+    "why": "Reasoning models made large jumps on math, coding, science, and agentic tasks, and 'thinking' modes are now standard in frontier assistants. Understanding how they are trained and where they fail is central to current research and to using them well.",
+    "depth": "This is frontier research. Must understand: chain-of-thought, the test-time compute trade-off, RL with verifiable rewards, and process versus outcome rewards. Just follow the fast-moving details (search methods, length control, faithfulness of reasoning traces) through papers and lab blogs.",
+    "hours": 40,
+    "outcomes": [
+      "You can explain how chain-of-thought and test-time compute improve accuracy, and when they don't.",
+      "You can describe how RL with verifiable rewards (as in DeepSeek-R1) produces long reasoning behavior.",
+      "You can compare parallel sampling, self-consistency, search, and sequential thinking as ways to spend inference compute.",
+      "You can reason about open problems such as faithfulness of reasoning traces, overthinking, and reward hacking."
+    ],
+    "subtopics": [
+      {
+        "title": "Chain-of-thought and self-consistency",
+        "desc": "Asking a model to show its steps improves multi-step reasoning. Sampling several reasoning paths and taking a majority vote improves it further.",
+        "level": "core",
+        "resources": [
+          { "title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models", "url": "https://arxiv.org/abs/2201.11903", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Self-Consistency Improves Chain of Thought Reasoning", "url": "https://arxiv.org/abs/2203.11171", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Scaling test-time compute",
+        "desc": "Spending more compute at inference, through longer thinking or more samples, can beat using a bigger model. The best strategy depends on problem difficulty.",
+        "level": "core",
+        "resources": [
+          { "title": "Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters", "url": "https://arxiv.org/abs/2408.03314", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Learning to reason with LLMs", "url": "https://openai.com/index/learning-to-reason-with-llms/", "type": "article", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "RL with verifiable rewards",
+        "desc": "Train on problems whose answers can be checked automatically, like math and unit-tested code, and reward correct final answers. DeepSeek-R1 showed long reasoning, self-checking, and backtracking emerge from this.",
+        "level": "core",
+        "resources": [
+          { "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning", "url": "https://arxiv.org/abs/2501.12948", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Understanding Reasoning LLMs", "url": "https://magazine.sebastianraschka.com/p/understanding-reasoning-llms", "type": "article", "source": "Sebastian Raschka", "free": true }
+        ]
+      },
+      {
+        "title": "Process versus outcome rewards",
+        "desc": "Outcome rewards check only the final answer; process reward models score each step. Step-level feedback helps search and verification but is costly to label.",
+        "level": "deep",
+        "resources": [
+          { "title": "Let's Verify Step by Step", "url": "https://arxiv.org/abs/2305.20050", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Distilling and bootstrapping reasoning",
+        "desc": "Small models can learn reasoning by fine-tuning on traces from stronger models, sometimes with only about a thousand examples. Self-training methods like STaR bootstrap from the model's own correct traces.",
+        "level": "deep",
+        "resources": [
+          { "title": "s1: Simple test-time scaling", "url": "https://arxiv.org/abs/2501.19393", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "STaR: Bootstrapping Reasoning With Reasoning", "url": "https://arxiv.org/abs/2203.14465", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Faithfulness and open problems",
+        "desc": "A model's written reasoning does not always reflect what actually drove its answer, which matters for monitoring and safety. Overthinking easy problems and wasting tokens is another active issue.",
+        "level": "deep",
+        "resources": [
+          { "title": "Reasoning models don't always say what they think", "url": "https://www.anthropic.com/research/reasoning-models-dont-say-think", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Search over thoughts",
+        "desc": "Tree-of-thoughts and similar methods explore several branches of reasoning and back up when stuck. Explicit search has partly given way to learned long chains of thought, but the ideas recur.",
+        "level": "optional",
+        "resources": [
+          { "title": "Tree of Thoughts: Deliberate Problem Solving with Large Language Models", "url": "https://arxiv.org/abs/2305.10601", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Why We Think", "url": "https://lilianweng.github.io/posts/2025-05-01-thinking/", "type": "article", "source": "Lilian Weng", "free": true },
+      { "title": "Understanding Reasoning LLMs", "url": "https://magazine.sebastianraschka.com/p/understanding-reasoning-llms", "type": "article", "source": "Sebastian Raschka", "free": true },
+      { "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning", "url": "https://arxiv.org/abs/2501.12948", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Learning to reason with LLMs", "url": "https://openai.com/index/learning-to-reason-with-llms/", "type": "article", "source": "OpenAI", "free": true },
+      { "title": "Scaling LLM Test-Time Compute Optimally", "url": "https://arxiv.org/abs/2408.03314", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Building with extended thinking", "url": "https://platform.claude.com/docs/en/build-with-claude/extended-thinking", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Open R1", "url": "https://github.com/huggingface/open-r1", "type": "tool", "source": "Hugging Face", "free": true }
+    ],
+    "project": "Take a small open model (0.5B to 3B) and a math dataset with checkable answers such as GSM8K. Measure accuracy with direct answers, chain-of-thought, and majority voting over 8 samples. Then run a short GRPO training job with TRL using a correctness reward, and plot accuracy and average response length over training."
+  }
+}

@@ -1,0 +1,596 @@
+{
+  "deployment-basics": {
+    "summary": "Deployment means taking code that works on your laptop and running it somewhere other people can reach it, reliably. For AI apps that usually means wrapping a model or LLM call in a small web API, packaging it in a container, and shipping it to a cloud host with an automated pipeline.",
+    "why": "A model or prompt nobody can use has no value. The first time you ship, you discover the real problems: secrets, timeouts, cold starts, cost, and what happens when two users hit it at once.",
+    "depth": "Master one simple path end to end: a FastAPI service, a Dockerfile, environment variables for secrets, and a CI job that deploys on push. Just know that Kubernetes, service meshes, and autoscaling policies exist; you can learn them when a real workload needs them.",
+    "hours": 20,
+    "outcomes": [
+      "You can wrap a model or LLM call in a FastAPI endpoint with input validation and sensible timeouts.",
+      "You can write a Dockerfile, build an image, and run it locally the same way it runs in the cloud.",
+      "You can deploy a service to a managed host and keep API keys out of your code.",
+      "You can set up a GitHub Actions workflow that runs tests and deploys on every merge.",
+      "You can explain the trade-offs between batch, real-time, and streaming inference."
+    ],
+    "subtopics": [
+      {
+        "title": "Serving a model behind an API",
+        "desc": "Expose your model or LLM chain as an HTTP endpoint. Learn request and response schemas, input validation with Pydantic, async handlers, streaming responses, and health-check endpoints.",
+        "level": "core",
+        "resources": [
+          { "title": "FastAPI documentation", "url": "https://fastapi.tiangolo.com/", "type": "docs", "source": "FastAPI", "free": true },
+          { "title": "Model Serving", "url": "https://madewithml.com/courses/mlops/serving/", "type": "course", "source": "Made With ML", "free": true }
+        ]
+      },
+      {
+        "title": "Containers with Docker",
+        "desc": "A container bundles your code, dependencies, and runtime so it behaves the same everywhere. Learn Dockerfiles, images, layers, and how to keep images small and builds fast.",
+        "level": "core",
+        "resources": [
+          { "title": "Docker: Get started", "url": "https://docs.docker.com/get-started/", "type": "docs", "source": "Docker", "free": true },
+          { "title": "Python language-specific guide", "url": "https://docs.docker.com/guides/python/", "type": "docs", "source": "Docker", "free": true }
+        ]
+      },
+      {
+        "title": "Config, secrets, and the twelve-factor app",
+        "desc": "Keep configuration in environment variables, never commit API keys, and use your host's secret manager. The twelve-factor rules are a short checklist for apps that deploy cleanly.",
+        "level": "core",
+        "resources": [
+          { "title": "The Twelve-Factor App", "url": "https://12factor.net/", "type": "article", "source": "12factor.net", "free": true },
+          { "title": "Secrets Management Cheat Sheet", "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html", "type": "docs", "source": "OWASP", "free": true }
+        ]
+      },
+      {
+        "title": "CI/CD with GitHub Actions",
+        "desc": "Continuous integration runs your tests on every change. Continuous deployment ships the change automatically once tests pass. This is what makes deploying boring, which is the goal.",
+        "level": "core",
+        "resources": [
+          { "title": "GitHub Actions quickstart", "url": "https://docs.github.com/en/actions/get-started/quickstart", "type": "docs", "source": "GitHub", "free": true }
+        ]
+      },
+      {
+        "title": "Choosing where to host",
+        "desc": "Options range from demo hosts (Hugging Face Spaces, Streamlit, Gradio) to app platforms (Render, Fly.io), serverless GPU platforms (Modal), and the big clouds. Pick based on whether you need a GPU, how spiky traffic is, and how much ops work you want.",
+        "level": "core",
+        "resources": [
+          { "title": "Modal documentation", "url": "https://modal.com/docs", "type": "docs", "source": "Modal", "free": true },
+          { "title": "Gradio quickstart", "url": "https://gradio.app/guides/quickstart", "type": "docs", "source": "Gradio", "free": true }
+        ]
+      },
+      {
+        "title": "Batch vs real-time vs streaming inference",
+        "desc": "Batch jobs score many inputs on a schedule and are cheap. Real-time APIs answer one request at a time with low latency. Streaming sends tokens as they are generated, which matters for LLM chat UX.",
+        "level": "deep",
+        "resources": [
+          { "title": "Lecture 5: Deployment", "url": "https://fullstackdeeplearning.com/course/2022/lecture-5-deployment/", "type": "video", "source": "Full Stack Deep Learning", "free": true }
+        ]
+      },
+      {
+        "title": "Safe rollouts: canaries and rollbacks",
+        "desc": "Release a new version to a small slice of traffic first, watch the metrics, then expand or roll back. This matters even more with AI, where a new prompt or model can quietly change behavior.",
+        "level": "optional",
+        "resources": [
+          { "title": "Canary Release", "url": "https://martinfowler.com/bliki/CanaryRelease.html", "type": "article", "source": "Martin Fowler", "free": true },
+          { "title": "Kubernetes basics", "url": "https://kubernetes.io/docs/tutorials/kubernetes-basics/", "type": "interactive", "source": "Kubernetes", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Made With ML: MLOps course", "url": "https://madewithml.com/", "type": "course", "source": "Made With ML", "free": true },
+      { "title": "Lecture 5: Deployment", "url": "https://fullstackdeeplearning.com/course/2022/lecture-5-deployment/", "type": "video", "source": "Full Stack Deep Learning", "free": true },
+      { "title": "FastAPI: Deployment concepts", "url": "https://fastapi.tiangolo.com/deployment/", "type": "docs", "source": "FastAPI", "free": true },
+      { "title": "Docker: Get started", "url": "https://docs.docker.com/get-started/", "type": "docs", "source": "Docker", "free": true },
+      { "title": "Designing Machine Learning Systems (Ch. 7: Model Deployment)", "url": "https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/", "type": "book", "source": "Chip Huyen / O'Reilly", "free": false },
+      { "title": "The Twelve-Factor App", "url": "https://12factor.net/", "type": "article", "source": "12factor.net", "free": true }
+    ],
+    "project": "Build a small FastAPI service that calls an LLM API (or a scikit-learn model) and returns a structured answer. Containerize it, add a /health endpoint, store the API key as a secret, and deploy it to Render, Fly.io, or Modal with a GitHub Actions workflow that runs a test and redeploys on every push to main."
+  },
+
+  "llm-evals": {
+    "summary": "Evals are tests for LLM apps. You collect realistic inputs, define what a good output looks like, and score your system automatically (with code checks, LLM judges, or human review) so you can tell if a change made things better or worse.",
+    "why": "LLM outputs are non-deterministic and fail in subtle ways, so you cannot ship by vibes. Evals are what let you swap models, edit prompts, or change retrieval with confidence. Teams that improve fastest are almost always the ones with good evals.",
+    "depth": "Master error analysis (reading real traces and naming failure modes), building a small labeled dataset, writing code-based assertions, and calibrating an LLM judge against human labels. Just know public benchmarks like MMLU exist; they rarely tell you whether your product works.",
+    "hours": 30,
+    "outcomes": [
+      "You can read a sample of real outputs, categorize the failures, and decide which ones to measure.",
+      "You can build a versioned eval dataset that covers normal, edge, and adversarial cases.",
+      "You can write code-based checks and an LLM-as-judge grader, and measure how often the judge agrees with a human.",
+      "You can run evals in CI so a prompt or model change cannot ship if it regresses.",
+      "You can evaluate multi-step agents on both final outcomes and the path they took."
+    ],
+    "subtopics": [
+      {
+        "title": "Error analysis first",
+        "desc": "Before writing any metric, read 50 to 100 real traces and write notes on what went wrong. Group the notes into failure categories and count them. This tells you what to measure and stops you from tracking generic scores that don't matter.",
+        "level": "core",
+        "resources": [
+          { "title": "A Field Guide to Rapidly Improving AI Products", "url": "https://hamel.dev/blog/posts/field-guide/", "type": "article", "source": "Hamel Husain", "free": true }
+        ]
+      },
+      {
+        "title": "Building eval datasets",
+        "desc": "Collect inputs from real usage, hand-write tricky cases, and generate synthetic ones to fill gaps. Label expected behavior, version the dataset, and keep growing it every time you find a new bug.",
+        "level": "core",
+        "resources": [
+          { "title": "Define success criteria and build evaluations", "url": "https://platform.claude.com/docs/en/test-and-evaluate/develop-tests", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Code-based checks",
+        "desc": "Many failures can be caught with plain code: valid JSON, required fields present, no banned phrases, correct tool called, answer matches a regex or exact value. These are fast, cheap, and deterministic, so use them wherever you can.",
+        "level": "core",
+        "resources": [
+          { "title": "Promptfoo: Intro", "url": "https://www.promptfoo.dev/docs/intro/", "type": "tool", "source": "Promptfoo", "free": true }
+        ]
+      },
+      {
+        "title": "LLM-as-a-judge",
+        "desc": "Use a model to grade outputs on things code cannot check, like tone or faithfulness to sources. Prefer simple pass/fail judgments with a written critique, and validate the judge against human labels before you trust it.",
+        "level": "core",
+        "resources": [
+          { "title": "Using LLM-as-a-Judge For Evaluation: A Complete Guide", "url": "https://hamel.dev/blog/posts/llm-judge/", "type": "article", "source": "Hamel Husain", "free": true },
+          { "title": "Evaluating the Effectiveness of LLM-Evaluators", "url": "https://eugeneyan.com/writing/llm-evaluators/", "type": "article", "source": "Eugene Yan", "free": true }
+        ]
+      },
+      {
+        "title": "Evaluating agents",
+        "desc": "Agents take many steps, so grade both the end state (did the task get done?) and the trajectory (right tools, no wasted loops). Run each task several times because agent results vary from run to run.",
+        "level": "deep",
+        "resources": [
+          { "title": "Demystifying evals for AI agents", "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents", "type": "article", "source": "Anthropic", "free": true },
+          { "title": "Evaluating AI Agents", "url": "https://www.deeplearning.ai/courses/evaluating-ai-agents", "type": "course", "source": "DeepLearning.AI", "free": true }
+        ]
+      },
+      {
+        "title": "Statistics for evals",
+        "desc": "A score on 50 examples is noisy. Learn to report confidence intervals, compare two systems with paired tests on the same questions, and know how many examples you need before a difference is real.",
+        "level": "deep",
+        "resources": [
+          { "title": "A statistical approach to model evaluations", "url": "https://www.anthropic.com/research/statistical-approach-to-model-evals", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Eval tooling and benchmarks",
+        "desc": "Frameworks like Promptfoo, Inspect, OpenAI Evals, and Braintrust run datasets and graders for you. Public benchmarks and the LM Evaluation Harness compare base models, which is useful for picking a model but not for testing your app.",
+        "level": "optional",
+        "resources": [
+          { "title": "Inspect", "url": "https://inspect.aisi.org.uk/", "type": "tool", "source": "UK AI Security Institute", "free": true },
+          { "title": "LM Evaluation Harness", "url": "https://github.com/EleutherAI/lm-evaluation-harness", "type": "tool", "source": "EleutherAI", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Your AI Product Needs Evals", "url": "https://hamel.dev/blog/posts/evals/", "type": "article", "source": "Hamel Husain", "free": true },
+      { "title": "AI Evals: Everything You Need to Know (FAQ)", "url": "https://hamel.dev/blog/posts/evals-faq/", "type": "article", "source": "Hamel Husain", "free": true },
+      { "title": "Demystifying evals for AI agents", "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Evaluation best practices", "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices", "type": "docs", "source": "OpenAI", "free": true },
+      { "title": "AI Engineering (Ch. 3 and 4: Evaluation)", "url": "https://www.oreilly.com/library/view/ai-engineering/9781098166298/", "type": "book", "source": "Chip Huyen / O'Reilly", "free": false },
+      { "title": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena", "url": "https://arxiv.org/abs/2306.05685", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "AI Evals For Engineers & PMs", "url": "https://maven.com/parlance-labs/evals", "type": "course", "source": "Hamel Husain & Shreya Shankar (Maven)", "free": false }
+    ],
+    "project": "Take an LLM app you've built (a RAG bot or extraction tool). Read 50 real outputs and write down every failure. Turn the top three failure types into checks: at least one code assertion and one LLM judge. Hand-label 40 examples, measure the judge's agreement with your labels, then wire the eval suite into CI so a pull request shows the score change."
+  },
+
+  "observability": {
+    "summary": "Observability is being able to see what your LLM app actually did on every request: the prompt, retrieved context, tool calls, model output, latency, token count, and cost. Tracing records each of those steps as a linked tree you can inspect later.",
+    "why": "When a user says 'the bot gave a weird answer,' you need the exact trace to debug it. Traces are also the raw material for evals and for spotting cost or latency problems before they become incidents.",
+    "depth": "Master instrumenting an app so every request produces a trace with nested spans, plus dashboards for latency, errors, tokens, and cost. Know the OpenTelemetry GenAI conventions exist so your traces stay portable. You don't need to run your own tracing backend at scale.",
+    "hours": 15,
+    "outcomes": [
+      "You can instrument an LLM app so each request produces a trace with spans for retrieval, model calls, and tool calls.",
+      "You can find a specific bad response in production and see the full context that produced it.",
+      "You can build a dashboard of p50/p95 latency, error rate, token usage, and cost per request.",
+      "You can collect user feedback and attach it to traces, then turn flagged traces into eval cases.",
+      "You can explain what to log and what to redact for privacy."
+    ],
+    "subtopics": [
+      {
+        "title": "Logs, metrics, and traces",
+        "desc": "The three pillars of observability. Logs are events, metrics are numbers over time, and traces follow one request through every step. LLM apps lean heavily on traces because each request has many steps.",
+        "level": "core",
+        "resources": [
+          { "title": "Observability primer", "url": "https://opentelemetry.io/docs/concepts/observability-primer/", "type": "docs", "source": "OpenTelemetry", "free": true },
+          { "title": "Monitoring Distributed Systems", "url": "https://sre.google/sre-book/monitoring-distributed-systems/", "type": "book", "source": "Google SRE Book", "free": true }
+        ]
+      },
+      {
+        "title": "Tracing LLM calls, RAG, and agents",
+        "desc": "Wrap each step in a span: the user request, retrieval, reranking, each model call, each tool call. Record inputs, outputs, model name, and token counts. For agents, the trace tree is the only sane way to see why it looped or picked the wrong tool.",
+        "level": "core",
+        "resources": [
+          { "title": "LLM Observability & Application Tracing", "url": "https://langfuse.com/docs/observability/overview", "type": "docs", "source": "Langfuse", "free": true }
+        ]
+      },
+      {
+        "title": "OpenTelemetry GenAI conventions",
+        "desc": "OpenTelemetry is the vendor-neutral standard for telemetry. Its GenAI semantic conventions define standard attribute names for model, tokens, and prompts, so you can switch tools without re-instrumenting.",
+        "level": "deep",
+        "resources": [
+          { "title": "OpenTelemetry for Generative AI", "url": "https://opentelemetry.io/blog/2024/otel-generative-ai/", "type": "article", "source": "OpenTelemetry", "free": true },
+          { "title": "OpenLLMetry", "url": "https://github.com/traceloop/openllmetry", "type": "tool", "source": "Traceloop", "free": true }
+        ]
+      },
+      {
+        "title": "Cost, latency, and token dashboards",
+        "desc": "Track time to first token, total latency at p50 and p95, tokens in and out, cache hit rate, and cost per request or per user. Alert on sudden changes, which often mean a prompt bug or a runaway agent loop.",
+        "level": "core"
+      },
+      {
+        "title": "Feedback loops and online evals",
+        "desc": "Capture thumbs up/down, edits, and retries, and attach them to traces. Run cheap automated checks on a sample of live traffic. Route bad traces into your eval dataset so the same bug gets caught next time.",
+        "level": "core",
+        "resources": [
+          { "title": "A Field Guide to Rapidly Improving AI Products", "url": "https://hamel.dev/blog/posts/field-guide/", "type": "article", "source": "Hamel Husain", "free": true }
+        ]
+      },
+      {
+        "title": "Privacy and retention",
+        "desc": "Traces contain user data. Decide what to redact (emails, keys, health data), how long to keep traces, and who can read them. This is a compliance question, not just a technical one.",
+        "level": "deep"
+      },
+      {
+        "title": "Choosing a tracing tool",
+        "desc": "Popular options include Langfuse and Arize Phoenix (open source, self-hostable), LangSmith, and Braintrust. Most accept OpenTelemetry data. Pick one, instrument early, and avoid building your own.",
+        "level": "optional",
+        "resources": [
+          { "title": "What is Arize Phoenix?", "url": "https://arize.com/docs/phoenix", "type": "tool", "source": "Arize", "free": true },
+          { "title": "LangSmith Observability", "url": "https://docs.langchain.com/langsmith/observability", "type": "docs", "source": "LangChain", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "LLM Observability & Application Tracing", "url": "https://langfuse.com/docs/observability/overview", "type": "docs", "source": "Langfuse", "free": true },
+      { "title": "Observability primer", "url": "https://opentelemetry.io/docs/concepts/observability-primer/", "type": "docs", "source": "OpenTelemetry", "free": true },
+      { "title": "Building A Generative AI Platform", "url": "https://huyenchip.com/2024/07/25/genai-platform.html", "type": "article", "source": "Chip Huyen", "free": true },
+      { "title": "What We've Learned From A Year of Building with LLMs", "url": "https://applied-llms.org/", "type": "article", "source": "Applied LLMs", "free": true },
+      { "title": "OpenTelemetry for Generative AI", "url": "https://opentelemetry.io/blog/2024/otel-generative-ai/", "type": "article", "source": "OpenTelemetry", "free": true },
+      { "title": "What is Arize Phoenix?", "url": "https://arize.com/docs/phoenix", "type": "tool", "source": "Arize", "free": true }
+    ],
+    "project": "Add tracing to a RAG or agent app with Langfuse or Phoenix (self-hosted or free tier). Make sure each request shows spans for retrieval, model calls, and tools, with token counts and cost. Add a thumbs up/down button that attaches feedback to the trace, then build a dashboard of p95 latency and cost per request and use it to find your slowest step."
+  },
+
+  "mlops": {
+    "summary": "MLOps is the set of practices and tools for taking ML models from notebook to production and keeping them healthy: versioning data and models, tracking experiments, automating training pipelines, testing, deploying, and monitoring for drift.",
+    "why": "Most ML projects fail after the model is trained, not before. Without pipelines, you can't reproduce a model, retrain it when data changes, or know when it has quietly gotten worse.",
+    "depth": "Master experiment tracking, a model registry, a reproducible training pipeline, and drift monitoring for one real model. Just know the big platforms (Kubeflow, SageMaker, Vertex AI) exist; the concepts transfer, and small teams rarely need them on day one.",
+    "hours": 40,
+    "outcomes": [
+      "You can track experiments so any model can be traced back to its code, data, and hyperparameters.",
+      "You can version datasets and models and promote a model through a registry from staging to production.",
+      "You can build an orchestrated pipeline that ingests data, trains, evaluates, and only deploys if quality gates pass.",
+      "You can write tests for data, models, and code, and run them in CI.",
+      "You can detect data and prediction drift and decide when to retrain."
+    ],
+    "subtopics": [
+      {
+        "title": "The ML lifecycle and MLOps maturity",
+        "desc": "See the full loop from data collection to monitoring and back. Google's maturity levels (manual, pipeline automation, full CI/CD) help you decide how much automation your team needs right now.",
+        "level": "core",
+        "resources": [
+          { "title": "MLOps: Continuous delivery and automation pipelines in machine learning", "url": "https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning", "type": "docs", "source": "Google Cloud", "free": true },
+          { "title": "Hidden Technical Debt in Machine Learning Systems", "url": "https://papers.nips.cc/paper_files/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html", "type": "paper", "source": "NeurIPS 2015", "free": true }
+        ]
+      },
+      {
+        "title": "Experiment tracking and model registry",
+        "desc": "Log every run's parameters, metrics, and artifacts so you can compare runs and reproduce the winner. A registry stores model versions with stages like staging and production, so deploys point at a version, not a file on someone's laptop.",
+        "level": "core",
+        "resources": [
+          { "title": "Experiment Tracking", "url": "https://madewithml.com/courses/mlops/experiment-tracking/", "type": "course", "source": "Made With ML", "free": true },
+          { "title": "MLflow documentation", "url": "https://mlflow.org/docs/latest/index.html", "type": "docs", "source": "MLflow", "free": true }
+        ]
+      },
+      {
+        "title": "Data and model versioning",
+        "desc": "Code lives in Git, but datasets and model weights are too big. Tools like DVC version them alongside your code so you can say exactly which data trained which model.",
+        "level": "core",
+        "resources": [
+          { "title": "Versioning", "url": "https://madewithml.com/courses/mlops/versioning/", "type": "course", "source": "Made With ML", "free": true },
+          { "title": "DVC documentation", "url": "https://doc.dvc.org/", "type": "docs", "source": "DVC", "free": true }
+        ]
+      },
+      {
+        "title": "Pipelines and orchestration",
+        "desc": "Turn notebook steps into a pipeline (ingest, validate, featurize, train, evaluate, register) that runs on a schedule or trigger. Orchestrators like Airflow, Prefect, Dagster, ZenML, or Kubeflow handle retries and dependencies.",
+        "level": "core",
+        "resources": [
+          { "title": "Orchestration", "url": "https://madewithml.com/courses/mlops/orchestration/", "type": "course", "source": "Made With ML", "free": true }
+        ]
+      },
+      {
+        "title": "Testing ML systems and CI/CD",
+        "desc": "Test code as usual, but also test data (schemas, ranges, nulls) and models (minimum accuracy, behavior on known cases, no regression versus the current model). Gate deploys on these checks.",
+        "level": "core",
+        "resources": [
+          { "title": "Testing ML Systems", "url": "https://madewithml.com/courses/mlops/testing/", "type": "course", "source": "Made With ML", "free": true },
+          { "title": "The ML Test Score", "url": "https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/", "type": "paper", "source": "Google Research", "free": true }
+        ]
+      },
+      {
+        "title": "Monitoring, drift, and retraining",
+        "desc": "Real-world data shifts over time, and model quality decays with it. Monitor input distributions, prediction distributions, and (when labels arrive) actual accuracy. Decide whether to retrain on a schedule or when drift crosses a threshold.",
+        "level": "deep",
+        "resources": [
+          { "title": "Data Distribution Shifts and Monitoring", "url": "https://huyenchip.com/2022/02/07/data-distribution-shifts-and-monitoring.html", "type": "article", "source": "Chip Huyen", "free": true },
+          { "title": "Evidently documentation", "url": "https://docs.evidentlyai.com/introduction", "type": "tool", "source": "Evidently AI", "free": true }
+        ]
+      },
+      {
+        "title": "Feature stores",
+        "desc": "A feature store computes features once and serves the same values for training and live prediction, which prevents training-serving skew. Useful for teams with many models sharing features; overkill for a single model.",
+        "level": "optional",
+        "resources": [
+          { "title": "Feast documentation", "url": "https://docs.feast.dev/", "type": "docs", "source": "Feast", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Made With ML: MLOps course", "url": "https://madewithml.com/", "type": "course", "source": "Made With ML", "free": true },
+      { "title": "Designing Machine Learning Systems", "url": "https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/", "type": "book", "source": "Chip Huyen / O'Reilly", "free": false },
+      { "title": "MLOps Zoomcamp", "url": "https://github.com/DataTalksClub/mlops-zoomcamp", "type": "course", "source": "DataTalks.Club", "free": true },
+      { "title": "Full Stack Deep Learning 2022", "url": "https://fullstackdeeplearning.com/course/2022/", "type": "video", "source": "Full Stack Deep Learning", "free": true },
+      { "title": "MLOps: Continuous delivery and automation pipelines in machine learning", "url": "https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning", "type": "docs", "source": "Google Cloud", "free": true },
+      { "title": "Machine Learning in Production", "url": "https://mlip-cmu.github.io/", "type": "course", "source": "Carnegie Mellon University", "free": true },
+      { "title": "Rules of Machine Learning", "url": "https://developers.google.com/machine-learning/guides/rules-of-ml", "type": "article", "source": "Google", "free": true }
+    ],
+    "project": "Build an end-to-end pipeline for a tabular model (for example, predicting churn). Version the data with DVC, track runs in MLflow, register the best model, and use Prefect or GitHub Actions to retrain weekly and only promote the new model if it beats the current one. Serve it with FastAPI and add an Evidently drift report on incoming data."
+  },
+
+  "llm-inference": {
+    "summary": "Inference optimization is making a model generate tokens faster, cheaper, and for more users at once on the same hardware. It covers how serving engines manage GPU memory, batch requests, compress weights, and cut wasted work.",
+    "why": "Inference is where most of the money goes once a model is in use. If you self-host open models, the right engine and settings can mean several times more throughput per GPU, or a model that fits on hardware you can afford.",
+    "depth": "Master the mental model: prefill vs decode, why decoding is memory-bandwidth bound, the KV cache, and the latency vs throughput trade-off. Be able to run and tune vLLM or SGLang. Writing custom CUDA kernels is specialist work; know that FlashAttention and similar kernels exist and what they fix.",
+    "hours": 35,
+    "outcomes": [
+      "You can explain prefill vs decode and why token generation is limited by memory bandwidth, not compute.",
+      "You can estimate KV cache memory for a model and context length, and how many users a GPU can hold.",
+      "You can serve an open model with vLLM or SGLang and benchmark time to first token, tokens per second, and throughput.",
+      "You can choose a quantization format and measure its effect on quality and speed.",
+      "You can decide when to use tensor parallelism, prefix caching, or speculative decoding."
+    ],
+    "subtopics": [
+      {
+        "title": "The inference mental model",
+        "desc": "Prefill processes the whole prompt in parallel and is compute heavy. Decode generates one token at a time and is limited by how fast weights move from GPU memory. Key metrics are time to first token (TTFT), time per output token (TPOT), and total throughput.",
+        "level": "core",
+        "resources": [
+          { "title": "Transformer Inference Arithmetic", "url": "https://kipp.ly/p/transformer-inference-arithmetic", "type": "article", "source": "kipply", "free": true },
+          { "title": "LLM Inference Performance Engineering: Best Practices", "url": "https://www.databricks.com/blog/llm-inference-performance-engineering-best-practices", "type": "article", "source": "Databricks", "free": true }
+        ]
+      },
+      {
+        "title": "KV cache and PagedAttention",
+        "desc": "The KV cache stores attention keys and values for past tokens so they aren't recomputed. It grows with context length and batch size and often limits how many users fit on a GPU. PagedAttention (vLLM) manages it in fixed-size blocks to cut waste.",
+        "level": "core",
+        "resources": [
+          { "title": "Efficient Memory Management for LLM Serving with PagedAttention", "url": "https://arxiv.org/abs/2309.06180", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Continuous batching",
+        "desc": "Instead of waiting for a whole batch to finish, the server adds and removes requests every decoding step. This keeps the GPU busy and is the single biggest throughput win in modern serving engines.",
+        "level": "core",
+        "resources": [
+          { "title": "Achieve 23x LLM Inference Throughput & Reduce p50 Latency", "url": "https://www.anyscale.com/blog/continuous-batching-llm-inference", "type": "article", "source": "Anyscale", "free": true }
+        ]
+      },
+      {
+        "title": "Quantization",
+        "desc": "Store weights (and sometimes activations or the KV cache) in fewer bits, such as FP8, INT8, or 4-bit formats like AWQ and GPTQ. Less memory means bigger batches and cheaper GPUs. Always measure quality on your own evals after quantizing.",
+        "level": "core",
+        "resources": [
+          { "title": "Quantization (vLLM docs)", "url": "https://docs.vllm.ai/en/latest/features/quantization/index.html", "type": "docs", "source": "vLLM", "free": true },
+          { "title": "AWQ: Activation-aware Weight Quantization", "url": "https://arxiv.org/abs/2306.00978", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Prefix caching and speculative decoding",
+        "desc": "Prefix caching reuses the KV cache when many requests share the same system prompt or documents. Speculative decoding has a small draft model guess several tokens that the big model verifies in one pass, cutting latency without changing outputs.",
+        "level": "deep",
+        "resources": [
+          { "title": "Automatic Prefix Caching", "url": "https://docs.vllm.ai/en/latest/features/automatic_prefix_caching/", "type": "docs", "source": "vLLM", "free": true },
+          { "title": "Fast Inference from Transformers via Speculative Decoding", "url": "https://arxiv.org/abs/2211.17192", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Attention kernels and multi-GPU serving",
+        "desc": "FlashAttention reorders the attention computation to avoid slow memory reads. Models too big for one GPU are split with tensor or pipeline parallelism. Some systems also split prefill and decode onto different GPUs (disaggregated serving).",
+        "level": "deep",
+        "resources": [
+          { "title": "FlashAttention", "url": "https://arxiv.org/abs/2205.14135", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Parallelism and Scaling", "url": "https://docs.vllm.ai/en/latest/serving/parallelism_scaling/", "type": "docs", "source": "vLLM", "free": true }
+        ]
+      },
+      {
+        "title": "Choosing a serving engine",
+        "desc": "vLLM and SGLang are the main open-source engines for GPU serving, with TensorRT-LLM for NVIDIA-tuned setups and llama.cpp for CPUs and laptops. Hugging Face TGI is now in maintenance mode, and Hugging Face points users to vLLM and SGLang for new deployments.",
+        "level": "optional",
+        "resources": [
+          { "title": "SGLang documentation", "url": "https://docs.sglang.io/", "type": "docs", "source": "SGLang", "free": true },
+          { "title": "text-generation-inference (GitHub)", "url": "https://github.com/huggingface/text-generation-inference", "type": "tool", "source": "Hugging Face", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "vLLM documentation", "url": "https://docs.vllm.ai/en/latest/", "type": "docs", "source": "vLLM", "free": true },
+      { "title": "Mastering LLM Techniques: Inference Optimization", "url": "https://developer.nvidia.com/blog/mastering-llm-techniques-inference-optimization/", "type": "article", "source": "NVIDIA", "free": true },
+      { "title": "Large Transformer Model Inference Optimization", "url": "https://lilianweng.github.io/posts/2023-01-10-inference-optimization/", "type": "article", "source": "Lilian Weng", "free": true },
+      { "title": "Efficiently Serving LLMs", "url": "https://www.deeplearning.ai/courses/efficiently-serving-llms", "type": "course", "source": "DeepLearning.AI", "free": true },
+      { "title": "How To Scale Your Model (Inference chapters)", "url": "https://jax-ml.github.io/scaling-book/", "type": "book", "source": "Google DeepMind", "free": true },
+      { "title": "AI Engineering (Ch. 9: Inference Optimization)", "url": "https://www.oreilly.com/library/view/ai-engineering/9781098166298/", "type": "book", "source": "Chip Huyen / O'Reilly", "free": false }
+    ],
+    "project": "Rent a single GPU and serve an 8B open model with vLLM. Write a load-test script that measures TTFT, tokens per second, and throughput at 1, 8, and 32 concurrent users. Then compare FP16 vs an AWQ or FP8 quantized version and turn prefix caching on and off with a long shared system prompt. Write up the numbers and a quick quality check on 20 eval questions."
+  },
+
+  "llmops": {
+    "summary": "LLMOps at scale is running LLM features in production for many users without blowing the budget or the latency target. It covers model routing, caching, rate limits, fallbacks, guardrails, prompt versioning, and the gateway layer that ties it together.",
+    "why": "Once usage grows, LLM bills and tail latency become real business problems, and provider outages become your outages. Teams that route easy requests to small models, cache aggressively, and fail over gracefully often cut costs by half or more.",
+    "depth": "Master cost and latency levers (model choice, prompt caching, batching, output length), routing with fallbacks, and treating prompts as versioned, eval-gated artifacts. Learned routers and semantic caches are worth knowing about; apply them only after the basics are in place and measured.",
+    "hours": 25,
+    "outcomes": [
+      "You can break down cost per request and per user, and name the top three levers to reduce it.",
+      "You can put an LLM gateway in front of several providers with retries, fallbacks, and rate limiting.",
+      "You can route requests between a small and a large model and prove with evals that quality held.",
+      "You can use provider prompt caching and batch APIs to cut cost on suitable workloads.",
+      "You can version prompts and roll out a change behind an eval gate and a canary."
+    ],
+    "subtopics": [
+      {
+        "title": "Cost anatomy and budgeting",
+        "desc": "Cost is roughly input tokens times input price plus output tokens times output price, multiplied by calls per task. Agents and long contexts multiply this fast. Track cost per feature and per user, and set budgets and alerts.",
+        "level": "core",
+        "resources": [
+          { "title": "Building A Generative AI Platform", "url": "https://huyenchip.com/2024/07/25/genai-platform.html", "type": "article", "source": "Chip Huyen", "free": true }
+        ]
+      },
+      {
+        "title": "Latency engineering",
+        "desc": "Stream tokens, shorten outputs, run independent calls in parallel, pick smaller models for simple steps, and keep prompts stable so they cache. Measure p95, not just averages, since slow tails are what users notice.",
+        "level": "core",
+        "resources": [
+          { "title": "Latency optimization", "url": "https://developers.openai.com/api/docs/guides/latency-optimization", "type": "docs", "source": "OpenAI", "free": true },
+          { "title": "Reducing latency", "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-latency", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Caching and batch APIs",
+        "desc": "Provider prompt caching makes repeated prefixes (system prompts, documents, tool definitions) much cheaper and faster. Batch APIs process non-urgent jobs at a discount. Response caching helps when identical requests repeat.",
+        "level": "core",
+        "resources": [
+          { "title": "Prompt caching", "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "Batch API", "url": "https://developers.openai.com/api/docs/guides/batch", "type": "docs", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "Model routing and cascades",
+        "desc": "Send easy requests to a cheap model and hard ones to a strong model. A router can be rules, a classifier, or a cascade that escalates when the cheap model is unsure. Always validate routing with evals, not intuition.",
+        "level": "deep",
+        "resources": [
+          { "title": "RouteLLM: Learning to Route LLMs with Preference Data", "url": "https://arxiv.org/abs/2406.18665", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "FrugalGPT", "url": "https://arxiv.org/abs/2305.05176", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Gateways, rate limits, and fallbacks",
+        "desc": "An LLM gateway gives you one API over many providers, plus retries with backoff, fallbacks when a provider is down or rate-limited, per-team keys, and spend tracking. Know your provider's rate limit tiers before launch day.",
+        "level": "core",
+        "resources": [
+          { "title": "LiteLLM: Getting Started", "url": "https://docs.litellm.ai/docs/", "type": "tool", "source": "LiteLLM", "free": true },
+          { "title": "Rate limits", "url": "https://platform.claude.com/docs/en/api/rate-limits", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Prompt and model versioning",
+        "desc": "Treat prompts, model IDs, and tool definitions as versioned config. Every change runs through your eval suite, ships behind a flag or canary, and can be rolled back. Pin model versions so a provider update doesn't surprise you.",
+        "level": "core",
+        "resources": [
+          { "title": "Automated Testing for LLMOps", "url": "https://www.deeplearning.ai/courses/automated-testing-llmops", "type": "course", "source": "DeepLearning.AI", "free": true }
+        ]
+      },
+      {
+        "title": "Self-host vs API economics",
+        "desc": "APIs win at low or spiky volume. Self-hosting open models can win at high, steady volume or when data must stay in-house, but you pay for GPUs, engineers, and idle time. Run the numbers with real traffic before switching.",
+        "level": "optional",
+        "resources": [
+          { "title": "LLMOps (LLM Bootcamp)", "url": "https://fullstackdeeplearning.com/llm-bootcamp/spring-2023/llmops/", "type": "video", "source": "Full Stack Deep Learning", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Building A Generative AI Platform", "url": "https://huyenchip.com/2024/07/25/genai-platform.html", "type": "article", "source": "Chip Huyen", "free": true },
+      { "title": "What We've Learned From A Year of Building with LLMs", "url": "https://applied-llms.org/", "type": "article", "source": "Applied LLMs", "free": true },
+      { "title": "AI Engineering (Ch. 9 and 10)", "url": "https://www.oreilly.com/library/view/ai-engineering/9781098166298/", "type": "book", "source": "Chip Huyen / O'Reilly", "free": false },
+      { "title": "Prompt caching", "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Latency optimization", "url": "https://developers.openai.com/api/docs/guides/latency-optimization", "type": "docs", "source": "OpenAI", "free": true },
+      { "title": "LLMOps (LLM Bootcamp)", "url": "https://fullstackdeeplearning.com/llm-bootcamp/spring-2023/llmops/", "type": "video", "source": "Full Stack Deep Learning", "free": true },
+      { "title": "RouteLLM: Learning to Route LLMs with Preference Data", "url": "https://arxiv.org/abs/2406.18665", "type": "paper", "source": "arXiv", "free": true }
+    ],
+    "project": "Take an existing LLM app with tracing and evals. Put LiteLLM in front of it with a fallback provider. Add a simple router that sends short or simple requests to a small model, enable prompt caching on your system prompt, and move one offline job to a batch API. Report cost per request, p95 latency, and eval score before and after."
+  },
+
+  "distributed-training": {
+    "summary": "Distributed training spreads one training job across many GPUs, and often many machines, so you can train bigger models or train faster. It combines GPU performance basics with parallelism strategies like data, tensor, and pipeline parallelism, and sharded optimizers like ZeRO and FSDP.",
+    "why": "Any model beyond a few billion parameters cannot be trained or even fine-tuned fully on one GPU. Knowing how parallelism works lets you pick the right setup, avoid out-of-memory errors, and stop wasting expensive GPU hours.",
+    "depth": "Master why training runs out of memory (weights, gradients, optimizer state, activations), mixed precision, gradient accumulation and checkpointing, and running DDP and FSDP in PyTorch. Know how tensor, pipeline, and context parallelism work conceptually; implementing them from scratch is for people building training frameworks.",
+    "hours": 45,
+    "outcomes": [
+      "You can estimate how much GPU memory a training run needs and explain where it goes.",
+      "You can use mixed precision, gradient accumulation, and activation checkpointing to fit a larger model or batch.",
+      "You can launch a multi-GPU job with PyTorch DDP and FSDP (or Accelerate/DeepSpeed) and verify it scales.",
+      "You can explain data, tensor, pipeline, and sequence parallelism and when each one is used.",
+      "You can profile a training step and tell whether it is compute, memory, or communication bound."
+    ],
+    "subtopics": [
+      {
+        "title": "GPU fundamentals and performance",
+        "desc": "Learn what a GPU is good at, the difference between compute-bound and memory-bound work, why tensor cores need the right shapes and dtypes, and how to read a profiler trace.",
+        "level": "core",
+        "resources": [
+          { "title": "Making Deep Learning Go Brrrr From First Principles", "url": "https://horace.io/brrr_intro.html", "type": "article", "source": "Horace He", "free": true },
+          { "title": "GPU Glossary", "url": "https://modal.com/gpu-glossary", "type": "docs", "source": "Modal", "free": true }
+        ]
+      },
+      {
+        "title": "Memory budget and single-GPU tricks",
+        "desc": "Training memory is weights plus gradients plus optimizer state plus activations. Mixed precision (BF16), gradient accumulation, and activation checkpointing are the first tools to reach for before adding GPUs.",
+        "level": "core",
+        "resources": [
+          { "title": "Automatic Mixed Precision (torch.amp)", "url": "https://docs.pytorch.org/docs/stable/amp.html", "type": "docs", "source": "PyTorch", "free": true }
+        ]
+      },
+      {
+        "title": "Data parallelism with DDP",
+        "desc": "Every GPU holds a full copy of the model and processes a different slice of the batch, then gradients are averaged with an all-reduce. This is the simplest and most common way to scale.",
+        "level": "core",
+        "resources": [
+          { "title": "Getting Started with Distributed Data Parallel", "url": "https://docs.pytorch.org/tutorials/intermediate/ddp_tutorial.html", "type": "docs", "source": "PyTorch", "free": true },
+          { "title": "PyTorch Distributed Overview", "url": "https://docs.pytorch.org/tutorials/beginner/dist_overview.html", "type": "docs", "source": "PyTorch", "free": true }
+        ]
+      },
+      {
+        "title": "Sharding: ZeRO and FSDP",
+        "desc": "Instead of each GPU keeping a full copy of optimizer state, gradients, and weights, shard them across GPUs and gather pieces only when needed. This is how most teams fine-tune and train models that don't fit on one GPU.",
+        "level": "core",
+        "resources": [
+          { "title": "Getting Started with Fully Sharded Data Parallel (FSDP2)", "url": "https://docs.pytorch.org/tutorials/intermediate/FSDP_tutorial.html", "type": "docs", "source": "PyTorch", "free": true },
+          { "title": "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models", "url": "https://arxiv.org/abs/1910.02054", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Tensor, pipeline, and context parallelism",
+        "desc": "Tensor parallelism splits individual matrix multiplies across GPUs. Pipeline parallelism puts different layers on different GPUs. Context (sequence) parallelism splits long sequences. Large runs combine them all, which is called 3D or 4D parallelism.",
+        "level": "deep",
+        "resources": [
+          { "title": "Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism", "url": "https://arxiv.org/abs/1909.08053", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "How to Train Really Large Models on Many GPUs?", "url": "https://lilianweng.github.io/posts/2021-09-25-train-large/", "type": "article", "source": "Lilian Weng", "free": true }
+        ]
+      },
+      {
+        "title": "Communication and networking",
+        "desc": "Collectives like all-reduce, all-gather, and reduce-scatter move tensors between GPUs over NVLink inside a node and InfiniBand or Ethernet between nodes. At scale, communication overlap often decides whether adding GPUs helps.",
+        "level": "deep",
+        "resources": [
+          { "title": "NCCL overview", "url": "https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/overview.html", "type": "docs", "source": "NVIDIA", "free": true }
+        ]
+      },
+      {
+        "title": "Running real clusters",
+        "desc": "Large jobs need checkpointing so a crashed node doesn't lose days of work, schedulers like Slurm or Kubernetes, and monitoring for hardware failures and loss spikes. This is mostly operational know-how.",
+        "level": "optional",
+        "resources": [
+          { "title": "Machine Learning Engineering Open Book", "url": "https://github.com/stas00/ml-engineering", "type": "book", "source": "Stas Bekman", "free": true },
+          { "title": "torchtitan", "url": "https://github.com/pytorch/torchtitan", "type": "tool", "source": "PyTorch", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "The Ultra-Scale Playbook: Training LLMs on GPU Clusters", "url": "https://huggingface.co/spaces/nanotron/ultrascale-playbook", "type": "book", "source": "Hugging Face", "free": true },
+      { "title": "How To Scale Your Model", "url": "https://jax-ml.github.io/scaling-book/", "type": "book", "source": "Google DeepMind", "free": true },
+      { "title": "PyTorch Distributed Overview", "url": "https://docs.pytorch.org/tutorials/beginner/dist_overview.html", "type": "docs", "source": "PyTorch", "free": true },
+      { "title": "Making Deep Learning Go Brrrr From First Principles", "url": "https://horace.io/brrr_intro.html", "type": "article", "source": "Horace He", "free": true },
+      { "title": "Machine Learning Engineering Open Book", "url": "https://github.com/stas00/ml-engineering", "type": "book", "source": "Stas Bekman", "free": true },
+      { "title": "GPU MODE lectures", "url": "https://www.youtube.com/@GPUMODE", "type": "video", "source": "GPU MODE", "free": true },
+      { "title": "Zero Redundancy Optimizer (ZeRO) tutorial", "url": "https://www.deepspeed.ai/tutorials/zero/", "type": "docs", "source": "DeepSpeed", "free": true }
+    ],
+    "project": "Take a small GPT-style training script (such as nanoGPT) and run it on one GPU, then on 2 to 4 GPUs with DDP, then with FSDP. Add BF16 mixed precision and activation checkpointing. For each setup, record peak memory, tokens per second, and scaling efficiency, and use the PyTorch profiler to find where time goes in one training step."
+  }
+}

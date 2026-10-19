@@ -1,0 +1,1014 @@
+{
+  "llm-apis": {
+    "summary": "LLM APIs let your code send messages to a model like Claude, GPT, or Gemini over HTTP and get text back. SDKs are the official libraries (Python, TypeScript, and more) that wrap those calls so you don't have to build raw requests.",
+    "why": "Every LLM app, from a chatbot to an agent, is built on these calls. Once you can call a model from code, you can put AI inside any product, script, or pipeline instead of copy-pasting into a chat window.",
+    "depth": "Master the message format (system prompt, user and assistant turns), key parameters, streaming, error handling, and how tokens turn into cost. Just know that batch APIs, provider routers, and prompt caching exist until you need to cut cost or latency.",
+    "hours": 12,
+    "outcomes": [
+      "You can call at least two providers' APIs from code using their official SDKs and manage API keys safely.",
+      "You can build a multi-turn conversation by managing the message history yourself.",
+      "You can stream responses to a user interface and handle rate limits, timeouts, and retries.",
+      "You can estimate the token cost of a request and reduce it with prompt caching or a cheaper model."
+    ],
+    "subtopics": [
+      {
+        "title": "The Messages format",
+        "desc": "Most APIs take a list of messages with roles (system, user, assistant) and return the next assistant message. The API is stateless: you resend the whole conversation every turn.",
+        "level": "core",
+        "resources": [
+          { "title": "Messages API reference", "url": "https://platform.claude.com/docs/en/api/messages", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Parameters, models, and tokens",
+        "desc": "Pick a model tier (small and fast versus large and smart), set max output tokens, and understand temperature. Pricing is per input and output token, so long prompts and long answers both cost money.",
+        "level": "core",
+        "resources": [
+          { "title": "Models overview", "url": "https://platform.claude.com/docs/en/models/overview", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "Token counting", "url": "https://platform.claude.com/docs/en/build-with-claude/token-counting", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Streaming responses",
+        "desc": "Streaming sends the answer token by token using server-sent events, so users see text appear immediately instead of waiting for the full response.",
+        "level": "core",
+        "resources": [
+          { "title": "Streaming messages", "url": "https://platform.claude.com/docs/en/build-with-claude/streaming", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Errors, rate limits, and retries",
+        "desc": "APIs limit requests and tokens per minute and sometimes fail with overload errors. Production code retries with exponential backoff and sets timeouts.",
+        "level": "core",
+        "resources": [
+          { "title": "Rate limits", "url": "https://platform.claude.com/docs/en/api/rate-limits", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Prompt caching and batch processing",
+        "desc": "Prompt caching reuses a long, repeated prefix (like a big system prompt or document) at a fraction of the cost and latency. Batch APIs process large jobs asynchronously at roughly half the price.",
+        "level": "deep",
+        "resources": [
+          { "title": "Prompt caching", "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "Batch processing", "url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Multi-provider gateways",
+        "desc": "Libraries and services like LiteLLM, OpenRouter, and the Vercel AI SDK give you one interface over many providers, which makes switching or falling back between models easier.",
+        "level": "optional",
+        "resources": [
+          { "title": "LiteLLM docs", "url": "https://docs.litellm.ai/docs/", "type": "docs", "source": "LiteLLM", "free": true },
+          { "title": "AI SDK introduction", "url": "https://ai-sdk.dev/docs/introduction", "type": "docs", "source": "Vercel", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Get started with Claude", "url": "https://platform.claude.com/docs/en/get-started", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "OpenAI developer quickstart", "url": "https://developers.openai.com/api/docs/quickstart", "type": "docs", "source": "OpenAI", "free": true },
+      { "title": "Gemini API documentation", "url": "https://ai.google.dev/gemini-api/docs", "type": "docs", "source": "Google", "free": true },
+      { "title": "Claude Cookbooks", "url": "https://github.com/anthropics/claude-cookbooks", "type": "tool", "source": "Anthropic", "free": true },
+      { "title": "OpenAI Cookbook", "url": "https://developers.openai.com/cookbook", "type": "article", "source": "OpenAI", "free": true },
+      { "title": "Reducing latency", "url": "https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-latency", "type": "docs", "source": "Anthropic", "free": true }
+    ],
+    "project": "Build a command-line chat app that keeps conversation history, streams answers, retries on rate-limit errors, and prints the token count and cost of each turn. Then add a flag that switches between two providers."
+  },
+
+  "structured-outputs": {
+    "summary": "Structured outputs make a model return data in an exact shape, usually JSON matching a schema you define. Tool calling (also called function calling) lets the model ask your code to run a function, like a search or a database lookup, and then use the result.",
+    "why": "Real software needs predictable data, not free text. Structured outputs turn an LLM into a reliable extractor or classifier, and tool calling is the building block of every agent.",
+    "depth": "Master JSON Schema basics, defining tools with clear names and descriptions, and running the tool-call loop yourself. Just know how constrained decoding works under the hood; you rarely need to implement it.",
+    "hours": 10,
+    "outcomes": [
+      "You can define a schema (for example with Pydantic) and get validated, typed objects back from a model.",
+      "You can write tool definitions and run the full loop: model requests a tool, your code runs it, the result goes back to the model.",
+      "You can design tool names, descriptions, and parameters that a model uses correctly.",
+      "You can handle bad or missing outputs with validation and retries."
+    ],
+    "subtopics": [
+      {
+        "title": "JSON Schema and Pydantic",
+        "desc": "A schema describes the fields, types, and required keys you expect. In Python, Pydantic models are the usual way to define a schema and validate what comes back.",
+        "level": "core",
+        "resources": [
+          { "title": "Pydantic: get started", "url": "https://pydantic.dev/docs/validation/latest/get-started/", "type": "docs", "source": "Pydantic", "free": true }
+        ]
+      },
+      {
+        "title": "Native structured outputs",
+        "desc": "Major APIs now accept a schema and guarantee the response matches it. This replaces fragile tricks like 'respond only in JSON' and regex parsing.",
+        "level": "core",
+        "resources": [
+          { "title": "Structured outputs (Claude)", "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "Structured outputs (OpenAI)", "url": "https://developers.openai.com/api/docs/guides/structured-outputs", "type": "docs", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "The tool-calling loop",
+        "desc": "You describe tools; the model replies with a tool call (name plus arguments); your code executes it and sends back a tool result; the model continues. Parallel tool calls and multi-step loops follow the same pattern.",
+        "level": "core",
+        "resources": [
+          { "title": "Tool use overview", "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "Function calling", "url": "https://developers.openai.com/api/docs/guides/function-calling", "type": "docs", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "Designing good tools",
+        "desc": "Models pick and use tools based on names, descriptions, and parameter docs. Fewer, well-scoped tools with clear error messages and concise outputs work far better than many overlapping ones.",
+        "level": "deep",
+        "resources": [
+          { "title": "Writing effective tools for agents", "url": "https://www.anthropic.com/engineering/writing-tools-for-agents", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Extraction and classification patterns",
+        "desc": "Common uses: pulling fields from invoices or emails, tagging support tickets, routing requests. Libraries like Instructor add validation-driven retries on top of any provider.",
+        "level": "deep",
+        "resources": [
+          { "title": "Instructor", "url": "https://python.useinstructor.com/", "type": "tool", "source": "Instructor", "free": true }
+        ]
+      },
+      {
+        "title": "Constrained decoding",
+        "desc": "Under the hood, structured output works by masking out tokens that would break the grammar at each step. Open-source tools like Outlines do this for local models.",
+        "level": "optional",
+        "resources": [
+          { "title": "Outlines", "url": "https://github.com/dottxt-ai/outlines", "type": "tool", "source": "dottxt", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Tool use overview", "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Function-calling and Data Extraction with LLMs", "url": "https://www.deeplearning.ai/courses/function-calling-and-data-extraction-with-llms", "type": "course", "source": "DeepLearning.AI", "free": true },
+      { "title": "Structured outputs guide", "url": "https://developers.openai.com/api/docs/guides/structured-outputs", "type": "docs", "source": "OpenAI", "free": true },
+      { "title": "Writing effective tools for agents", "url": "https://www.anthropic.com/engineering/writing-tools-for-agents", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Gemini function calling", "url": "https://ai.google.dev/gemini-api/docs/function-calling", "type": "docs", "source": "Google", "free": true },
+      { "title": "Toolformer: Language Models Can Teach Themselves to Use Tools", "url": "https://arxiv.org/abs/2302.04761", "type": "paper", "source": "arXiv", "free": true }
+    ],
+    "project": "Build an email triage script: it extracts sender, intent, urgency, and requested action into a Pydantic model, then uses two tools (look up a customer by email, create a ticket) to act on the result. Log every tool call."
+  },
+
+  "rag-fundamentals": {
+    "summary": "Retrieval-augmented generation (RAG) means finding relevant pieces of your own documents and putting them into the model's prompt so it can answer from them. The classic pipeline is: split documents into chunks, embed them, store them, retrieve the closest chunks for a question, and generate an answer that cites them.",
+    "why": "Models don't know your company docs, recent events, or private data, and they make things up when they guess. RAG grounds answers in real sources, keeps knowledge up to date without retraining, and lets you show citations.",
+    "depth": "Master the full pipeline end to end, how embeddings and similarity search work, and how to tell whether a bad answer came from retrieval or generation. Just know that fancier techniques (reranking, hybrid search, GraphRAG) exist; they come in the next nodes once your basic pipeline works and you can measure it.",
+    "hours": 15,
+    "outcomes": [
+      "You can explain the RAG pipeline and when RAG beats fine-tuning or just using a long context window.",
+      "You can build a working RAG app over your own documents with embeddings, a vector store, and an LLM.",
+      "You can write a grounded prompt that makes the model cite sources and say 'I don't know' when the context lacks the answer.",
+      "You can debug a wrong answer by checking what was retrieved before blaming the model.",
+      "You can build a small test set of questions and measure retrieval hit rate."
+    ],
+    "subtopics": [
+      {
+        "title": "The RAG pipeline end to end",
+        "desc": "Indexing happens offline (load, chunk, embed, store). Querying happens live (embed the question, retrieve top-k chunks, build the prompt, generate). Knowing which stage broke is the core RAG skill.",
+        "level": "core",
+        "resources": [
+          { "title": "Retrieval-Augmented Generation (RAG)", "url": "https://www.pinecone.io/learn/retrieval-augmented-generation/", "type": "article", "source": "Pinecone", "free": true },
+          { "title": "Introduction to RAG", "url": "https://developers.llamaindex.ai/python/framework/understanding/rag/", "type": "docs", "source": "LlamaIndex", "free": true }
+        ]
+      },
+      {
+        "title": "Embeddings for retrieval",
+        "desc": "An embedding model turns text into a vector so that similar meanings land close together. Choice of embedding model (quality, languages, dimensions, cost) has a big effect on retrieval quality; the MTEB leaderboard compares them.",
+        "level": "core",
+        "resources": [
+          { "title": "Choosing an Embedding Model", "url": "https://www.pinecone.io/learn/series/rag/embedding-models-rundown/", "type": "article", "source": "Pinecone", "free": true },
+          { "title": "MTEB leaderboard", "url": "https://huggingface.co/spaces/mteb/leaderboard", "type": "tool", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Similarity search basics",
+        "desc": "Retrieval compares the query vector to stored vectors with cosine similarity or dot product and returns the top-k nearest. For a few thousand chunks a simple in-memory search is fine.",
+        "level": "core",
+        "resources": [
+          { "title": "What is Similarity Search?", "url": "https://www.pinecone.io/learn/what-is-similarity-search/", "type": "article", "source": "Pinecone", "free": true }
+        ]
+      },
+      {
+        "title": "Basic chunking",
+        "desc": "Documents are split into chunks small enough to be specific but large enough to keep meaning, often a few hundred tokens with some overlap. Start with a recursive splitter that respects paragraphs and headings.",
+        "level": "core",
+        "resources": [
+          { "title": "Chunking Strategies for LLM Applications", "url": "https://www.pinecone.io/learn/chunking-strategies/", "type": "article", "source": "Pinecone", "free": true }
+        ]
+      },
+      {
+        "title": "Grounded prompting and citations",
+        "desc": "Put retrieved chunks in clearly labeled blocks, tell the model to answer only from them, cite chunk IDs, and admit when the answer isn't there. This is where hallucination control mostly happens.",
+        "level": "core",
+        "resources": [
+          { "title": "Effective context engineering for AI agents", "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "RAG vs long context vs fine-tuning",
+        "desc": "If your knowledge fits in the context window, just include it (with prompt caching). Use RAG when the corpus is large or changes often. Fine-tuning changes style and behavior, not facts.",
+        "level": "deep",
+        "resources": [
+          { "title": "Lost in the Middle: How Language Models Use Long Contexts", "url": "https://arxiv.org/abs/2307.03172", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Context Rot", "url": "https://www.trychroma.com/research/context-rot", "type": "article", "source": "Chroma", "free": true }
+        ]
+      },
+      {
+        "title": "The original RAG paper",
+        "desc": "The 2020 paper from Facebook AI that named the technique, combining a retriever with a generator. Useful history; modern RAG is simpler and uses off-the-shelf LLMs.",
+        "level": "optional",
+        "resources": [
+          { "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks", "url": "https://arxiv.org/abs/2005.11401", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Retrieval Augmented Generation (RAG) course", "url": "https://www.deeplearning.ai/courses/retrieval-augmented-generation", "type": "course", "source": "DeepLearning.AI", "free": true },
+      { "title": "What is Retrieval-Augmented Generation (RAG)?", "url": "https://www.youtube.com/watch?v=T-D1OfcDW1M", "type": "video", "source": "IBM Technology", "free": true },
+      { "title": "Learn RAG From Scratch", "url": "https://www.youtube.com/watch?v=sVcwVQRHIc8", "type": "video", "source": "freeCodeCamp / LangChain", "free": true },
+      { "title": "Retrieval Augmented Generation series", "url": "https://www.pinecone.io/learn/series/rag/", "type": "article", "source": "Pinecone", "free": true },
+      { "title": "Embeddings", "url": "https://platform.claude.com/docs/en/build-with-claude/embeddings", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Advanced RAG on Hugging Face documentation using LangChain", "url": "https://huggingface.co/learn/cookbook/advanced_rag", "type": "interactive", "source": "Hugging Face", "free": true },
+      { "title": "Retrieval-Augmented Generation for Large Language Models: A Survey", "url": "https://arxiv.org/abs/2312.10997", "type": "paper", "source": "arXiv", "free": true }
+    ],
+    "project": "Build a 'chat with your docs' app over 20 to 50 real documents (your notes, a product manual, or a docs site). It must cite the chunks it used and refuse when the answer isn't present. Write 20 test questions with known source chunks and report how often the right chunk is in the top 5."
+  },
+
+  "vector-databases": {
+    "summary": "A vector database stores embeddings and finds the nearest ones to a query vector quickly, even across millions of items. It adds the things real apps need on top: metadata filters, updates, persistence, and scaling.",
+    "why": "Once your corpus grows past what fits in memory, or you need filtering by user, date, or permissions, a plain list of vectors stops working. Picking and tuning the right store affects speed, cost, and retrieval quality.",
+    "depth": "Master how approximate nearest neighbor (ANN) indexes trade recall for speed, metadata filtering, and the practical choice between pgvector, a dedicated vector DB, or a managed service. Just know how quantization and index internals (HNSW graphs, IVF, product quantization) work at a high level unless you operate at very large scale.",
+    "hours": 10,
+    "outcomes": [
+      "You can explain exact versus approximate nearest neighbor search and the recall/latency trade-off.",
+      "You can store, filter, update, and delete vectors with metadata in at least one vector database.",
+      "You can choose between pgvector, an open-source vector DB, and a managed service for a given project.",
+      "You can tune index parameters and measure their effect on recall and latency."
+    ],
+    "subtopics": [
+      {
+        "title": "What a vector database does",
+        "desc": "It stores vectors plus metadata, builds an index for fast similarity search, and supports create, update, delete, and filtered queries. A vector library like FAISS gives you only the index.",
+        "level": "core",
+        "resources": [
+          { "title": "What is a Vector Database & How Does it Work?", "url": "https://www.pinecone.io/learn/vector-database/", "type": "article", "source": "Pinecone", "free": true },
+          { "title": "What is a Vector Database?", "url": "https://qdrant.tech/articles/what-is-a-vector-database/", "type": "article", "source": "Qdrant", "free": true }
+        ]
+      },
+      {
+        "title": "ANN indexes: HNSW and friends",
+        "desc": "HNSW is a layered graph that lets search hop quickly toward the nearest neighbors; it is the default in most databases. IVF clusters vectors and searches only nearby clusters. Both trade a little recall for big speed gains.",
+        "level": "core",
+        "resources": [
+          { "title": "Hierarchical Navigable Small Worlds (HNSW)", "url": "https://www.pinecone.io/learn/series/faiss/hnsw/", "type": "article", "source": "Pinecone", "free": true },
+          { "title": "Vector indexing concepts", "url": "https://docs.weaviate.io/weaviate/concepts/vector-index", "type": "docs", "source": "Weaviate", "free": true }
+        ]
+      },
+      {
+        "title": "Metadata filtering and multi-tenancy",
+        "desc": "Real queries look like 'nearest chunks, but only from this customer's documents after 2025'. Filtering by metadata, and separating tenants, is often what decides which database fits.",
+        "level": "core"
+      },
+      {
+        "title": "Choosing a store",
+        "desc": "pgvector adds vector search to Postgres, which is often enough and keeps one database. Dedicated options include Qdrant, Weaviate, Chroma, LanceDB, Milvus, and managed Pinecone. Decide on scale, filtering needs, hybrid search support, and operations effort.",
+        "level": "core",
+        "resources": [
+          { "title": "pgvector", "url": "https://github.com/pgvector/pgvector", "type": "tool", "source": "GitHub", "free": true },
+          { "title": "Chroma docs", "url": "https://docs.trychroma.com/docs/overview/introduction", "type": "docs", "source": "Chroma", "free": true }
+        ]
+      },
+      {
+        "title": "Quantization and embedding size",
+        "desc": "Storing vectors as int8 or binary, or truncating Matryoshka embeddings to fewer dimensions, cuts memory and cost by 4x to 32x with small quality loss. Rescoring with full vectors recovers most of it.",
+        "level": "deep",
+        "resources": [
+          { "title": "Binary and Scalar Embedding Quantization", "url": "https://huggingface.co/blog/embedding-quantization", "type": "article", "source": "Hugging Face", "free": true },
+          { "title": "Introduction to Matryoshka Embedding Models", "url": "https://huggingface.co/blog/matryoshka", "type": "article", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Benchmarks and index internals",
+        "desc": "ANN-Benchmarks compares algorithms on recall versus queries per second. The HNSW paper and the FAISS library are the reference points if you want to go deep.",
+        "level": "optional",
+        "resources": [
+          { "title": "ANN-Benchmarks", "url": "https://ann-benchmarks.com/index.html", "type": "tool", "source": "ANN-Benchmarks", "free": true },
+          { "title": "HNSW paper", "url": "https://arxiv.org/abs/1603.09320", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Vector Databases in Production for Busy Engineers", "url": "https://www.pinecone.io/learn/series/vector-databases-in-production-for-busy-engineers/", "type": "article", "source": "Pinecone", "free": true },
+      { "title": "Faiss: The Missing Manual", "url": "https://www.pinecone.io/learn/series/faiss/", "type": "article", "source": "Pinecone", "free": true },
+      { "title": "Retrieval Optimization: Tokenization to Vector Quantization", "url": "https://www.deeplearning.ai/courses/retrieval-optimization-from-tokenization-to-vector-quantization", "type": "course", "source": "DeepLearning.AI", "free": true },
+      { "title": "Qdrant documentation", "url": "https://qdrant.tech/documentation/", "type": "docs", "source": "Qdrant", "free": true },
+      { "title": "pgvector", "url": "https://github.com/pgvector/pgvector", "type": "tool", "source": "GitHub", "free": true },
+      { "title": "Nearest Neighbor Indexes for Similarity Search", "url": "https://www.pinecone.io/learn/series/faiss/vector-indexes/", "type": "article", "source": "Pinecone", "free": true }
+    ],
+    "project": "Load the same 100k-chunk dataset into pgvector and one dedicated vector DB. Compare query latency, recall against exact search, and memory use at two HNSW settings, then add a metadata filter and see how results and speed change. Write up which you'd pick and why."
+  },
+
+  "chunking-retrieval": {
+    "summary": "This node is about getting the right chunks in front of the model. It covers how you split documents, how you combine keyword search (BM25) with vector search, and how a reranker re-scores the candidates so the best ones end up on top.",
+    "why": "Most RAG failures are retrieval failures: the answer was in the docs, but the right chunk never made it into the prompt. Better chunking, hybrid search, and reranking are the cheapest, biggest quality wins in most RAG systems.",
+    "depth": "Master chunking trade-offs, BM25 basics, hybrid search with rank fusion, two-stage retrieve-then-rerank, and measuring retrieval with recall@k and MRR. Just know that late-interaction models like ColBERT and late chunking exist; reach for them when the basics plateau.",
+    "hours": 15,
+    "outcomes": [
+      "You can choose and justify a chunking strategy for a given document type (prose, code, tables, PDFs).",
+      "You can explain how BM25 scores documents and why it catches exact terms that embeddings miss.",
+      "You can implement hybrid search with reciprocal rank fusion and add a cross-encoder reranker.",
+      "You can measure retrieval quality with recall@k, MRR, and nDCG on a labeled test set.",
+      "You can apply contextual retrieval to reduce failed retrievals."
+    ],
+    "subtopics": [
+      {
+        "title": "Chunking strategies",
+        "desc": "Fixed-size chunks with overlap are the baseline. Recursive and structure-aware splitting follows headings, paragraphs, and code blocks. Semantic chunking splits where the topic changes. Chunk size is a real trade-off: small chunks are precise, large chunks keep context.",
+        "level": "core",
+        "resources": [
+          { "title": "Chunking Strategies for LLM Applications", "url": "https://www.pinecone.io/learn/chunking-strategies/", "type": "article", "source": "Pinecone", "free": true },
+          { "title": "Evaluating Chunking Strategies for Retrieval", "url": "https://www.trychroma.com/research/evaluating-chunking", "type": "article", "source": "Chroma", "free": true }
+        ]
+      },
+      {
+        "title": "Keyword search and BM25",
+        "desc": "BM25 ranks documents by how often query terms appear, weighted by how rare those terms are, with a penalty for long documents. It is fast, needs no training, and excels at names, IDs, error codes, and jargon.",
+        "level": "core",
+        "resources": [
+          { "title": "Practical BM25: The BM25 Algorithm and its Variables", "url": "https://www.elastic.co/blog/practical-bm25-part-2-the-bm25-algorithm-and-its-variables", "type": "article", "source": "Elastic", "free": true }
+        ]
+      },
+      {
+        "title": "Hybrid search and rank fusion",
+        "desc": "Run BM25 (sparse) and vector (dense) search in parallel and merge the results, usually with reciprocal rank fusion (RRF) or a weighted score. Hybrid almost always beats either method alone.",
+        "level": "core",
+        "resources": [
+          { "title": "Hybrid Search Explained", "url": "https://weaviate.io/blog/hybrid-search-explained", "type": "article", "source": "Weaviate", "free": true },
+          { "title": "Hybrid Search in Qdrant", "url": "https://qdrant.tech/documentation/search-tuning/hybrid-search/", "type": "docs", "source": "Qdrant", "free": true }
+        ]
+      },
+      {
+        "title": "Reranking",
+        "desc": "Retrieve a wide set (say top 50) cheaply, then score each candidate against the query with a cross-encoder or rerank API and keep the top 5. Cross-encoders read query and document together, so they judge relevance far better than embedding distance.",
+        "level": "core",
+        "resources": [
+          { "title": "Rerankers and Two-Stage Retrieval", "url": "https://www.pinecone.io/learn/series/rag/rerankers/", "type": "article", "source": "Pinecone", "free": true },
+          { "title": "Retrieve & Re-Rank", "url": "https://www.sbert.net/examples/sentence_transformer/applications/retrieve_rerank/README.html", "type": "docs", "source": "Sentence Transformers", "free": true }
+        ]
+      },
+      {
+        "title": "Contextual retrieval",
+        "desc": "Before embedding, prepend a short LLM-written note to each chunk explaining where it sits in the document. Combined with contextual BM25 and reranking, Anthropic measured a 67% drop in failed retrievals.",
+        "level": "core",
+        "resources": [
+          { "title": "Introducing Contextual Retrieval", "url": "https://www.anthropic.com/engineering/contextual-retrieval", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Measuring retrieval",
+        "desc": "Build a set of questions with known relevant chunks and measure recall@k (was it found), MRR (how high), and nDCG (ranking quality). Tune chunking and search against these numbers, not vibes.",
+        "level": "deep",
+        "resources": [
+          { "title": "Evaluation Measures in Information Retrieval", "url": "https://www.pinecone.io/learn/offline-evaluation/", "type": "article", "source": "Pinecone", "free": true },
+          { "title": "BEIR benchmark", "url": "https://arxiv.org/abs/2104.08663", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Late interaction and late chunking",
+        "desc": "ColBERT keeps one vector per token and matches token by token for high-quality retrieval. Late chunking embeds the whole document first, then pools per chunk, so each chunk keeps document context.",
+        "level": "optional",
+        "resources": [
+          { "title": "ColBERT paper", "url": "https://arxiv.org/abs/2004.12832", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Late Chunking in Long-Context Embedding Models", "url": "https://jina.ai/news/late-chunking-in-long-context-embedding-models/", "type": "article", "source": "Jina AI", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Introducing Contextual Retrieval", "url": "https://www.anthropic.com/engineering/contextual-retrieval", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Rerankers and Two-Stage Retrieval", "url": "https://www.pinecone.io/learn/series/rag/rerankers/", "type": "article", "source": "Pinecone", "free": true },
+      { "title": "Chunking Strategies to Improve LLM RAG Pipeline Performance", "url": "https://weaviate.io/blog/chunking-strategies-for-rag", "type": "article", "source": "Weaviate", "free": true },
+      { "title": "What is hybrid search?", "url": "https://www.elastic.co/what-is/hybrid-search", "type": "article", "source": "Elastic", "free": true },
+      { "title": "Systematically Improving Your RAG", "url": "https://jxnl.co/writing/2024/05/22/systematically-improving-your-rag/", "type": "article", "source": "Jason Liu", "free": true },
+      { "title": "Cohere Rerank overview", "url": "https://docs.cohere.com/docs/rerank-overview", "type": "docs", "source": "Cohere", "free": true },
+      { "title": "Claude Cookbooks (includes contextual retrieval notebook)", "url": "https://github.com/anthropics/claude-cookbooks", "type": "tool", "source": "Anthropic", "free": true }
+    ],
+    "project": "Take your RAG app from the previous node and a 50-question labeled test set. Measure recall@5 and MRR for: vector only, BM25 only, hybrid with RRF, hybrid plus reranker, and hybrid plus reranker with contextual chunks. Chart the results and keep the best configuration."
+  },
+
+  "advanced-rag": {
+    "summary": "Advanced RAG covers the patterns that go beyond 'embed, retrieve top-k, answer': rewriting queries, routing between sources, retrieving over knowledge graphs, letting an agent decide when and what to search, and evaluating the whole system rigorously.",
+    "why": "Simple RAG breaks on vague questions, multi-hop questions ('compare X across these three reports'), questions about a whole corpus, and data that lives in many places. These patterns fix specific failure modes, and evaluation tells you which ones are worth their cost.",
+    "depth": "Master query rewriting, agentic RAG with search as a tool, and component-level evaluation (retrieval metrics plus faithfulness and answer relevance). Know GraphRAG, Self-RAG, and CRAG well enough to recognize when a problem calls for them; most production systems don't need all of them.",
+    "hours": 25,
+    "outcomes": [
+      "You can diagnose RAG failures and pick the pattern that fixes each (rewriting, routing, graph retrieval, agentic search).",
+      "You can implement query rewriting, decomposition, and HyDE and measure whether they help.",
+      "You can build an agentic RAG loop where the model calls search tools, judges results, and searches again.",
+      "You can explain when GraphRAG is worth its indexing cost and build a small version.",
+      "You can run an end-to-end RAG evaluation with retrieval metrics, faithfulness, and answer relevance, using LLM judges you've checked against human labels."
+    ],
+    "subtopics": [
+      {
+        "title": "Query rewriting and decomposition",
+        "desc": "Users ask vague or compound questions. An LLM can rewrite the query, expand it into several variants (multi-query), split it into sub-questions, or step back to a more general question before retrieval.",
+        "level": "core",
+        "resources": [
+          { "title": "Query Rewriting for Retrieval-Augmented Large Language Models", "url": "https://arxiv.org/abs/2305.14283", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Advanced RAG Techniques", "url": "https://www.pinecone.io/learn/advanced-rag-techniques/", "type": "article", "source": "Pinecone", "free": true }
+        ]
+      },
+      {
+        "title": "HyDE and query-side tricks",
+        "desc": "HyDE has the model write a hypothetical answer and embeds that instead of the question, because answers look more like documents than questions do. Useful when queries are short and documents are long.",
+        "level": "deep",
+        "resources": [
+          { "title": "Precise Zero-Shot Dense Retrieval without Relevance Labels (HyDE)", "url": "https://arxiv.org/abs/2212.10496", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Agentic RAG",
+        "desc": "Instead of a fixed pipeline, give an agent search tools (vector, keyword, SQL, web) and let it decide what to search, read the results, and search again until it has enough. This is now the default for complex questions and research assistants.",
+        "level": "core",
+        "resources": [
+          { "title": "Agentic Retrieval-Augmented Generation: A Survey on Agentic RAG", "url": "https://arxiv.org/abs/2501.09136", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "How we built our multi-agent research system", "url": "https://www.anthropic.com/engineering/multi-agent-research-system", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "GraphRAG and knowledge graphs",
+        "desc": "GraphRAG extracts entities and relationships into a graph, clusters them into communities, and summarizes each. It shines on 'global' questions about a whole corpus and on multi-hop links, but indexing is expensive.",
+        "level": "deep",
+        "resources": [
+          { "title": "From Local to Global: A Graph RAG Approach", "url": "https://arxiv.org/abs/2404.16130", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Microsoft GraphRAG docs", "url": "https://microsoft.github.io/graphrag/", "type": "docs", "source": "Microsoft", "free": true }
+        ]
+      },
+      {
+        "title": "Self-correcting RAG (Self-RAG, CRAG)",
+        "desc": "These patterns grade retrieved documents and draft answers, then re-retrieve, fall back to web search, or revise when quality is low. You can implement the core idea with a simple grader step in an agent loop.",
+        "level": "deep",
+        "resources": [
+          { "title": "Self-RAG", "url": "https://arxiv.org/abs/2310.11511", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Corrective Retrieval Augmented Generation", "url": "https://arxiv.org/abs/2401.15884", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "RAG evaluation",
+        "desc": "Evaluate retrieval (recall@k, MRR) and generation separately. Generation metrics include faithfulness (is every claim supported by the context), answer relevance, and context precision. Use LLM-as-judge tools like Ragas, but validate the judge against your own labels.",
+        "level": "core",
+        "resources": [
+          { "title": "Ragas: available metrics", "url": "https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/", "type": "docs", "source": "Ragas", "free": true },
+          { "title": "RAG Evaluation cookbook", "url": "https://huggingface.co/learn/cookbook/rag_evaluation", "type": "interactive", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Routing, multi-source, and structured data",
+        "desc": "Route questions to the right index or tool (docs, SQL database, API). Text-to-SQL, metadata extraction, and parent-child or small-to-big retrieval handle data that doesn't fit plain chunks.",
+        "level": "optional",
+        "resources": [
+          { "title": "Building Performant RAG Applications for Production", "url": "https://developers.llamaindex.ai/python/framework/optimizing/production_rag/", "type": "docs", "source": "LlamaIndex", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Retrieval-Augmented Generation for Large Language Models: A Survey", "url": "https://arxiv.org/abs/2312.10997", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Building Performant RAG Applications for Production", "url": "https://developers.llamaindex.ai/python/framework/optimizing/production_rag/", "type": "docs", "source": "LlamaIndex", "free": true },
+      { "title": "Knowledge Graphs for RAG", "url": "https://www.deeplearning.ai/courses/knowledge-graphs-rag", "type": "course", "source": "DeepLearning.AI", "free": true },
+      { "title": "Learn RAG From Scratch", "url": "https://www.youtube.com/watch?v=sVcwVQRHIc8", "type": "video", "source": "freeCodeCamp / LangChain", "free": true },
+      { "title": "RAG Evaluation: Don't let customers tell you first", "url": "https://www.pinecone.io/learn/series/rag/rag-evaluation/", "type": "article", "source": "Pinecone", "free": true },
+      { "title": "Ragas: Automated Evaluation of Retrieval Augmented Generation", "url": "https://arxiv.org/abs/2309.15217", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Evaluating (LlamaIndex)", "url": "https://developers.llamaindex.ai/python/framework/module_guides/evaluating/", "type": "docs", "source": "LlamaIndex", "free": true }
+    ],
+    "project": "Build a research assistant over a few hundred related documents (for example, a company's annual reports). Compare three versions on a 50-question test set that includes multi-hop and whole-corpus questions: tuned hybrid RAG, hybrid RAG with query decomposition, and an agentic RAG loop with search tools. Report retrieval recall, faithfulness, answer correctness, latency, and cost per question."
+  },
+
+  "no-code-automation": {
+    "summary": "No-code AI automation means wiring AI models into everyday workflows with visual tools like Zapier, Make, n8n, and Power Automate. A trigger (new email, form, or row) kicks off steps that call an AI model, then act on the result in other apps.",
+    "why": "Many of the highest-value AI wins are boring workflows: sorting inbound email, drafting replies, summarizing calls, enriching leads. No-code tools let non-engineers ship these in hours, and engineers use them to prototype fast.",
+    "depth": "Master triggers, actions, data mapping between steps, AI steps with structured outputs, branching, and error handling. Just know that these platforms now offer AI agents and MCP connections; use them once your plain workflows are reliable.",
+    "hours": 10,
+    "outcomes": [
+      "You can build a multi-step workflow with a trigger, an AI step, branching, and actions in other apps.",
+      "You can make an AI step return structured fields that later steps can use reliably.",
+      "You can add error handling, human approval steps, and logging so automations fail safely.",
+      "You can decide when a task needs a deterministic workflow, an AI agent, or custom code."
+    ],
+    "subtopics": [
+      {
+        "title": "Triggers, actions, and data mapping",
+        "desc": "Every automation starts with a trigger and passes data through actions. Learning to map fields between steps, and to test with real sample data, is most of the skill.",
+        "level": "core",
+        "resources": [
+          { "title": "Get started with Zapier", "url": "https://zapier.com/blog/get-started-with-zapier/", "type": "article", "source": "Zapier", "free": true },
+          { "title": "Build your first workflow", "url": "https://docs.n8n.io/build-your-first-workflow", "type": "docs", "source": "n8n", "free": true }
+        ]
+      },
+      {
+        "title": "AI steps that return structured data",
+        "desc": "Use AI steps to classify, extract, summarize, or draft. Ask for specific fields (category, priority, summary) instead of free text so routers and filters downstream can act on them.",
+        "level": "core",
+        "resources": [
+          { "title": "What is AI automation? A complete guide", "url": "https://zapier.com/blog/ai-automation/", "type": "article", "source": "Zapier", "free": true }
+        ]
+      },
+      {
+        "title": "Branching, loops, and error handling",
+        "desc": "Routers and filters send items down different paths. Error handlers, retries, and alerts stop silent failures. Add a human approval step before anything that sends email to customers or moves money.",
+        "level": "core",
+        "resources": [
+          { "title": "Make Help Center", "url": "https://help.make.com/", "type": "docs", "source": "Make", "free": true }
+        ]
+      },
+      {
+        "title": "Choosing a platform",
+        "desc": "Zapier is the easiest with the most app integrations. Make gives visual control over complex flows. n8n is open source, self-hostable, and strongest for AI and developer-style work. Power Automate fits Microsoft 365 shops.",
+        "level": "core",
+        "resources": [
+          { "title": "Power Automate documentation", "url": "https://learn.microsoft.com/en-us/power-automate/", "type": "docs", "source": "Microsoft", "free": true }
+        ]
+      },
+      {
+        "title": "AI agents inside automation tools",
+        "desc": "Zapier Agents, Make AI Agents, and n8n's AI Agent node let a model choose which actions to take toward a goal. More flexible than fixed workflows, but less predictable, so start narrow.",
+        "level": "deep",
+        "resources": [
+          { "title": "Make AI Agents", "url": "https://help.make.com/make-ai-agents", "type": "docs", "source": "Make", "free": true },
+          { "title": "Integrate AI (n8n)", "url": "https://docs.n8n.io/build/integrate-ai", "type": "docs", "source": "n8n", "free": true }
+        ]
+      },
+      {
+        "title": "MCP connections",
+        "desc": "Automation platforms can expose their app integrations to AI assistants over MCP, so Claude or ChatGPT can trigger actions across thousands of apps.",
+        "level": "optional",
+        "resources": [
+          { "title": "Zapier MCP", "url": "https://zapier.com/mcp", "type": "tool", "source": "Zapier", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "n8n: Integrate AI", "url": "https://docs.n8n.io/build/integrate-ai", "type": "docs", "source": "n8n", "free": true },
+      { "title": "Make Academy", "url": "https://academy.make.com/", "type": "course", "source": "Make", "free": true },
+      { "title": "Zapier's AI tools guide", "url": "https://zapier.com/blog/zapier-ai-guide/", "type": "article", "source": "Zapier", "free": true },
+      { "title": "n8n workflow templates", "url": "https://n8n.io/workflows/", "type": "tool", "source": "n8n", "free": true },
+      { "title": "AI examples (n8n)", "url": "https://docs.n8n.io/build/integrate-ai/ai-examples", "type": "docs", "source": "n8n", "free": true },
+      { "title": "Building effective agents", "url": "https://www.anthropic.com/engineering/building-effective-agents", "type": "article", "source": "Anthropic", "free": true }
+    ],
+    "project": "Build an inbox triage automation: when a new email or form submission arrives, an AI step extracts category, urgency, and a one-line summary; a router sends urgent items to Slack, logs everything to a spreadsheet, and drafts (but does not send) a reply for human review. Add an error alert path."
+  },
+
+  "agents-fundamentals": {
+    "summary": "An AI agent is an LLM that runs tools in a loop to reach a goal: it decides what to do, calls a tool, looks at the result, and repeats until done. Workflows, by contrast, follow code paths you define, with LLM calls at fixed steps.",
+    "why": "Agents handle open-ended tasks where you can't script every step in advance, like coding, research, or customer support with many systems. Knowing when not to use an agent matters just as much, since they cost more and fail in less predictable ways.",
+    "depth": "Master the agent loop, the difference between workflows and agents, the common workflow patterns, tool design, context management, guardrails, and how to evaluate an agent. Just know the research lineage (ReAct, Reflexion, Voyager) at a summary level.",
+    "hours": 20,
+    "outcomes": [
+      "You can explain the agent loop and decide whether a problem needs a simple prompt, a workflow, or an agent.",
+      "You can build a minimal agent from scratch with tool calling and a stopping condition, without a framework.",
+      "You can apply workflow patterns: prompt chaining, routing, parallelization, orchestrator-workers, and evaluator-optimizer.",
+      "You can manage an agent's context (what goes in, what gets summarized or dropped) over long runs.",
+      "You can add guardrails: tool permissions, human approval, step limits, and evals on full trajectories."
+    ],
+    "subtopics": [
+      {
+        "title": "The agent loop",
+        "desc": "Model reads context, picks an action (tool call or final answer), gets an observation, and loops. Everything else is detail: which tools, what context, and when to stop.",
+        "level": "core",
+        "resources": [
+          { "title": "Building effective agents", "url": "https://www.anthropic.com/engineering/building-effective-agents", "type": "article", "source": "Anthropic", "free": true },
+          { "title": "ReAct: Synergizing Reasoning and Acting", "url": "https://arxiv.org/abs/2210.03629", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Workflows vs agents",
+        "desc": "Start with the simplest thing that works. Prompt chaining, routing, parallelization, orchestrator-workers, and evaluator-optimizer are workflow patterns that solve most problems more reliably than a fully autonomous agent.",
+        "level": "core",
+        "resources": [
+          { "title": "Building effective agents", "url": "https://www.anthropic.com/engineering/building-effective-agents", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Tools and the agent-computer interface",
+        "desc": "Agents are only as good as their tools. Clear names, focused scope, helpful error messages, and token-efficient outputs make a large difference. Giving an agent a code-execution sandbox or bash is often the most general tool.",
+        "level": "core",
+        "resources": [
+          { "title": "Writing effective tools for agents", "url": "https://www.anthropic.com/engineering/writing-tools-for-agents", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Context engineering for agents",
+        "desc": "Agents fill their context window fast. Techniques include just-in-time retrieval, summarizing or compacting history, note-taking files, and sub-agents with fresh context. Skills package instructions the agent loads only when needed.",
+        "level": "core",
+        "resources": [
+          { "title": "Effective context engineering for AI agents", "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents", "type": "article", "source": "Anthropic", "free": true },
+          { "title": "Equipping agents for the real world with Agent Skills", "url": "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Planning, reflection, and memory",
+        "desc": "Agents can plan before acting, critique their own output, and keep memory across sessions. Reasoning models now do much of the planning internally, so explicit planning prompts matter less than they used to.",
+        "level": "deep",
+        "resources": [
+          { "title": "LLM Powered Autonomous Agents", "url": "https://lilianweng.github.io/posts/2023-06-23-agent/", "type": "article", "source": "Lilian Weng", "free": true },
+          { "title": "Agents", "url": "https://huyenchip.com/2025/01/07/agents.html", "type": "article", "source": "Chip Huyen", "free": true }
+        ]
+      },
+      {
+        "title": "Guardrails and evaluating agents",
+        "desc": "Limit tool permissions, require human approval for risky actions, cap steps and spend, and watch for prompt injection in tool results. Evaluate whole trajectories and final outcomes, not just single responses.",
+        "level": "deep",
+        "resources": [
+          { "title": "Demystifying evals for AI agents", "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents", "type": "article", "source": "Anthropic", "free": true },
+          { "title": "The lethal trifecta for AI agents", "url": "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/", "type": "article", "source": "Simon Willison", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Building effective agents", "url": "https://www.anthropic.com/engineering/building-effective-agents", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Agentic AI", "url": "https://www.deeplearning.ai/courses/agentic-ai", "type": "course", "source": "DeepLearning.AI", "free": true },
+      { "title": "Hugging Face Agents Course", "url": "https://huggingface.co/learn/agents-course/unit0/introduction", "type": "course", "source": "Hugging Face", "free": true },
+      { "title": "Effective context engineering for AI agents", "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Agents", "url": "https://huyenchip.com/2025/01/07/agents.html", "type": "article", "source": "Chip Huyen", "free": true },
+      { "title": "LLM Powered Autonomous Agents", "url": "https://lilianweng.github.io/posts/2023-06-23-agent/", "type": "article", "source": "Lilian Weng", "free": true },
+      { "title": "I think 'agent' may finally have a widely enough agreed upon definition", "url": "https://simonwillison.net/2025/Sep/18/agents/", "type": "article", "source": "Simon Willison", "free": true }
+    ],
+    "project": "Build an agent from scratch in under 200 lines, with no framework: it gets three tools (web or doc search, a Python sandbox or calculator, and a file writer), a step limit, and a cost cap. Give it a research task, log every step, then rewrite the same task as a fixed workflow and compare reliability and cost over 10 runs."
+  },
+
+  "mcp": {
+    "summary": "The Model Context Protocol (MCP) is an open standard for connecting AI applications to tools and data. An MCP server exposes tools, resources, and prompts once, and any MCP client (Claude, ChatGPT, IDEs, agent frameworks) can use them.",
+    "why": "Before MCP, every app needed custom integrations for every tool. MCP is now the common way to give assistants and agents access to files, databases, SaaS apps, and internal systems, so building and securing MCP servers is a core AI engineering skill.",
+    "depth": "Master the client-server architecture, the three server primitives (tools, resources, prompts), building a server with an official SDK, testing it with the Inspector, and the security basics. Just know the transport details, authorization flow internals, and the full spec until you ship a remote server.",
+    "hours": 10,
+    "outcomes": [
+      "You can explain MCP's hosts, clients, and servers and what tools, resources, and prompts are for.",
+      "You can build an MCP server in Python or TypeScript and connect it to Claude Desktop, Claude Code, or another client.",
+      "You can test and debug a server with the MCP Inspector.",
+      "You can identify MCP security risks (prompt injection via tool output, over-broad permissions, token handling) and mitigate them."
+    ],
+    "subtopics": [
+      {
+        "title": "Architecture: hosts, clients, servers",
+        "desc": "The host is the AI app, which runs one MCP client per server connection. Servers run locally (stdio) or remotely (streamable HTTP) and speak JSON-RPC.",
+        "level": "core",
+        "resources": [
+          { "title": "Architecture overview", "url": "https://modelcontextprotocol.io/docs/learn/architecture", "type": "docs", "source": "Model Context Protocol", "free": true }
+        ]
+      },
+      {
+        "title": "Tools, resources, and prompts",
+        "desc": "Tools are actions the model can call. Resources are data the app can read into context. Prompts are reusable templates the user can pick. Clients can also offer features back to servers, like sampling and elicitation.",
+        "level": "core",
+        "resources": [
+          { "title": "Understanding MCP servers", "url": "https://modelcontextprotocol.io/docs/learn/server-concepts", "type": "docs", "source": "Model Context Protocol", "free": true },
+          { "title": "Understanding MCP clients", "url": "https://modelcontextprotocol.io/docs/learn/client-concepts", "type": "docs", "source": "Model Context Protocol", "free": true }
+        ]
+      },
+      {
+        "title": "Building and testing a server",
+        "desc": "Official SDKs (Python, TypeScript, and others) and FastMCP make a basic server a few dozen lines. Test it with the MCP Inspector before connecting it to a client.",
+        "level": "core",
+        "resources": [
+          { "title": "Build an MCP server", "url": "https://modelcontextprotocol.io/docs/develop/build-server", "type": "docs", "source": "Model Context Protocol", "free": true },
+          { "title": "MCP Inspector", "url": "https://modelcontextprotocol.io/docs/tools/inspector", "type": "docs", "source": "Model Context Protocol", "free": true }
+        ]
+      },
+      {
+        "title": "Using MCP in clients and agents",
+        "desc": "Connect servers to Claude Desktop, Claude Code, IDEs, or your own agent. APIs can also call remote MCP servers directly, so your app doesn't need its own client.",
+        "level": "core",
+        "resources": [
+          { "title": "Connect Claude Code to tools via MCP", "url": "https://code.claude.com/docs/en/mcp", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "MCP connector (Claude API)", "url": "https://platform.claude.com/docs/en/agents-and-tools/mcp-connector", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Security and authorization",
+        "desc": "Remote servers use OAuth-based authorization. The bigger risk is the model itself: tool outputs can carry prompt injections, and combining private data, untrusted content, and outbound actions is dangerous. Only install servers you trust.",
+        "level": "deep",
+        "resources": [
+          { "title": "Understanding Authorization in MCP", "url": "https://modelcontextprotocol.io/docs/tutorials/security/authorization", "type": "docs", "source": "Model Context Protocol", "free": true },
+          { "title": "Simon Willison on MCP", "url": "https://simonwillison.net/tags/model-context-protocol/", "type": "article", "source": "Simon Willison", "free": true }
+        ]
+      },
+      {
+        "title": "Scaling to many tools",
+        "desc": "Loading hundreds of tool definitions wastes context. Patterns like tool search and letting the agent write code that calls MCP tools keep token use down.",
+        "level": "deep",
+        "resources": [
+          { "title": "Code execution with MCP", "url": "https://www.anthropic.com/engineering/code-execution-with-mcp", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Ecosystem and the registry",
+        "desc": "Thousands of servers exist for GitHub, databases, browsers, SaaS tools, and more. The official MCP Registry lists public servers.",
+        "level": "optional",
+        "resources": [
+          { "title": "The MCP Registry", "url": "https://modelcontextprotocol.io/registry/about", "type": "docs", "source": "Model Context Protocol", "free": true },
+          { "title": "Reference servers", "url": "https://github.com/modelcontextprotocol/servers", "type": "tool", "source": "GitHub", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "What is the Model Context Protocol?", "url": "https://modelcontextprotocol.io/docs/getting-started/intro", "type": "docs", "source": "Model Context Protocol", "free": true },
+      { "title": "MCP: Build Rich-Context AI Apps with Anthropic", "url": "https://www.deeplearning.ai/courses/mcp-build-rich-context-ai-apps-with-anthropic", "type": "course", "source": "DeepLearning.AI", "free": true },
+      { "title": "Introduction to Model Context Protocol", "url": "https://anthropic.skilljar.com/introduction-to-model-context-protocol", "type": "course", "source": "Anthropic Academy", "free": true },
+      { "title": "Introducing the Model Context Protocol", "url": "https://www.anthropic.com/news/model-context-protocol", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "MCP specification", "url": "https://modelcontextprotocol.io/specification/latest", "type": "docs", "source": "Model Context Protocol", "free": true },
+      { "title": "MCP Python SDK", "url": "https://github.com/modelcontextprotocol/python-sdk", "type": "tool", "source": "GitHub", "free": true },
+      { "title": "FastMCP", "url": "https://gofastmcp.com/", "type": "tool", "source": "FastMCP", "free": true }
+    ],
+    "project": "Build an MCP server for something you actually use (a notes folder, a SQLite database, or a work API) with at least two tools and one resource. Test it in the Inspector, connect it to Claude Desktop or Claude Code, and write down which tool descriptions you had to rewrite before the model used them correctly."
+  },
+
+  "agent-frameworks": {
+    "summary": "Agent frameworks and SDKs give you ready-made pieces for building agents: the tool loop, state, memory, handoffs between agents, tracing, and human-in-the-loop steps. Popular options include the Claude Agent SDK, OpenAI Agents SDK, LangGraph, Pydantic AI, Google ADK, CrewAI, and smolagents.",
+    "why": "Once you've built an agent by hand, a framework saves time on plumbing like retries, persistence, streaming, and observability. Picking the right one, or deciding you don't need one, affects how easy your agent is to debug and change.",
+    "depth": "Master one framework well enough to build, trace, and deploy an agent, and understand what it does under the hood. Just know the others' strengths so you can choose; avoid deep lock-in to abstractions you can't see through.",
+    "hours": 15,
+    "outcomes": [
+      "You can build and deploy an agent with tools, state, and tracing in at least one framework.",
+      "You can compare frameworks on control, abstraction level, provider lock-in, and observability.",
+      "You can add human-in-the-loop approval and persistent state to an agent.",
+      "You can explain what a framework is doing under the hood and drop down to raw API calls when needed."
+    ],
+    "subtopics": [
+      {
+        "title": "Framework or no framework",
+        "desc": "Many good agents are a few hundred lines of direct API calls. Frameworks help most when you need durable state, complex control flow, or built-in tracing. If you use one, make sure you understand the code underneath.",
+        "level": "core",
+        "resources": [
+          { "title": "Building effective agents", "url": "https://www.anthropic.com/engineering/building-effective-agents", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Vendor agent SDKs",
+        "desc": "The Claude Agent SDK gives you the same harness that powers Claude Code (file and bash tools, context compaction, subagents, MCP). The OpenAI Agents SDK offers agents, handoffs, guardrails, and tracing. Both are light and code-first.",
+        "level": "core",
+        "resources": [
+          { "title": "Agent SDK overview", "url": "https://code.claude.com/docs/en/agent-sdk/overview", "type": "docs", "source": "Anthropic", "free": true },
+          { "title": "OpenAI Agents SDK", "url": "https://openai.github.io/openai-agents-python/", "type": "docs", "source": "OpenAI", "free": true }
+        ]
+      },
+      {
+        "title": "Graph-based orchestration",
+        "desc": "LangGraph models an agent as a graph of nodes and edges with explicit state, checkpoints, and interrupts. Good for long-running, branching workflows that need persistence and human approval.",
+        "level": "core",
+        "resources": [
+          { "title": "LangGraph overview", "url": "https://docs.langchain.com/oss/python/langgraph/overview", "type": "docs", "source": "LangChain", "free": true },
+          { "title": "AI Agents in LangGraph", "url": "https://www.deeplearning.ai/courses/ai-agents-in-langgraph", "type": "course", "source": "DeepLearning.AI", "free": true }
+        ]
+      },
+      {
+        "title": "Type-safe and lightweight options",
+        "desc": "Pydantic AI brings typed inputs and outputs and dependency injection. smolagents is minimal and has agents write Python code as their actions. Google ADK targets multi-agent apps on Gemini and Vertex but works with other models.",
+        "level": "deep",
+        "resources": [
+          { "title": "Pydantic AI", "url": "https://pydantic.dev/docs/ai/overview/", "type": "docs", "source": "Pydantic", "free": true },
+          { "title": "smolagents", "url": "https://huggingface.co/docs/smolagents/index", "type": "docs", "source": "Hugging Face", "free": true }
+        ]
+      },
+      {
+        "title": "Tracing, state, and human-in-the-loop",
+        "desc": "Whatever you pick, you need traces of every step, a way to persist and resume state, and pause points for human approval. Check how each framework handles these before committing.",
+        "level": "deep"
+      },
+      {
+        "title": "Role-based frameworks",
+        "desc": "CrewAI and AutoGen frame agents as roles in a team that talk to each other. Quick to prototype, harder to control precisely.",
+        "level": "optional",
+        "resources": [
+          { "title": "CrewAI docs", "url": "https://docs.crewai.com/", "type": "docs", "source": "CrewAI", "free": true },
+          { "title": "AutoGen", "url": "https://microsoft.github.io/autogen/stable/", "type": "docs", "source": "Microsoft", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Building agents with the Claude Agent SDK", "url": "https://claude.com/resources/articles/building-agents-with-the-claude-agent-sdk", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Agent SDK overview", "url": "https://code.claude.com/docs/en/agent-sdk/overview", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "OpenAI Agents SDK", "url": "https://openai.github.io/openai-agents-python/", "type": "docs", "source": "OpenAI", "free": true },
+      { "title": "LangGraph overview", "url": "https://docs.langchain.com/oss/python/langgraph/overview", "type": "docs", "source": "LangChain", "free": true },
+      { "title": "Hugging Face Agents Course", "url": "https://huggingface.co/learn/agents-course/unit0/introduction", "type": "course", "source": "Hugging Face", "free": true },
+      { "title": "Agent Development Kit (ADK)", "url": "https://adk.dev/", "type": "docs", "source": "Google", "free": true },
+      { "title": "Claude Quickstarts", "url": "https://github.com/anthropics/claude-quickstarts", "type": "tool", "source": "Anthropic", "free": true }
+    ],
+    "project": "Rebuild your from-scratch agent in two frameworks (for example the Claude Agent SDK and LangGraph). Add a human approval step before any write action and persistent state so a run can resume after a crash. Compare lines of code, trace quality, and how easy each was to debug."
+  },
+
+  "multi-agent": {
+    "summary": "Multi-agent systems split work across several LLM agents, such as an orchestrator that delegates to specialized subagents running in parallel. Orchestration is how you coordinate them: who decides, how context is shared, and how results are combined.",
+    "why": "For broad tasks like deep research or large codebases, parallel subagents with fresh context windows can cover more ground and finish faster than one agent. They also use many more tokens and fail in new ways, so you need to know when they are worth it.",
+    "depth": "Master the orchestrator-worker pattern, context sharing and handoffs, and the known failure modes. Know agent-to-agent protocols like A2A and emergent 'society of agents' research exist, but most real systems use one lead agent with subagents.",
+    "hours": 15,
+    "outcomes": [
+      "You can decide when multiple agents beat a single agent, considering parallelism, context limits, and token cost.",
+      "You can build an orchestrator that spawns subagents with clear task briefs and merges their results.",
+      "You can design how context and state are shared or isolated between agents.",
+      "You can diagnose common multi-agent failures like duplicated work, lost context, and agents contradicting each other."
+    ],
+    "subtopics": [
+      {
+        "title": "Orchestrator and subagents",
+        "desc": "A lead agent plans, writes detailed briefs, spawns subagents in parallel, and synthesizes their findings. Each subagent works in its own context window, which acts as compression.",
+        "level": "core",
+        "resources": [
+          { "title": "How we built our multi-agent research system", "url": "https://www.anthropic.com/engineering/multi-agent-research-system", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "When not to go multi-agent",
+        "desc": "Multi-agent setups can use several times more tokens and lose shared context. Tasks with tightly linked decisions, like most coding, often work better with a single agent that has full context.",
+        "level": "core",
+        "resources": [
+          { "title": "Don't Build Multi-Agents", "url": "https://cognition.com/blog/dont-build-multi-agents", "type": "article", "source": "Cognition", "free": true }
+        ]
+      },
+      {
+        "title": "Handoffs and routing",
+        "desc": "In a handoff, one agent passes the conversation to a specialist (for example from triage to billing). Routing and handoffs are common in customer support systems.",
+        "level": "core",
+        "resources": [
+          { "title": "Handoffs", "url": "https://openai.github.io/openai-agents-python/handoffs/", "type": "docs", "source": "OpenAI", "free": true },
+          { "title": "Multi-agent (LangChain)", "url": "https://docs.langchain.com/oss/python/langchain/multi-agent", "type": "docs", "source": "LangChain", "free": true }
+        ]
+      },
+      {
+        "title": "Failure modes",
+        "desc": "Research catalogs failures such as poor task specs, agents ignoring each other, premature stopping, and weak verification. Most are design problems, fixable with better briefs and checks.",
+        "level": "deep",
+        "resources": [
+          { "title": "Why Do Multi-Agent LLM Systems Fail?", "url": "https://arxiv.org/abs/2503.13657", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Agent-to-agent protocols",
+        "desc": "A2A is an open protocol for agents built by different vendors to discover each other and exchange tasks. MCP connects agents to tools; A2A connects agents to agents.",
+        "level": "optional",
+        "resources": [
+          { "title": "A2A Protocol", "url": "https://a2a-protocol.org/latest/", "type": "docs", "source": "Linux Foundation", "free": true }
+        ]
+      },
+      {
+        "title": "Conversation-based multi-agent research",
+        "desc": "Frameworks like AutoGen explored agents that solve tasks by conversing. Good background for understanding the design space.",
+        "level": "optional",
+        "resources": [
+          { "title": "AutoGen paper", "url": "https://arxiv.org/abs/2308.08155", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "How we built our multi-agent research system", "url": "https://www.anthropic.com/engineering/multi-agent-research-system", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Don't Build Multi-Agents", "url": "https://cognition.com/blog/dont-build-multi-agents", "type": "article", "source": "Cognition", "free": true },
+      { "title": "Agent orchestration (OpenAI Agents SDK)", "url": "https://openai.github.io/openai-agents-python/multi_agent/", "type": "docs", "source": "OpenAI", "free": true },
+      { "title": "Multi AI Agent Systems with crewAI", "url": "https://www.deeplearning.ai/courses/multi-ai-agent-systems-with-crewai", "type": "course", "source": "DeepLearning.AI", "free": true },
+      { "title": "Why Do Multi-Agent LLM Systems Fail?", "url": "https://arxiv.org/abs/2503.13657", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Building effective agents", "url": "https://www.anthropic.com/engineering/building-effective-agents", "type": "article", "source": "Anthropic", "free": true }
+    ],
+    "project": "Build a research system with a lead agent that breaks a question into 3 to 5 sub-questions, runs subagents in parallel with search tools, and writes a cited report. Compare it to a single agent on 10 questions for quality, wall-clock time, and total tokens."
+  },
+
+  "computer-use": {
+    "summary": "Computer-use and browser agents operate software the way people do: they look at screenshots or page structure, then click, type, and scroll. Browser agents focus on websites; computer-use agents can drive a whole desktop.",
+    "why": "Lots of work lives in apps with no API, like legacy systems, web portals, and internal tools. These agents can automate those tasks, and they're the basis of products like Claude in Chrome and ChatGPT agent. They are also slower, costlier, and riskier than API-based tools.",
+    "depth": "Master how the screenshot-action loop works, when to prefer an API, MCP, or DOM-based browser automation instead, and how to sandbox these agents safely. Just know the benchmarks (OSWorld, WebArena) and how vision-based actions are trained.",
+    "hours": 12,
+    "outcomes": [
+      "You can explain the screenshot, reason, act loop and the trade-off between vision-based and DOM-based control.",
+      "You can run a computer-use agent safely in a sandboxed VM or container.",
+      "You can build a browser automation that combines an LLM with Playwright or a browser-agent library.",
+      "You can identify and reduce risks like prompt injection from web pages and unintended actions."
+    ],
+    "subtopics": [
+      {
+        "title": "How computer use works",
+        "desc": "The model gets a screenshot, decides on an action (move mouse, click at x,y, type), the harness performs it, and a new screenshot comes back. Counting pixels and reading screens accurately were the hard parts to train.",
+        "level": "core",
+        "resources": [
+          { "title": "Developing a computer use model", "url": "https://www.anthropic.com/news/developing-computer-use", "type": "article", "source": "Anthropic", "free": true },
+          { "title": "Computer use tool", "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool", "type": "docs", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Browser agents and DOM-based control",
+        "desc": "In a browser you can use the page's accessibility tree or DOM instead of pixels, which is faster and more reliable. Playwright, Playwright MCP, and browser-use are common building blocks.",
+        "level": "core",
+        "resources": [
+          { "title": "Playwright MCP", "url": "https://github.com/microsoft/playwright-mcp", "type": "tool", "source": "Microsoft", "free": true },
+          { "title": "browser-use", "url": "https://github.com/browser-use/browser-use", "type": "tool", "source": "GitHub", "free": true }
+        ]
+      },
+      {
+        "title": "Choosing the right interface",
+        "desc": "Prefer an API or MCP server if one exists, then DOM-based browser control, then pixel-level computer use. Each step down is more general but slower and more fragile.",
+        "level": "core"
+      },
+      {
+        "title": "Safety and sandboxing",
+        "desc": "Run agents in an isolated VM or container with limited accounts. Web pages can contain prompt injections, so require confirmation before purchases, sending messages, or changing settings.",
+        "level": "core",
+        "resources": [
+          { "title": "Piloting Claude in Chrome", "url": "https://claude.com/resources/articles/claude-for-chrome", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Benchmarks",
+        "desc": "OSWorld tests real desktop tasks across apps; WebArena tests realistic websites. Scores rose fast through 2025 and 2026, but long, multi-app tasks are still error-prone.",
+        "level": "deep",
+        "resources": [
+          { "title": "OSWorld", "url": "https://arxiv.org/abs/2404.07972", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "WebArena", "url": "https://webarena.dev/", "type": "tool", "source": "WebArena", "free": true }
+        ]
+      },
+      {
+        "title": "Hosted browser infrastructure",
+        "desc": "Services run headless browsers at scale with sessions, proxies, and recordings, so you don't have to manage browser fleets yourself.",
+        "level": "optional",
+        "resources": [
+          { "title": "Browserbase", "url": "https://www.browserbase.com/", "type": "tool", "source": "Browserbase", "free": false }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Computer use tool", "url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool", "type": "docs", "source": "Anthropic", "free": true },
+      { "title": "Claude Quickstarts (computer use demo)", "url": "https://github.com/anthropics/claude-quickstarts", "type": "tool", "source": "Anthropic", "free": true },
+      { "title": "Computer use (OpenAI)", "url": "https://developers.openai.com/api/docs/guides/tools-computer-use", "type": "docs", "source": "OpenAI", "free": true },
+      { "title": "Developing a computer use model", "url": "https://www.anthropic.com/news/developing-computer-use", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Playwright", "url": "https://playwright.dev/", "type": "tool", "source": "Microsoft", "free": true },
+      { "title": "OSWorld: Benchmarking Multimodal Agents", "url": "https://arxiv.org/abs/2404.07972", "type": "paper", "source": "arXiv", "free": true }
+    ],
+    "project": "In a Docker container or VM, build an agent that logs into a test web app, fills a multi-page form from data in a spreadsheet, and takes a screenshot of the confirmation. Implement it twice, once with pixel-based computer use and once with Playwright plus an LLM, and compare success rate, speed, and cost over 10 runs."
+  },
+
+  "autonomous-agents": {
+    "summary": "Long-horizon autonomous agents work on tasks that take hours or days with little human input, like building a feature end to end or running a small business process. The open problems are staying on track, managing memory across many context windows, recovering from errors, and knowing when to ask for help.",
+    "why": "The length of tasks agents can complete reliably has been doubling roughly every several months, which makes this one of the fastest-moving areas in AI. Understanding the limits, and how to measure them, matters for anyone building or betting on agents.",
+    "depth": "This is frontier territory. Read the key engineering posts, benchmarks, and papers, and run your own long experiments. Know the research directions (memory, self-improvement, verification, safety of autonomy); nobody has mastered them yet.",
+    "hours": 30,
+    "outcomes": [
+      "You can explain how long-horizon ability is measured (for example METR's task-length metric, SWE-bench) and the limits of those measures.",
+      "You can design a harness for multi-session work: progress files, checkpoints, tests, and context resets.",
+      "You can analyze why long runs fail (drift, compounding errors, reward hacking, giving up) from real transcripts.",
+      "You can discuss safety concerns of autonomy, such as oversight, permissions, and monitoring."
+    ],
+    "subtopics": [
+      {
+        "title": "Measuring task horizon",
+        "desc": "METR measures the length of tasks (in human-expert time) an agent can complete with 50% reliability; this has grown exponentially. SWE-bench and its successors test real software tasks.",
+        "level": "core",
+        "resources": [
+          { "title": "Measuring AI Ability to Complete Long Tasks", "url": "https://metr.org/blog/2025-03-19-measuring-ai-ability-to-complete-long-tasks/", "type": "article", "source": "METR", "free": true },
+          { "title": "SWE-bench", "url": "https://www.swebench.com/", "type": "tool", "source": "SWE-bench", "free": true }
+        ]
+      },
+      {
+        "title": "Harnesses for multi-session work",
+        "desc": "Agents that span many context windows need structure: an initializer that sets up the environment, a feature list, progress notes, git commits, and tests so each new session can pick up cleanly.",
+        "level": "core",
+        "resources": [
+          { "title": "Effective harnesses for long-running agents", "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Memory and context over long runs",
+        "desc": "Compaction, external memory files, and retrieval over past actions let agents keep going past one context window. Deciding what to remember and forget is still an open problem.",
+        "level": "core",
+        "resources": [
+          { "title": "Effective context engineering for AI agents", "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Self-improvement and skill libraries",
+        "desc": "Research agents like Voyager build a growing library of reusable skills; Reflexion learns from verbal feedback on failures. Modern agent skills and memory systems build on these ideas.",
+        "level": "deep",
+        "resources": [
+          { "title": "Voyager: An Open-Ended Embodied Agent", "url": "https://arxiv.org/abs/2305.16291", "type": "paper", "source": "arXiv", "free": true },
+          { "title": "Reflexion: Language Agents with Verbal Reinforcement Learning", "url": "https://arxiv.org/abs/2303.11366", "type": "paper", "source": "arXiv", "free": true }
+        ]
+      },
+      {
+        "title": "Real-world autonomy experiments",
+        "desc": "Experiments like Anthropic's Project Vend, where Claude ran a small shop, show how agents behave over weeks: creative, but prone to odd mistakes and being talked into bad deals.",
+        "level": "deep",
+        "resources": [
+          { "title": "Project Vend: Can Claude run a small shop?", "url": "https://www.anthropic.com/research/project-vend-1", "type": "article", "source": "Anthropic", "free": true }
+        ]
+      },
+      {
+        "title": "Oversight and safety of autonomy",
+        "desc": "More autonomy means less human checking. Open questions include scalable oversight, monitoring agent behavior, sandboxing, and preventing reward hacking or harmful side effects.",
+        "level": "deep",
+        "resources": [
+          { "title": "The lethal trifecta for AI agents", "url": "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/", "type": "article", "source": "Simon Willison", "free": true }
+        ]
+      }
+    ],
+    "resources": [
+      { "title": "Effective harnesses for long-running agents", "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Measuring AI Ability to Complete Long Software Tasks", "url": "https://arxiv.org/abs/2503.14499", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?", "url": "https://arxiv.org/abs/2310.06770", "type": "paper", "source": "arXiv", "free": true },
+      { "title": "Demystifying evals for AI agents", "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "Project Vend: Can Claude run a small shop?", "url": "https://www.anthropic.com/research/project-vend-1", "type": "article", "source": "Anthropic", "free": true },
+      { "title": "LLM Powered Autonomous Agents", "url": "https://lilianweng.github.io/posts/2023-06-23-agent/", "type": "article", "source": "Lilian Weng", "free": true }
+    ],
+    "project": "Give a coding agent a multi-day project (for example, a small web app with 30 listed features) using a harness with a feature list, progress file, and tests. Let it run across many sessions with minimal intervention, then analyze the transcripts: where it drifted, what it broke, and which harness changes helped most."
+  }
+}
